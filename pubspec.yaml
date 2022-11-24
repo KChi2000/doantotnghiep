@@ -47,6 +47,8 @@ dependencies:
   cloud_firestore: ^4.0.2
   shared_preferences: ^2.0.15
   simple_gradient_text: ^1.2.4
+  flutter_bloc: ^8.1.1
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:

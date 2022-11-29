@@ -1,3 +1,4 @@
+import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/main.dart';
 import 'package:doantotnghiep/screens/connectToFriend.dart';
@@ -5,6 +6,7 @@ import 'package:doantotnghiep/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/plugin_api.dart';
 
 import 'package:latlong2/latlong.dart';
@@ -22,14 +24,20 @@ class Tracking extends StatelessWidget {
         ),
         backgroundColor: Colors.yellow,
         actions: [
-          IconButton(onPressed: ()async{
-           await HelperFunctions.deleteLoggedUserUid();
-           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MyApp()));
-          }, icon: Icon(Icons.logout))
+          IconButton(
+              onPressed: () async {
+                await HelperFunctions.deleteLoggedUserUid().then((value) {
+                    //  context.read<CheckLoggedCubit>().checkUserIsLogged();
+                    print(value);
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => MyApp()));
+                });
+                
+              },
+              icon: Icon(Icons.logout))
         ],
       ),
-      body:
-       FlutterMap(
+      body: FlutterMap(
         options: MapOptions(
           center: LatLng(21.0117040, 105.8114780),
           zoom: 5,
@@ -99,10 +107,14 @@ class Tracking extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-         Navigator.push(context, MaterialPageRoute(builder: (context)=>ConnectToFriend()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ConnectToFriend()));
         },
         backgroundColor: Colors.yellow,
-        child: Icon(Icons.message,color: Colors.black,),
+        child: Icon(
+          Icons.message,
+          color: Colors.black,
+        ),
       ),
     );
   }

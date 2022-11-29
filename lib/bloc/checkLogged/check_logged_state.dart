@@ -6,7 +6,7 @@ part of 'check_logged_cubit.dart';
   CheckLoggedState(this.uid);
   @override
   // TODO: implement props
-  List<Object?> get props => [];
+  List<Object?> get props => [uid];
  }
 
 

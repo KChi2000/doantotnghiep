@@ -1,13 +1,26 @@
+import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
+import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
+import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
+import 'package:doantotnghiep/bloc/getInviteId/get_invite_id_cubit.dart';
+
+import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
+import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
 import 'package:doantotnghiep/screens/Tracking.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(
+    BlocProvider(
+      create: (context) => CheckLoggedCubit(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -18,7 +31,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var uidStored;
   @override
   void initState() {
     // TODO: implement initState
@@ -27,23 +39,47 @@ class _MyAppState extends State<MyApp> {
   }
 
   void checkUserLoggedIn() async {
-    uidStored = await HelperFunctions.getLoggedUserUid();
-    print(uidStored);
-    if (uidStored != null) {
-      setState(() {});
-    }
+    context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        useMaterial3: true,
-        primarySwatch: Colors.pink,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => CheckCodeCubit(),
+        ),
+        BlocProvider(
+          create: (context) => JoindStatusCubit(),
+        ),
+        BlocProvider(
+          create: (context) => JoinToGroupCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ShowBoxInviteIdCubit(),
+        ),
+         BlocProvider(
+          create: (context) => GetInviteIdCubit(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          useMaterial3: true,
+          primarySwatch: Colors.pink,
+        ),
+        home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
+          builder: (context, state) {
+            print('store id: ${state.uid}');
+
+            if (state.uid.isNotEmpty) {
+              return Tracking();
+            }
+            return Login();
+          },
+        ),
       ),
-      home: uidStored != null ? Tracking() : Login(),
     );
   }
 }

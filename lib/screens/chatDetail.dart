@@ -1,3 +1,4 @@
+import 'package:doantotnghiep/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -34,10 +35,30 @@ class chatDetail extends StatelessWidget {
           ],
         ),
         body: Container(
+          width: screenwidth,
+          height: screenheight,
           padding: EdgeInsets.all(10),
           child: Column(
             children: [
-              
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: 10,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: screenwidth * 0.3,
+                      height: 50,
+                      color: Colors.amber,
+                      margin: EdgeInsets.only(bottom: 30),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                width: screenwidth,
+                height: 50,
+                color: Colors.black,
+              )
             ],
           ),
         ));

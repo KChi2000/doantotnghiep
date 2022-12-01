@@ -1,11 +1,15 @@
 import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
+import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getInviteId/get_invite_id_cubit.dart';
 
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
+import 'package:doantotnghiep/bloc/login/login_cubit.dart';
+import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/model/UserInfo.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
 import 'package:doantotnghiep/screens/Tracking.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -46,6 +50,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+         BlocProvider(
+          create: (context) => RegisterCubit(),
+        ),
         BlocProvider(
           create: (context) => CheckCodeCubit(),
         ),
@@ -58,8 +65,14 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => ShowBoxInviteIdCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => GetInviteIdCubit(),
+        ),
+        BlocProvider(
+          create: (context) => LoginCubit(),
+        ),
+        BlocProvider(
+          create: (context) => GetChatMessageCubit(),
         ),
       ],
       child: MaterialApp(
@@ -72,7 +85,8 @@ class _MyAppState extends State<MyApp> {
         home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
           builder: (context, state) {
             print('store id: ${state.uid}');
-
+            print('store model name ${Userinfo.userSingleton.name}');
+            print('store model name ${Userinfo.userSingleton.uid}');
             if (state.uid.isNotEmpty) {
               return Tracking();
             }

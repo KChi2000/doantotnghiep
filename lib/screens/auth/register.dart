@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doantotnghiep/bloc/register/register_cubit.dart';
+import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/components/showSnackbar.dart';
 import 'package:doantotnghiep/components/textfield.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/main.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
 import 'package:doantotnghiep/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
@@ -26,39 +30,11 @@ class _RegisterState extends State<Register> {
   var passwordCon = TextEditingController();
 
   var fullnameCon = TextEditingController();
-  var uid;
-  bool isLoading = false;
-  late AuthService authService;
+
   final formKey = GlobalKey<FormState>();
   @override
   void initState() {
-    authService = AuthService(context:context);
     super.initState();
-  }
-
-  void register() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      await authService
-          .registerWithEmail(fullnameCon.text, emailCon.text, passwordCon.text)
-          .then((value) async {
-        if (value) {
-          await HelperFunctions.saveLoggedUserEmail(emailCon.text);
-          await HelperFunctions.saveLoggedUserName(fullnameCon.text);
-        } else {
-          showSnackbar(context, value.toString(), Colors.pink);
-          setState(() {
-            isLoading = false;
-          });
-        }
-      });
-    } catch (e) {
-      // setState(() {
-      //   isLoading = false;
-      // });
-    }
   }
 
   @override
@@ -142,20 +118,29 @@ class _RegisterState extends State<Register> {
                       constraints: BoxConstraints(minWidth: 100),
                       child: ElevatedButton(
                         onPressed: () async {
-                          print(emailCon.text);
-                          print(passwordCon.text);
                           if (formKey.currentState!.validate()) {
-                            register();
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MyApp()));
+                            context.read<RegisterCubit>().register(
+                                context,
+                                fullnameCon.text,
+                                emailCon.text,
+                                passwordCon.text);
                           }
                         },
-                        child: isLoading
-                            ? SizedBox(
+                        child: BlocBuilder<RegisterCubit, RegisterState>(
+                          builder: (context, state) {
+                            if (state is registerLoading) {
+                              return SizedBox(
                                 width: 25,
                                 height: 25,
                                 child: CircularProgressIndicator(),
-                              )
-                            : Text('Đăng kí'),
+                              );
+                            } 
+                            // if (state is registerLoaded) {
+                            //   navigateRempve(context, MyApp());
+                            // }
+                            return Text('Đăng kí');
+                          },
+                        ),
                       ),
                     ),
                     Row(

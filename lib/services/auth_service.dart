@@ -22,15 +22,35 @@ class AuthService {
 
       if (user != null) {
         await DatabaseService(uid: user.user!.uid)
-            .addUserData(fullName, email)
-            .then((value) => true);
+            .addUserData(fullName, email);  
         await HelperFunctions.saveLoggedUserUid(user.user!.uid);
-        setUserinfo(user.user!.uid, fullName, email);
-        print(userinfo.name);
+       Userinfo.userSingleton.uid = user.user!.uid;
+        return true;
       }
     } on FirebaseAuthException catch (e) {
-      showSnackbar(context, e.toString(), Colors.pink);
+       switch (e.code) {
+         case "email-already-in-use":
+          showSnackbar(context,
+              'Error: Email already in use. Please try another email!', Colors.pink);
+          break;
+           case "invalid-email":
+          showSnackbar(context,
+              'Enter a valid email!', Colors.pink);
+          break;
+        case "weak-password":
+          showSnackbar(context, 'Error: Password must longer than 6', Colors.pink);
+          break;
+        case "network-request-failed":
+          showSnackbar(context,
+              'No network connected!!', Colors.pink);
+          break;
+       
+        default:
+          showSnackbar(context, e.toString(), Colors.pink);
+      }
+       print(' sevice: ${e.code}');
       return e;
+     
     }
   }
 
@@ -38,17 +58,38 @@ class AuthService {
     try {
       var user = await firebaseAuth.signInWithEmailAndPassword(
           email: email, password: pass);
-         
-          return true;
+
+      return true;
     } on FirebaseAuthException catch (e) {
-      showSnackbar(context, e.toString(), Colors.pink);
+      switch (e.code) {
+        case "wrong-password":
+          showSnackbar(context, 'Error: Wrong password!', Colors.pink);
+          break;
+        case "user-not-found":
+          showSnackbar(context,
+              'Error: User doesn\'t exists. Try another Account!', Colors.pink);
+          break;
+        case "invalid-email":
+          showSnackbar(context,
+              'Enter a valid email!', Colors.pink);
+          break;
+          case "too-many-requests":
+          showSnackbar(context,
+              'Too many requests at the same time. Pls try it after 1 minutes!', Colors.pink);
+          break;
+         
+            case "network-request-failed":
+          showSnackbar(context,
+              'No network connected!!', Colors.pink);
+          break;
+        default:
+          showSnackbar(context, e.toString(), Colors.pink);
+      }
+
+      print(e.code);
       return e;
     }
   }
 
-  void setUserinfo(String id, String name, String email) {
-    userinfo.uid = id;
-    userinfo.name = name;
-    userinfo.email = email;
-  }
+  
 }

@@ -32,9 +32,11 @@ class DatabaseService {
     var snapshot = await userCollection.doc(uid).snapshots();
     return snapshot;
   }
-Future<QuerySnapshot<Object?>> getInvitedId(String groupId){
-   return groupCollection.where('groupsId',isEqualTo: groupId).get();
-}
+
+  Future<QuerySnapshot<Object?>> getInvitedId(String groupId) {
+    return groupCollection.where('groupId', isEqualTo: groupId).get();
+  }
+
   Future<QuerySnapshot<Object?>> getGroups(String invitedId) async {
     return groupCollection.where('inviteId', isEqualTo: invitedId).get();
   }
@@ -45,7 +47,7 @@ Future<QuerySnapshot<Object?>> getInvitedId(String groupId){
     var listgroup = await docsnapshot['groups'];
     print(listgroup);
     listgroup.forEach((element) {
-      if (groupid.contains(element['groupsId'])) {
+      if (groupid.contains(element['groupId'])) {
         joined = true;
       } else {
         joined = false;
@@ -61,7 +63,7 @@ Future<QuerySnapshot<Object?>> getInvitedId(String groupId){
     if (joined) {
       await userDoc.update({
         'groups': FieldValue.arrayRemove([
-          {'groupsId': groupid, 'GroupName': groupname}
+          {'groupId': groupid, 'GroupName': groupname}
         ])
       });
       await groupDoc.update({
@@ -73,7 +75,7 @@ Future<QuerySnapshot<Object?>> getInvitedId(String groupId){
       print('vao else');
       await userDoc.update({
         'groups': FieldValue.arrayUnion([
-          {'groupsId': groupid, 'GroupName': groupname}
+          {'groupId': groupid, 'GroupName': groupname}
         ])
       });
       await groupDoc.update({
@@ -92,7 +94,7 @@ Future<QuerySnapshot<Object?>> getInvitedId(String groupId){
         'groupPic': '',
         'admin': {'adminId': adminId, 'adminName': adminName},
         'members': [],
-        'groupsId': '',
+        'groupId': '',
         'inviteId': invitedId,
         'recentMessage': '',
         'recentMessageSender': ''
@@ -101,16 +103,28 @@ Future<QuerySnapshot<Object?>> getInvitedId(String groupId){
         'members': FieldValue.arrayUnion([
           {'Id': adminId, 'Name': adminName}
         ]),
-        'groupsId': documentRef.id
+        'groupId': documentRef.id
       });
       return await userCollection.doc(uid).update({
         'groups': FieldValue.arrayUnion([
-          {'groupsId': documentRef.id, 'GroupName': groupname}
+          {'groupId': documentRef.id, 'GroupName': groupname}
         ])
       });
     } on FirebaseException catch (e) {
       // showSnackbar(context, message, color)
       print(e);
     }
+  }
+  sendMessage(String groupId, Map<String,dynamic> data){
+    groupCollection.doc(groupId).collection('Messages').add(data);
+    groupCollection.doc(groupId).update({
+      'recentMessage':data['contentMessage'],
+      'recentMessageSender':data['sender'],
+      'time':data['time']
+    });
+  }
+ Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId){
+   return groupCollection.doc(groupId).collection('Messages').orderBy('time').snapshots();
+    
   }
 }

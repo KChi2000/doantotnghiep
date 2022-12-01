@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doantotnghiep/bloc/login/login_cubit.dart';
+import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/components/textfield.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
@@ -8,6 +10,7 @@ import 'package:doantotnghiep/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 import '../../services/database_service.dart';
@@ -23,33 +26,9 @@ class _LoginState extends State<Login> {
   var emailCon = TextEditingController();
 
   var passwordCon = TextEditingController();
-  bool loading = false;
-  late AuthService authService;
-  bool success = false;
-  void LogIn() async {
-    setState(() {
-      loading = true;
-    });
-    authService.LoginWithEmail(emailCon.text, passwordCon.text)
-        .then((value) async {
-      if (value == true) {
-        QuerySnapshot snapshot =
-            await DatabaseService().getUserData(emailCon.text.trim());
-        await HelperFunctions.saveLoggedUserUid(snapshot.docs[0]['uid']);
-        await HelperFunctions.saveLoggedUserEmail(snapshot.docs[0]['email']);
-        await HelperFunctions.saveLoggedUserName(snapshot.docs[0]['fullName']);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MyApp()));
-      }
-      setState(() {
-        loading = false;
-      });
-    });
-  }
 
   @override
   void initState() {
-    authService = AuthService(context: context);
     super.initState();
   }
 
@@ -118,17 +97,23 @@ class _LoginState extends State<Login> {
                   ),
                   Container(
                     constraints: BoxConstraints(minWidth: 100),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          LogIn();
-                        },
-                        child: loading
-                            ? SizedBox(
-                                width: 25,
-                                height: 25,
-                                child: CircularProgressIndicator(),
-                              )
-                            : Text('Đăng nhập')),
+                    child: ElevatedButton(onPressed: () {
+                      context
+                          .read<LoginCubit>()
+                          .login(context, emailCon.text, passwordCon.text);
+                    }, child: BlocBuilder<LoginCubit, LoginState>(
+                      builder: (context, state) {
+                        if (state is LoginLoading) {
+                          return SizedBox(
+                            width: 25,
+                            height: 25,
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                    
+                        return Text('Đăng nhập');
+                      },
+                    )),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

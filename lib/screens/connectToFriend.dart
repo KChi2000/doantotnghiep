@@ -5,6 +5,7 @@ import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/model/UserInfo.dart';
 import 'package:doantotnghiep/screens/SearchAndJoined.dart';
 import 'package:doantotnghiep/screens/chatDetail.dart';
 import 'package:doantotnghiep/services/database_service.dart';
@@ -28,7 +29,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
   var formkey = GlobalKey<FormState>();
   Stream? group = null;
   loadGroups() async {
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser?.uid)
+    await DatabaseService(uid: Userinfo.userSingleton.uid)
         .getUserGroups()
         .then((value) {
       setState(() {
@@ -175,126 +176,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Row(
-              //   children: [
-              //     SizedBox(
-              //       width: 10,
-              //     ),
-              //     CircleAvatar(
-              //       minRadius: 40,
-              //       child: Container(),
-              //     ),
-              //     SizedBox(
-              //       width: 10,
-              //     ),
-              //     Text(
-              //       'Message',
-              //       style: TextStyle(fontSize: 40),
-              //     ),
-              //     // buttonicon(
-              //     //   icon: Icons.camera_alt,
-              //     //   click: () {},
-              //     // ),
-              //     Spacer(),
-              //     buttonicon(
-              //       icon: Icons.group_add_rounded,
-              //       click: () {
-              //         String invitedId = getRandomString(6);
-              //         groupNameCon.clear();
-              //         showDialog(
-              //             context: context,
-              //             builder: (context) {
-              //               return AlertDialog(
-              //                 title: Text('Create group'),
-              //                 content: Column(
-              //                   mainAxisSize: MainAxisSize.min,
-              //                   children: [
-              //                     Form(
-              //                       key: formkey,
-              //                       child: TextFormField(
-              //                         controller: groupNameCon,
-              //                         decoration: InputDecoration(
-              //                             hintText: 'group\'s name',
-              //                             isDense: true,
-              //                             border: OutlineInputBorder()),
-              //                         validator: (value) {
-              //                           if (groupNameCon.text.isEmpty ||
-              //                               groupNameCon.text.length == 0) {
-              //                             return 'Tên nhóm không được để trống';
-              //                           }
-              //                           return null;
-              //                         },
-              //                         autovalidateMode:
-              //                             AutovalidateMode.onUserInteraction,
-              //                       ),
-              //                     ),
-              //                     SizedBox(
-              //                       height: 5,
-              //                     ),
-              //                     Text(
-              //                         'Copy mã bên dưới để mời bạn bè tham gia vào nhóm'),
-              //                     Container(
-              //                       height: 40,
-              //                       width: 300,
-              //                       padding: EdgeInsets.only(left: 10),
-              //                       color: Colors.grey.withOpacity(0.3),
-              //                       child: Row(
-              //                         mainAxisSize: MainAxisSize.min,
-              //                         mainAxisAlignment:
-              //                             MainAxisAlignment.spaceBetween,
-              //                         children: [
-              //                           Text(
-              //                             invitedId,
-              //                             style: TextStyle(
-              //                                 fontSize: 16,
-              //                                 color: Colors.black87),
-              //                           ),
-              //                           IconButton(
-              //                               onPressed: () {},
-              //                               icon: Icon(
-              //                                 Icons.copy,
-              //                                 color: Colors.black87,
-              //                               ))
-              //                         ],
-              //                       ),
-              //                     )
-              //                   ],
-              //                 ),
-              //                 actions: [
-              //                   TextButton(
-              //                       onPressed: () {
-              //                         Navigator.pop(context);
-              //                       },
-              //                       child: Text('Cancel')),
-              //                   TextButton(
-              //                       onPressed: () async {
-              //                         if (formkey.currentState!.validate()) {
-              //                           String? username = await HelperFunctions
-              //                               .getLoggedUserName();
-              //                           await DatabaseService(
-              //                             uid: FirebaseAuth
-              //                                 .instance.currentUser!.uid,
-              //                           ).CreateGroup(
-              //                               groupNameCon.text,
-              //                               FirebaseAuth
-              //                                   .instance.currentUser!.uid,
-              //                               username!,
-              //                               invitedId);
-              //                           print('create group thanh cong');
-              //                           Navigator.pop(context);
-              //                         }
-              //                       },
-              //                       child: Text('Create'))
-              //                 ],
-              //               );
-              //             });
-              //       },
-              //     ),
-              //     SizedBox(
-              //       width: 15,
-              //     ),
-              //   ],
-              // ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -340,12 +221,17 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 itemBuilder: (context, index) {
                                   context.read<GetInviteIdCubit>().getInviteid(
                                       snapshot.data['groups'][index]
-                                          ['groupsId']);
+                                          ['groupId']);
+                                          print(snapshot.data['groups'][index]
+                                          ['recentMessageSender']);
                                   return messagerow(
                                       snapshot.data['groups'][index]
                                           ['GroupName'],
+                                      snapshot.data['groups'][index]['groupId'],
                                       snapshot.data['groups'][index]
-                                          ['groupsId']);
+                                          ['recentMessageSender'],
+                                      snapshot.data['groups'][index]
+                                          ['recentMessage']);
                                 },
                               );
                             }
@@ -371,13 +257,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
-  Widget messagerow(String groupname, String grId) {
+  Widget messagerow(String groupname, String grId, String recentsendername,
+      String recentsenderMessage) {
     return GestureDetector(
       onTap: () {
-        navigatePush(
-            context,
-            chatDetail(
-                groupId: '', groupName: groupname, userId: '', userName: ''));
+        navigatePush(context, chatDetail(groupId: grId, groupName: groupname));
       },
       onLongPress: () {
         print('nhả ra mau');
@@ -412,11 +296,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                     RichText(
                         text: TextSpan(children: [
                       TextSpan(
-                        text: 'You:',
+                        text: recentsendername.substring(0,recentsendername.length-29),
                         style: TextStyle(color: Colors.black87, fontSize: 14),
                       ),
                       TextSpan(
-                        text: 'How are u doin\'?',
+                        text: recentsenderMessage,
                         style: TextStyle(color: Colors.black87, fontSize: 14),
                       ),
                       TextSpan(

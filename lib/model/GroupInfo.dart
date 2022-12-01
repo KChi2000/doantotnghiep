@@ -3,7 +3,7 @@ class GroupInfo {
   String? inviteId;
   List<Members>? members;
   Admin? admin;
-  String? groupsId;
+  String? groupId;
   String? groupPic;
   String? recentMessage;
   String? groupName;
@@ -13,7 +13,7 @@ class GroupInfo {
       this.inviteId,
       this.members,
       this.admin,
-      this.groupsId,
+      this.groupId,
       this.groupPic,
       this.recentMessage,
       this.groupName});
@@ -28,7 +28,7 @@ class GroupInfo {
       });
     }
     admin = json['admin'] != null ? new Admin.fromJson(json['admin']) : null;
-    groupsId = json['groupsId'];
+    groupId = json['groupId'];
     groupPic = json['groupPic'];
     recentMessage = json['recentMessage'];
     groupName = json['GroupName'];
@@ -44,7 +44,7 @@ class GroupInfo {
     if (this.admin != null) {
       data['admin'] = this.admin!.toJson();
     }
-    data['groupsId'] = this.groupsId;
+    data['groupId'] = this.groupId;
     data['groupPic'] = this.groupPic;
     data['recentMessage'] = this.recentMessage;
     data['GroupName'] = this.groupName;

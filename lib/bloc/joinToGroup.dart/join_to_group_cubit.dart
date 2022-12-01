@@ -16,6 +16,7 @@ class JoinToGroupCubit extends Cubit<JoinToGroupState> {
 
       GroupInfo groupdata =
           GroupInfo.fromJson(data.docs[0].data() as Map<String, dynamic>);
+          print('bloc groupID: ${groupdata.groupId}');
       emit(LoadedGroup(groupdata));
     } catch (e) {
       emit(ErrorState());

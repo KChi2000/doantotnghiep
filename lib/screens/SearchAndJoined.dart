@@ -6,6 +6,7 @@ import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/GroupInfo.dart';
+import 'package:doantotnghiep/model/UserInfo.dart';
 import 'package:doantotnghiep/screens/chatDetail.dart';
 import 'package:doantotnghiep/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -84,7 +85,7 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                   if (state is LoadedGroup) {
                     context
                         .read<JoindStatusCubit>()
-                        .setJoinStatus(state.data.groupsId.toString());
+                        .setJoinStatus(state.data.groupId.toString());
                     print('adminnnn   ${state.data.admin!.adminName}');
                     return grouprow(state.data);
                   } else if (state is LoadingGroup) {
@@ -118,8 +119,7 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
             chatDetail(
                 groupId: '',
                 groupName: group.groupName.toString(),
-                userId: '',
-                userName: ''));
+               ));
       },
       onLongPress: () {
         print('nhả ra mau');
@@ -167,14 +167,15 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
               builder: (context, state) {
                 return TextButton(
                     onPressed: () async {
+                      print(group.groupId);
                       await DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                          .JoinToGroup(state.joined, group.groupsId.toString(),
+                              uid:  Userinfo.userSingleton.uid)
+                          .JoinToGroup(state.joined, group.groupId.toString(),
                               group.groupName.toString());
-
+                      
                       context
                           .read<JoindStatusCubit>()
-                          .setJoinStatus(group.groupsId.toString());
+                          .setJoinStatus(group.groupId.toString());
                       context.read<JoinToGroupCubit>().updateData(codeCon.text);
                     },
                     child: state.joined

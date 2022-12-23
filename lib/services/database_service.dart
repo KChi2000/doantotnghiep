@@ -28,15 +28,18 @@ class DatabaseService {
     return result;
   }
 
-  getUserGroups() async {
-    var snapshot = await userCollection.doc(uid).snapshots();
+ Future<DocumentSnapshot<Object?>> getUserGroups() async {
+    var snapshot =  userCollection.doc(uid).get();
     return snapshot;
   }
 
-  Future<QuerySnapshot<Object?>> getInvitedId(String groupId) {
-    return groupCollection.where('groupId', isEqualTo: groupId).get();
+  getInvitedId(String groupId) {
+    return groupCollection.where('groupId', isEqualTo: groupId).snapshots();
   }
-
+Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
+    return groupCollection.where('members', arrayContainsAny: [{'Id':uid,
+    'Name':name}]).snapshots();
+  }
   Future<QuerySnapshot<Object?>> getGroups(String invitedId) async {
     return groupCollection.where('inviteId', isEqualTo: invitedId).get();
   }
@@ -97,7 +100,8 @@ class DatabaseService {
         'groupId': '',
         'inviteId': invitedId,
         'recentMessage': '',
-        'recentMessageSender': ''
+        'recentMessageSender': '',
+        'time':''
       });
       await documentRef.update({
         'members': FieldValue.arrayUnion([

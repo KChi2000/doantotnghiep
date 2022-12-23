@@ -1,9 +1,12 @@
+import 'package:doantotnghiep/bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
+import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getInviteId/get_invite_id_cubit.dart';
-
+import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
+import 'dart:async';
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
@@ -15,6 +18,7 @@ import 'package:doantotnghiep/screens/Tracking.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,8 +78,24 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => GetChatMessageCubit(),
         ),
+        BlocProvider(
+          create: (context) => GetUserGroupCubit(),
+        ),
+         BlocProvider(
+          create: (context) => GroupInfoCubitCubit(),
+        ),
+         BlocProvider(
+          create: (context) => MessageCubitCubit(),
+        ),
       ],
       child: MaterialApp(
+        localizationsDelegates: [
+             GlobalMaterialLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: [Locale('vi', 'VN')],
+            locale: Locale('vi', 'VN'),
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(

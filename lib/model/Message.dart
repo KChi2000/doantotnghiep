@@ -5,6 +5,8 @@ class Message {
   String sender;
   String contentMessage;
   String time;
+  String displaytime='';
+  bool ontap=false;
   Message({
     required this.sender,
     required this.contentMessage,

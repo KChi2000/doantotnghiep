@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
@@ -75,7 +77,7 @@ class _chatDetailState extends State<chatDetail> {
               children: [
                 BlocBuilder<GetChatMessageCubit, GetChatMessageState>(
                   builder: (context, state) {
-                    return StreamBuilder<dynamic>(
+                    return StreamBuilder<QuerySnapshot>(
                         stream: state.data,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -85,76 +87,33 @@ class _chatDetailState extends State<chatDetail> {
                               child: CircularProgressIndicator(),
                             ));
                           }
-                          print(
-                              'stream data: ${snapshot.data.docs[0]['contentMessage']}');
-                          return Expanded(
-                            child: ListView.builder(
-                              controller: listController,
-                              shrinkWrap: true,
-                              itemCount: snapshot.data.docs.length,
-                              itemBuilder: (context, index) {
-                                Message message = Message(
-                                    sender: snapshot.data.docs[index]['sender'],
-                                    contentMessage: snapshot.data.docs[index]
-                                        ['contentMessage'],
-                                    time: snapshot.data.docs[index]['time']);
-                              
-                                return Align(
-                                  alignment: Userinfo.userSingleton.uid ==
-                                          message.sender.substring(
-                                              message.sender.length - 28)
-                                      ? Alignment.topRight
-                                      : Alignment.topLeft,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        Userinfo.userSingleton.uid ==
-                                                message.sender.substring(
-                                                    message.sender.length - 28)
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                    children: [
-                                      index >= 1 &&
-                                              index <
-                                                  snapshot.data.docs.length - 1
-                                          ? snapshot.data.docs[index]['sender']
-                                                      .toString() ==
-                                                  snapshot.data
-                                                      .docs[index - 1]['sender']
-                                                      .toString()
-                                              ? SizedBox()
-                                              : messageText(message.sender,message.sender)
-                                          :  messageText(message.sender,message.sender),
-                                      UnconstrainedBox(
-                                        child: Container(
-                                          // constraints: BoxConstraints(
-                                          //     maxWidth: screenwidth - 150),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 5),
-                                          decoration: BoxDecoration(
-                                            color: Userinfo.userSingleton.uid ==
-                                                    message.sender.substring(
-                                                        message.sender.length -
-                                                            28)
-                                                ? Colors.pink
-                                                : Colors.grey,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          margin: EdgeInsets.only(bottom: 3),
-                                          child: Center(
-                                              child: Text(
-                                            message.contentMessage,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white),
-                                          )),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                          if (snapshot.data!.docs.length == 0) {
+                            return Expanded(
+                                child: Center(
+                                    child: Text(
+                                        'Hãy nhắn gì đó cho các bạn của bạn nào ((:')));
+                          }
+                          context
+                              .read<MessageCubitCubit>()
+                              .DisplayMessage(snapshot);
+                          return BlocConsumer<MessageCubitCubit,
+                              MessageCubitState>(
+                            listener: (context, state) {
+                              print('cubit change');
+                            },
+                            builder: (context, state) {
+                              return Expanded(
+                                child: ListView.builder(
+                                  controller: listController,
+                                  shrinkWrap: true,
+                                  itemCount: state.list!.length,
+                                  itemBuilder: (context, index) {
+                                    return ItemMessage(state.list![index],
+                                        index, state.list!.length);
+                                  },
+                                ),
+                              );
+                            },
                           );
                         });
                   },
@@ -177,13 +136,25 @@ class _chatDetailState extends State<chatDetail> {
                         onTap: () {
                           InitialpositionList();
                         },
+                        onFieldSubmitted: (value) async {
+                          Message ms = Message(
+                              sender:
+                                  '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
+                              contentMessage: messageController.text.trim(),
+                              time: DateTime.now()
+                                  .microsecondsSinceEpoch
+                                  .toString());
+                          await DatabaseService()
+                              .sendMessage(widget.groupId, ms.toMap());
+                          messageController.clear();
+                        },
                       )),
                       IconButton(
                           onPressed: () async {
                             Message ms = Message(
                                 sender:
                                     '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
-                                contentMessage: messageController.text,
+                                contentMessage: messageController.text.trim(),
                                 time: DateTime.now()
                                     .microsecondsSinceEpoch
                                     .toString());
@@ -204,16 +175,80 @@ class _chatDetailState extends State<chatDetail> {
         ));
   }
 
-  Widget messageText(String message,String sender) {
+  Column ItemMessage(Message msg, int index, int length) {
+   
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: Userinfo.userSingleton.uid ==
+              msg.sender.substring(msg.sender.length - 28)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        msg.ontap
+            ? Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 5,horizontal: 7),
+                  decoration: BoxDecoration(color: Colors.grey,borderRadius: BorderRadius.circular(20)),
+                  
+                    child: Text(
+                'Lúc ${msg.displaytime}',
+                style: TextStyle(fontSize: 12,color: Colors.white),
+              )))
+            : SizedBox(),
+        GestureDetector(
+          onTap: () {
+            context.read<MessageCubitCubit>().onTapMsg(index);
+            print('ontappppppp');
+          },
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: screenwidth - 150,
+              // minWidth: 50
+            ),
+            // width: screenwidth - 150,
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: Userinfo.userSingleton.uid ==
+                      msg.sender.substring(msg.sender.length - 28)
+                  ? Colors.pink
+                  : Colors.grey,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            margin: EdgeInsets.only(bottom: 3),
+            child: Text(
+              msg.contentMessage,
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ),
+        ),
+        index < length - 1
+            ? msg.sender.toString() == msg.sender.toString()
+                ? SizedBox()
+                : messageText(msg.sender, msg.sender)
+            : messageText(msg.sender, msg.sender),
+      ],
+    );
+  }
+
+  Widget messageText(String message, String sender) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-          sender.substring(sender.length-28) != Userinfo.userSingleton.uid? SizedBox(width: 10,):SizedBox(),
+        sender.substring(sender.length - 28) != Userinfo.userSingleton.uid
+            ? SizedBox(
+                width: 10,
+              )
+            : SizedBox(),
         Text(
           message.substring(0, message.length - 29),
-          style: TextStyle(fontSize: 18, color: Colors.orange),
+          style: TextStyle(fontSize: 16, color: Colors.black54),
         ),
-         sender.substring(sender.length-28) == Userinfo.userSingleton.uid? SizedBox(width: 10,):SizedBox(),
+        sender.substring(sender.length - 28) == Userinfo.userSingleton.uid
+            ? SizedBox(
+                width: 10,
+              )
+            : SizedBox(),
       ],
     );
   }

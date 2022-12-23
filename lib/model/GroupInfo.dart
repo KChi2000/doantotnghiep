@@ -1,5 +1,5 @@
 class GroupInfo {
-  String? recentMassageSender;
+  String? recentMessageSender;
   String? inviteId;
   List<Members>? members;
   Admin? admin;
@@ -7,19 +7,22 @@ class GroupInfo {
   String? groupPic;
   String? recentMessage;
   String? groupName;
+  String? time;
+  bool? checked=false;
 
   GroupInfo(
-      {this.recentMassageSender,
+      {this.recentMessageSender,
       this.inviteId,
       this.members,
       this.admin,
       this.groupId,
       this.groupPic,
       this.recentMessage,
-      this.groupName});
+      this.groupName,
+      this.time,this.checked});
 
   GroupInfo.fromJson(Map<String, dynamic> json) {
-    recentMassageSender = json['recentMassageSender'];
+    recentMessageSender = json['recentMessageSender'];
     inviteId = json['inviteId'];
     if (json['members'] != null) {
       members = <Members>[];
@@ -32,11 +35,12 @@ class GroupInfo {
     groupPic = json['groupPic'];
     recentMessage = json['recentMessage'];
     groupName = json['GroupName'];
+    time = json['time'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['recentMassageSender'] = this.recentMassageSender;
+    data['recentMessageSender'] = this.recentMessageSender;
     data['inviteId'] = this.inviteId;
     if (this.members != null) {
       data['members'] = this.members!.map((v) => v.toJson()).toList();
@@ -48,6 +52,7 @@ class GroupInfo {
     data['groupPic'] = this.groupPic;
     data['recentMessage'] = this.recentMessage;
     data['GroupName'] = this.groupName;
+    data['time']=this.time;
     return data;
   }
 }

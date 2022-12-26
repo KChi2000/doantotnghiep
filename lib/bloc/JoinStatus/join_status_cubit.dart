@@ -14,7 +14,7 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
     var joined =
         await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
             .checkIfJoined(groupId);
-    print(joined);
+ 
     emit(JoindStatusState(joined: joined));
   }
 }

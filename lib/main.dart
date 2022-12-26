@@ -1,3 +1,4 @@
+import 'package:doantotnghiep/bloc/Changetab/changetab_cubit.dart';
 import 'package:doantotnghiep/bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
@@ -11,8 +12,10 @@ import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
+import 'package:doantotnghiep/components/pickImage/pick_image_cubit.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
 import 'package:doantotnghiep/screens/Tracking.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -87,6 +90,12 @@ class _MyAppState extends State<MyApp> {
          BlocProvider(
           create: (context) => MessageCubitCubit(),
         ),
+         BlocProvider(
+          create: (context) => ChangetabCubit(),
+        ),
+        BlocProvider(
+          create: (context) => PickImageCubit(),
+        ),
       ],
       child: MaterialApp(
         localizationsDelegates: [
@@ -108,7 +117,7 @@ class _MyAppState extends State<MyApp> {
             print('store model name ${Userinfo.userSingleton.name}');
             print('store model name ${Userinfo.userSingleton.uid}');
             if (state.uid.isNotEmpty) {
-              return Tracking();
+              return DisplayPage();
             }
             return Login();
           },

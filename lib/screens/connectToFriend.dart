@@ -44,18 +44,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
    
   }
 
-  void initData() async {
-    var userGroup =
-        await DatabaseService(uid: Userinfo.userSingleton.uid).getUserGroups();
-    UserGroup usergroup =
-        UserGroup.fromJson(userGroup.data() as Map<String, dynamic>);
-    usergroup.groups!.forEach(
-      (element) {
-        print('get User group: ${element.groupName}');
-      },
-    );
-  }
-
+ 
  
  
 
@@ -299,7 +288,9 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
             context,
             chatDetail(
                 groupId: group.groupId.toString(),
-                groupName: group.groupName.toString()));
+                groupName: group.groupName.toString(),
+                members: group.members!,
+                admininfo: group.admin!,));
       },
       onLongPress: () {},
       child: Stack(
@@ -347,7 +338,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                   .length -
                                               28)
                                   ? 'Bạn:'
-                                  : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}'
+                                  : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
                               : 'Chưa có tin nhắn nào',
                           style: TextStyle(color: Colors.black87, fontSize: 14),
                         ),

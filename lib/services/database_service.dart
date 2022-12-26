@@ -124,7 +124,7 @@ Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
     groupCollection.doc(groupId).update({
       'recentMessage':data['contentMessage'],
       'recentMessageSender':data['sender'],
-      'time':data['time']
+      'time':data['time'],
     });
   }
  Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId){

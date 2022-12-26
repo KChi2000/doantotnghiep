@@ -11,14 +11,18 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class chatDetail extends StatefulWidget {
-  chatDetail({
-    super.key,
-    required this.groupId,
-    required this.groupName,
-  });
-  String groupName;
+import '../model/GroupInfo.dart';
 
+class chatDetail extends StatefulWidget {
+  chatDetail(
+      {super.key,
+      required this.groupId,
+      required this.groupName,
+      required this.members,
+      required this.admininfo});
+  String groupName;
+  List<Members> members;
+  Admin admininfo;
   String groupId;
 
   @override
@@ -59,6 +63,32 @@ class _chatDetailState extends State<chatDetail> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(onPressed: () {}, icon: Icon(Icons.videocam)),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title:
+                                  Text('Thành viên(${widget.members.length})'),
+                              content: Container(
+                                constraints: BoxConstraints(
+                                    minHeight: 80, maxHeight: 200),
+                                width: 100,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: widget.members.length,
+                                  itemBuilder: (context, index) {
+                                    return ItemThanhVien(
+                                        widget.members[index], index);
+                                  },
+                                ),
+                              ),
+                            ));
+                  },
+                  icon: Icon(Icons.info)),
             )
           ],
         ),
@@ -175,8 +205,30 @@ class _chatDetailState extends State<chatDetail> {
         ));
   }
 
+  Widget ItemThanhVien(Members e, int index) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+       
+        widget.admininfo.adminId == e.Id
+            ? Userinfo.userSingleton.uid == e.Id?Text(
+                '${e.Name.toString()}(Bạn-Admin)',
+                style: TextStyle(fontSize: 18),
+              )
+            :Text(
+                '${e.Name.toString()}(Admin)',
+                style: TextStyle(fontSize: 18),
+              )
+            : Text(
+                '${e.Name.toString()}',
+                style: TextStyle(fontSize: 18),
+              ),
+               index != widget.members.length-1 ? Divider() : SizedBox(),
+      ],
+    );
+  }
+
   Column ItemMessage(Message msg, int index, int length) {
-   
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: Userinfo.userSingleton.uid ==
@@ -187,13 +239,14 @@ class _chatDetailState extends State<chatDetail> {
         msg.ontap
             ? Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 5,horizontal: 7),
-                  decoration: BoxDecoration(color: Colors.grey,borderRadius: BorderRadius.circular(20)),
-                  
+                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+                    decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(20)),
                     child: Text(
-                'Lúc ${msg.displaytime}',
-                style: TextStyle(fontSize: 12,color: Colors.white),
-              )))
+                      'Lúc ${msg.displaytime}',
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    )))
             : SizedBox(),
         GestureDetector(
           onTap: () {

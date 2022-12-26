@@ -86,7 +86,7 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                     context
                         .read<JoindStatusCubit>()
                         .setJoinStatus(state.data.groupId.toString());
-                    print('adminnnn   ${state.data.admin!.adminName}');
+                   
                     return grouprow(state.data);
                   } else if (state is LoadingGroup) {
                     return Expanded(
@@ -117,8 +117,10 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
         navigatePush(
             context,
             chatDetail(
-                groupId: '',
+                groupId: group.groupId.toString(),
                 groupName: group.groupName.toString(),
+                members: group.members!,
+                admininfo: group.admin!,
                ));
       },
       onLongPress: () {

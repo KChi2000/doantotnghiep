@@ -20,12 +20,13 @@ class MessageCubitCubit extends Cubit<MessageCubitState> {
         var tri = DateTime.fromMicrosecondsSinceEpoch(int.parse(element.time));
        print('day ${DateFormat('EEEE').format(tri)}');
         if (tri.difference(DateTime.now()).inDays == 0) {
-          element.displaytime = '${tri.hour}:${tri.minute} hôm nay';
+          print('phut ${tri.minute}');
+          element.displaytime = '${tri.hour}:${tri.minute.toString().padLeft(2,'0')} hôm nay';
         } 
         else if(DateTime.now().weekOfMonth == tri.weekOfMonth){
             String day=  DateFormat('EEEE').format(tri); 
             
-            element.displaytime = '${tri.hour}:${tri.minute} $day';
+            element.displaytime = '${tri.hour}:${tri.minute.toString().padLeft(2,'0')} $day';
         }
         else {
           element.displaytime =

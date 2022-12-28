@@ -1,14 +1,26 @@
 
 part of 'pick_image_cubit.dart';
 
- class PickImageState extends Equatable {
-  XFile? image;
-   PickImageState({ this.image});
-
-  @override
-  List<Object> get props => [image!];
+abstract class PickImageState extends Equatable {
+ 
+PickImageState();
+   @override
+  List<Object> get props => [];
 }
 
-// class PickImageInitial extends PickImageState {}
+class PickImageInitial extends PickImageState {
+   PickImageInitial();
 
-// class PickImage extends PickImageState {}
+   @override
+  List<Object> get props => [];
+}
+
+class PickImage extends PickImageState {
+  XFile image;
+   PickImage( {required this.image});
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [image];
+
+}

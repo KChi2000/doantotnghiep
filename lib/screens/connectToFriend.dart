@@ -21,6 +21,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:rive/rive.dart';
 
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 
@@ -38,15 +39,9 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
 
   @override
   void initState() {
-   
     context.read<GetUserGroupCubit>().getUerGroup();
     super.initState();
-   
   }
-
- 
- 
- 
 
   @override
   Widget build(BuildContext context) {
@@ -69,85 +64,249 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return AlertDialog(
-                          title: Text('Create group'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Form(
-                                key: formkey,
-                                child: TextFormField(
-                                  controller: groupNameCon,
-                                  decoration: InputDecoration(
-                                      hintText: 'group\'s name',
-                                      isDense: true,
-                                      border: OutlineInputBorder()),
-                                  validator: (value) {
-                                    if (groupNameCon.text.isEmpty ||
-                                        groupNameCon.text.length == 0) {
-                                      return 'Tên nhóm không được để trống';
-                                    }
-                                    return null;
-                                  },
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                  'Copy mã bên dưới để mời bạn bè tham gia vào nhóm'),
-                              Container(
-                                height: 40,
-                                width: 300,
-                                padding: EdgeInsets.only(left: 10),
-                                color: Colors.grey.withOpacity(0.3),
-                                child: Row(
+                        return Dialog(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30))),
+                            height: 290,
+                            child: Stack(
+                              children: [
+                                Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      invitedId,
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black87),
+                                    SizedBox(height: 90,),
+                                    Container(
+                                      height: 200,
+                                      // width: 200,
+                                      child: RiveAnimation.asset(
+                                        'assets/animations/nice.riv',
+                                        fit: BoxFit.fill,
+                                      ),
                                     ),
-                                    IconButton(
-                                        onPressed: () {
-                                          Clipboard.setData(ClipboardData(
-                                                  text: invitedId))
-                                              .then((_) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Invite id copied to clipboard: $invitedId"),
-                                              duration: Duration(seconds: 2),
-                                            ));
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.copy,
-                                          color: Colors.black54,
-                                        ))
                                   ],
                                 ),
-                              )
-                            ],
+                                Container(
+                                  padding: EdgeInsets.only(
+                                      top: 30, right: 30, left: 30),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                          child: Text(
+                                        'Tạo nhóm',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      )),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Form(
+                                        key: formkey,
+                                        child: TextFormField(
+                                          controller: groupNameCon,
+                                          decoration: InputDecoration(
+                                              hintText: 'group\'s name',
+                                              isDense: true,
+                                              border: OutlineInputBorder()),
+                                          validator: (value) {
+                                            if (groupNameCon.text.isEmpty ||
+                                                groupNameCon.text.length == 0) {
+                                              return 'Tên nhóm không được để trống';
+                                            }
+                                            return null;
+                                          },
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                          'Copy mã bên dưới để mời bạn bè tham gia vào nhóm', style: TextStyle(
+                                          fontSize: 12,
+                                         
+                                        ),),
+                                          SizedBox(height: 5,),
+                                      Container(
+                                        height: 40,
+                                        width: 300,
+                                        padding: EdgeInsets.only(left: 10),
+                                        color: Colors.grey.withOpacity(0.3),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              invitedId,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black87),
+                                            ),
+                                            IconButton(
+                                                onPressed: () {
+                                                  Clipboard.setData(
+                                                          ClipboardData(
+                                                              text: invitedId))
+                                                      .then((_) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(SnackBar(
+                                                      content: Text(
+                                                          "Invite id copied to clipboard: $invitedId"),
+                                                      duration:
+                                                          Duration(seconds: 2),
+                                                    ));
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  Icons.copy,
+                                                  color: Colors.black54,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Cancel')),
+                                          SizedBox(
+                                            width: 8,
+                                          ),
+                                          TextButton(
+                                              onPressed: () async {
+                                               if(formkey.currentState!.validate()){
+                                                   Navigator.pop(context);
+                                               }
+                                              },
+                                              child: Text('Create'))
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Cancel')),
-                            TextButton(
-                                onPressed: () async {
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Create'))
-                          ],
                         );
+                        // return AlertDialog(
+                        //   actionsPadding: EdgeInsets.zero,
+                        //   title: Text('Create group'),
+                        //   content: Container(
+                        //     height: 210,
+                        // child: Stack(
+                        //   children: [
+                        //     RiveAnimation.asset(
+                        //       'assets/animations/nice.riv',
+                        //       fit: BoxFit.fitHeight,
+                        //     ),
+                        //     Column(
+                        //       mainAxisSize: MainAxisSize.min,
+                        //       children: [
+                        //         Form(
+                        //           key: formkey,
+                        //           child: TextFormField(
+                        //             controller: groupNameCon,
+                        //             decoration: InputDecoration(
+                        //                 hintText: 'group\'s name',
+                        //                 isDense: true,
+                        //                 border: OutlineInputBorder()),
+                        //             validator: (value) {
+                        //               if (groupNameCon.text.isEmpty ||
+                        //                   groupNameCon.text.length == 0) {
+                        //                 return 'Tên nhóm không được để trống';
+                        //               }
+                        //               return null;
+                        //             },
+                        //             autovalidateMode:
+                        //                 AutovalidateMode.onUserInteraction,
+                        //           ),
+                        //         ),
+                        //         SizedBox(
+                        //           height: 5,
+                        //         ),
+                        //         Text(
+                        //             'Copy mã bên dưới để mời bạn bè tham gia vào nhóm'),
+                        //         Container(
+                        //           height: 40,
+                        //           width: 300,
+                        //           padding: EdgeInsets.only(left: 10),
+                        //           color: Colors.grey.withOpacity(0.3),
+                        //           child: Row(
+                        //             mainAxisSize: MainAxisSize.min,
+                        //             mainAxisAlignment:
+                        //                 MainAxisAlignment.spaceBetween,
+                        //             children: [
+                        //               Text(
+                        //                 invitedId,
+                        //                 style: TextStyle(
+                        //                     fontSize: 16,
+                        //                     color: Colors.black87),
+                        //               ),
+                        //               IconButton(
+                        //                   onPressed: () {
+                        //                     Clipboard.setData(ClipboardData(
+                        //                             text: invitedId))
+                        //                         .then((_) {
+                        //                       ScaffoldMessenger.of(context)
+                        //                           .showSnackBar(SnackBar(
+                        //                         content: Text(
+                        //                             "Invite id copied to clipboard: $invitedId"),
+                        //                         duration:
+                        //                             Duration(seconds: 2),
+                        //                       ));
+                        //                     });
+                        //                   },
+                        //                   icon: Icon(
+                        //                     Icons.copy,
+                        //                     color: Colors.black54,
+                        //                   ))
+                        //             ],
+                        //           ),
+                        //         ),
+                        //         SizedBox(
+                        //           height: 8,
+                        //         ),
+                        //         Row(
+                        //           mainAxisSize: MainAxisSize.max,
+                        //           mainAxisAlignment: MainAxisAlignment.end,
+                        //           children: [
+                        //             TextButton(
+                        //                 onPressed: () {
+                        //                   Navigator.pop(context);
+                        //                 },
+                        //                 child: Text('Cancel')),
+                        //             SizedBox(
+                        //               width: 8,
+                        //             ),
+                        //             TextButton(
+                        //                 onPressed: () async {
+                        //                   Navigator.pop(context);
+                        //                 },
+                        //                 child: Text('Create'))
+                        //           ],
+                        //         )
+                        //       ],
+                        //     ),
+                        //   ],
+                        // ),
+                        //   ),
+                        // );
                       }).whenComplete(() async {
                     if (formkey.currentState!.validate()) {
                       context.loaderOverlay.show();
@@ -220,11 +379,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                             return StreamBuilder<dynamic>(
                                 stream: state.stream,
                                 builder: (context, snapshot) {
-                                 
                                   if (snapshot.hasData) {
-                                     context
-                                      .read<GroupInfoCubitCubit>()
-                                      .updateGroup(snapshot.data);
+                                    context
+                                        .read<GroupInfoCubitCubit>()
+                                        .updateGroup(snapshot.data);
                                     if (snapshot.data?.docs.length == 0) {
                                       return Center(
                                         child: Text(
@@ -235,19 +393,23 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                     return BlocBuilder<GroupInfoCubitCubit,
                                         GroupInfoCubitState>(
                                       builder: (context, state) {
-                                        if(state is GroupInfoCubitLoaded){
-                                               return ListView.builder(
-                                          shrinkWrap: true,
-                                          reverse: true,
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          itemCount: state.groupinfo!.length,
-                                          itemBuilder: (context, index) {
-                                            return messagerow(state.groupinfo![index],index);
-                                          },
-                                        );
+                                        if (state is GroupInfoCubitLoaded) {
+                                          return ListView.builder(
+                                            shrinkWrap: true,
+                                            reverse: true,
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            itemCount: state.groupinfo!.length,
+                                            itemBuilder: (context, index) {
+                                              return messagerow(
+                                                  state.groupinfo![index],
+                                                  index);
+                                            },
+                                          );
                                         }
-                                       return Center(child: CircularProgressIndicator(),);
+                                        return Center(
+                                          child: CircularProgressIndicator(),
+                                        );
                                       },
                                     );
                                   }
@@ -280,17 +442,18 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
-  Widget messagerow(GroupInfo group,int ind) {
+  Widget messagerow(GroupInfo group, int ind) {
     return GestureDetector(
       onTap: () {
         context.read<GroupInfoCubitCubit>().setFalse();
         navigatePush(
             context,
             chatDetail(
-                groupId: group.groupId.toString(),
-                groupName: group.groupName.toString(),
-                members: group.members!,
-                admininfo: group.admin!,));
+              groupId: group.groupId.toString(),
+              groupName: group.groupName.toString(),
+              members: group.members!,
+              admininfo: group.admin!,
+            ));
       },
       onLongPress: () {},
       child: Stack(
@@ -376,16 +539,16 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                     alignment: Alignment.topRight,
                     child: IconButton(
                         onPressed: () {
-                        
-                          context.read<GroupInfoCubitCubit>().chooseItemToShow(ind);
+                          context
+                              .read<GroupInfoCubitCubit>()
+                              .chooseItemToShow(ind);
                         },
                         icon: Icon(Icons.more_vert)))
               ],
             ),
           ),
-         
-              
-               group.checked! ?   Positioned(
+          group.checked!
+              ? Positioned(
                   right: 50,
                   top: 20,
                   child: GestureDetector(
@@ -398,7 +561,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                           duration: Duration(seconds: 2),
                         ));
                       });
-                       context.read<GroupInfoCubitCubit>().setFalse();
+                      context.read<GroupInfoCubitCubit>().setFalse();
                     },
                     child: Container(
                       padding:
@@ -413,10 +576,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                           ]),
                       child: Text('Copy invite id'),
                     ),
-                  )): SizedBox()
-              
-             
-          
+                  ))
+              : SizedBox()
         ],
       ),
     );

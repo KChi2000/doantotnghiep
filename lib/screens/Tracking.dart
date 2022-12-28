@@ -21,25 +21,16 @@ class Tracking extends StatelessWidget {
   Widget build(BuildContext context) {
    
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'Map',
-              style: TextStyle(color: Colors.black),
-            ),
-            // backgroundColor: Colors.yellow,
-            actions: [
-              IconButton(
-                  onPressed: () async {
-                    await HelperFunctions.deleteLoggedUserUid().then((value) {
-                      //  context.read<CheckLoggedCubit>().checkUserIsLogged();
-                      print(value);
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => MyApp()));
-                    });
-                  },
-                  icon: Icon(Icons.logout))
-            ],
-          ),
+          // appBar: AppBar(
+          //   title: Text(
+          //     'Map',
+          //     style: TextStyle(color: Colors.black),
+          //   ),
+          //   // backgroundColor: Colors.yellow,
+          //   actions: [
+          
+          //   ],
+          // ),
           body: FlutterMap(
             options: MapOptions(
               center: LatLng(21.0117040, 105.8114780),

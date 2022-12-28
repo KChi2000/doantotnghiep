@@ -16,19 +16,41 @@ class MessageCubitCubit extends Cubit<MessageCubitState> {
         .toList();
     rs.forEach(
       (element) {
-       
         var tri = DateTime.fromMicrosecondsSinceEpoch(int.parse(element.time));
-       print('day ${DateFormat('EEEE').format(tri)}');
+
         if (tri.difference(DateTime.now()).inDays == 0) {
-          print('phut ${tri.minute}');
-          element.displaytime = '${tri.hour}:${tri.minute.toString().padLeft(2,'0')} hôm nay';
-        } 
-        else if(DateTime.now().weekOfMonth == tri.weekOfMonth){
-            String day=  DateFormat('EEEE').format(tri); 
-            
-            element.displaytime = '${tri.hour}:${tri.minute.toString().padLeft(2,'0')} $day';
-        }
-        else {
+          element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} hôm nay';
+        } else if (DateTime.now().weekOfMonth == tri.weekOfMonth) {
+          String day = DateFormat('EEEE').format(tri);
+          switch(day){
+            case 'Monday':
+            element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} thứ 2';
+            break;
+            case 'Tuesday':
+            element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} thứ 3';
+            break;
+            case 'Wednesday':
+            element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} thứ 4';
+            break;
+            case 'Thursday':
+            element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} thứ 5';
+            break;
+            case 'Friday':
+            element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} thứ 6';
+            break;
+            case 'Saturday':
+            element.displaytime =
+              '${tri.hour}:${tri.minute.toString().padLeft(2, '0')} thứ 7';
+            break;
+          }
+          
+        } else {
           element.displaytime =
               '${tri.hour}:${tri.minute} ${tri.day}-${tri.month}-${tri.year}';
         }

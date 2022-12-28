@@ -55,7 +55,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   path: ^1.8.2
-  image_picker: ^0.8.6
+  image_picker: ^0.8.5+3
+  lottie: ^2.1.0
+  rive: ^0.10.0
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +84,7 @@ flutter:
   assets:
     - assets/images/
     - assets/fonts/
+    - assets/animations/
   fonts:
     - family: beautiFont
       fonts:

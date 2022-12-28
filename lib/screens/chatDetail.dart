@@ -138,8 +138,8 @@ class _chatDetailState extends State<chatDetail> {
                                   shrinkWrap: true,
                                   itemCount: state.list!.length,
                                   itemBuilder: (context, index) {
-                                    return ItemMessage(state.list![index],
-                                        index, state.list!.length);
+                                    return ItemMessage(
+                                        state.list!, index, state.list!.length);
                                   },
                                 ),
                               );
@@ -209,34 +209,34 @@ class _chatDetailState extends State<chatDetail> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       
         widget.admininfo.adminId == e.Id
-            ? Userinfo.userSingleton.uid == e.Id?Text(
-                '${e.Name.toString()}(Bạn-Admin)',
-                style: TextStyle(fontSize: 18),
-              )
-            :Text(
-                '${e.Name.toString()}(Admin)',
-                style: TextStyle(fontSize: 18),
-              )
+            ? Userinfo.userSingleton.uid == e.Id
+                ? Text(
+                    '${e.Name.toString()}(Bạn-Admin)',
+                    style: TextStyle(fontSize: 18),
+                  )
+                : Text(
+                    '${e.Name.toString()}(Admin)',
+                    style: TextStyle(fontSize: 18),
+                  )
             : Text(
                 '${e.Name.toString()}',
                 style: TextStyle(fontSize: 18),
               ),
-               index != widget.members.length-1 ? Divider() : SizedBox(),
+        index != widget.members.length - 1 ? Divider() : SizedBox(),
       ],
     );
   }
 
-  Column ItemMessage(Message msg, int index, int length) {
+  Column ItemMessage(List<Message> list, int index, int length) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: Userinfo.userSingleton.uid ==
-              msg.sender.substring(msg.sender.length - 28)
+              list[index].sender.substring(list[index].sender.length - 28)
           ? CrossAxisAlignment.end
           : CrossAxisAlignment.start,
       children: [
-        msg.ontap
+        list[index].ontap
             ? Center(
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 7),
@@ -244,43 +244,109 @@ class _chatDetailState extends State<chatDetail> {
                         color: Colors.grey,
                         borderRadius: BorderRadius.circular(20)),
                     child: Text(
-                      'Lúc ${msg.displaytime}',
+                      'Lúc ${list[index].displaytime}',
                       style: TextStyle(fontSize: 12, color: Colors.white),
                     )))
             : SizedBox(),
+        index >= length - 1
+            ? index == length - 1 &&
+                    Userinfo.userSingleton.uid !=
+                        list[index]
+                            .sender
+                            .substring(list[index].sender.length - 28) && list[index].sender != list[index - 1].sender
+                ? messageText(list[index].sender, list[index].sender)
+                : SizedBox()
+            : Userinfo.userSingleton.uid !=
+                    list[index].sender.substring(list[index].sender.length - 28)
+                ? index == 0
+                    ? messageText(list[index].sender, list[index].sender)
+                    : list[index].sender != list[index - 1].sender 
+                        ? messageText(list[index].sender, list[index].sender)
+                        : SizedBox()
+                : SizedBox(),
         GestureDetector(
           onTap: () {
             context.read<MessageCubitCubit>().onTapMsg(index);
             print('ontappppppp');
           },
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: screenwidth - 150,
-              // minWidth: 50
-            ),
-            // width: screenwidth - 150,
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Userinfo.userSingleton.uid ==
-                      msg.sender.substring(msg.sender.length - 28)
-                  ? Colors.pink
-                  : Colors.grey,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            margin: EdgeInsets.only(bottom: 3),
-            child: Text(
-              msg.contentMessage,
-              textAlign: TextAlign.left,
-              style: TextStyle(fontSize: 18, color: Colors.white),
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 5,
+              ),
+              index < length - 1 &&
+                      Userinfo.userSingleton.uid !=
+                          list[index]
+                              .sender
+                              .substring(list[index].sender.length - 28)
+                  ? list[index].sender != list[index + 1].sender
+                      ? itemImage(list[index].sender)
+                      : SizedBox(
+                          width: 30,
+                        )
+                  : index == length - 1 &&
+                          Userinfo.userSingleton.uid !=
+                              list[index]
+                                  .sender
+                                  .substring(list[index].sender.length - 28)
+                      ? itemImage(list[index].sender)
+                      : SizedBox(
+                          width: 30,
+                        ),
+              SizedBox(
+                width: 5,
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: screenwidth - 150,
+                  // minWidth: 50
+                ),
+                // width: screenwidth - 150,
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Userinfo.userSingleton.uid ==
+                          list[index]
+                              .sender
+                              .substring(list[index].sender.length - 28)
+                      ? Colors.pink
+                      : Colors.grey,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                margin: EdgeInsets.only(bottom: 3),
+                child: Text(
+                  list[index].contentMessage,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+              Userinfo.userSingleton.uid ==
+                      list[index]
+                          .sender
+                          .substring(list[index].sender.length - 28)
+                  ? SizedBox(
+                      width: 10,
+                    )
+                  : SizedBox()
+            ],
           ),
         ),
-        index < length - 1
-            ? msg.sender.toString() == msg.sender.toString()
-                ? SizedBox()
-                : messageText(msg.sender, msg.sender)
-            : messageText(msg.sender, msg.sender),
       ],
+    );
+  }
+
+  Container itemImage(String name) {
+    return Container(
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Theme.of(context).primaryColor),
+      child: Center(
+          child: Text(
+        '${name.substring(0, 1)}',
+        style: TextStyle(color: Colors.white),
+      )),
     );
   }
 
@@ -290,12 +356,14 @@ class _chatDetailState extends State<chatDetail> {
       children: [
         sender.substring(sender.length - 28) != Userinfo.userSingleton.uid
             ? SizedBox(
-                width: 10,
+                width: 45,
               )
-            : SizedBox(),
+            : SizedBox(
+                width: 10,
+              ),
         Text(
           message.substring(0, message.length - 29),
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style: TextStyle(fontSize: 13, color: Colors.black54),
         ),
         sender.substring(sender.length - 28) == Userinfo.userSingleton.uid
             ? SizedBox(

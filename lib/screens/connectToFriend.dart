@@ -485,7 +485,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                     children: [
                       Text(
                         group.groupName.toString(),
-                        style: TextStyle(color: Colors.black87, fontSize: 17),
+                        style: TextStyle(color: Colors.black87, fontSize: 17,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600),
                       ),
                       Row(mainAxisSize: MainAxisSize.max, children: [
                         Text(
@@ -503,7 +503,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                   ? 'Bạn:'
                                   : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
                               : 'Chưa có tin nhắn nào',
-                          style: TextStyle(color: Colors.black87, fontSize: 14),
+                          style: TextStyle(color: Colors.black87, fontSize: 14,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600),
                         ),
                         Flexible(
                           // width: 200,
@@ -516,7 +516,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 14,
-                              overflow: TextOverflow.ellipsis,
+                              overflow: TextOverflow.ellipsis
+                              ,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600
                             ),
                           ),
                         ),
@@ -527,7 +528,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               : '${DateTime.fromMicrosecondsSinceEpoch(int.parse(group.time!)).toString().split(' ').last.substring(0, 5)}',
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 14,
+                            fontSize: 14
+                            ,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600
                           ),
                         )
                       ])
@@ -543,7 +545,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               .read<GroupInfoCubitCubit>()
                               .chooseItemToShow(ind);
                         },
-                        icon: Icon(Icons.more_vert)))
+                        icon: Icon(Icons.more_vert,color: Colors.black54,)))
               ],
             ),
           ),

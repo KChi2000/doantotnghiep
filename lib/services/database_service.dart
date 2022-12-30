@@ -3,8 +3,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doantotnghiep/components/showSnackbar.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/model/GroupInfo.dart';
+import 'package:doantotnghiep/model/UserInfo.dart';
 
 class DatabaseService {
+  bool checkCanUpdate =false;
   final String? uid;
   DatabaseService({this.uid});
   CollectionReference userCollection =
@@ -28,18 +31,21 @@ class DatabaseService {
     return result;
   }
 
- Future<DocumentSnapshot<Object?>> getUserGroups() async {
-    var snapshot =  userCollection.doc(uid).get();
+  Future<DocumentSnapshot<Object?>> getUserGroups() async {
+    var snapshot = userCollection.doc(uid).get();
     return snapshot;
   }
 
   getInvitedId(String groupId) {
     return groupCollection.where('groupId', isEqualTo: groupId).snapshots();
   }
-Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
-    return groupCollection.where('members', arrayContainsAny: [{'Id':uid,
-    'Name':name}]).snapshots();
+
+  Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
+    return groupCollection.where('members', arrayContainsAny: [
+      {'Id': uid, 'Name': name}
+    ]).snapshots();
   }
+
   Future<QuerySnapshot<Object?>> getGroups(String invitedId) async {
     return groupCollection.where('inviteId', isEqualTo: invitedId).get();
   }
@@ -48,7 +54,6 @@ Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
     bool joined = false;
     var docsnapshot = await userCollection.doc(uid).get();
     var listgroup = await docsnapshot['groups'];
-    print(listgroup);
     listgroup.forEach((element) {
       if (groupid.contains(element['groupId'])) {
         joined = true;
@@ -72,6 +77,9 @@ Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
       await groupDoc.update({
         'members': FieldValue.arrayRemove([
           {'Id': uid, 'Name': username}
+        ]),
+        'isReadAr': FieldValue.arrayRemove([
+          {'Id': '${username}_${uid}', 'isRead': false}
         ])
       });
     } else {
@@ -84,6 +92,9 @@ Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
       await groupDoc.update({
         'members': FieldValue.arrayUnion([
           {'Id': uid, 'Name': username}
+        ]),
+        'isReadAr': FieldValue.arrayUnion([
+          {'Id': '${username}_${uid}', 'isRead': false}
         ])
       });
     }
@@ -101,13 +112,17 @@ Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
         'inviteId': invitedId,
         'recentMessage': '',
         'recentMessageSender': '',
-        'time':''
+        'time': '',
+        'isReadAr': []
       });
       await documentRef.update({
         'members': FieldValue.arrayUnion([
           {'Id': adminId, 'Name': adminName}
         ]),
-        'groupId': documentRef.id
+        'groupId': documentRef.id,
+        'isReadAr': FieldValue.arrayUnion([
+          {'Id': '${adminName}_${adminId}', 'isRead': false}
+        ])
       });
       return await userCollection.doc(uid).update({
         'groups': FieldValue.arrayUnion([
@@ -116,19 +131,65 @@ Stream<QuerySnapshot<Object?>> getGroupsByUserId(String name) {
       });
     } on FirebaseException catch (e) {
       // showSnackbar(context, message, color)
-      print(e);
+
     }
   }
-  sendMessage(String groupId, Map<String,dynamic> data){
-    groupCollection.doc(groupId).collection('Messages').add(data);
-    groupCollection.doc(groupId).update({
-      'recentMessage':data['contentMessage'],
-      'recentMessageSender':data['sender'],
-      'time':data['time'],
+
+  sendMessage(String groupId, Map<String, dynamic> data) async {
+    checkCanUpdate = false;
+   await groupCollection.doc(groupId).collection('Messages').add(data);
+    var fetchdata = await groupCollection.doc(groupId).get();
+    Map<String, dynamic> temp = fetchdata.data() as Map<String, dynamic>;
+    List<Read>? listread = GroupInfo.fromJson(temp).isReadAr;
+    List<Map<String, dynamic>> listresult = [];
+    listread!.forEach((element) {
+      if (element.Id != data['sender']) {
+        element.isRead = false;
+      } else {
+        element.isRead = true;
+      }
+      print('from send message ${element.Id} ${element.isRead}');
+      listresult.add(element.toJson());
     });
+
+   await groupCollection.doc(groupId).update({
+      'recentMessage': data['contentMessage'],
+      'recentMessageSender': data['sender'],
+      'time': data['time'],
+      'isReadAr': listresult
+    });
+    checkCanUpdate = true;
+    print('xong sending');
   }
- Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId){
-   return groupCollection.doc(groupId).collection('Messages').orderBy('time').snapshots();
-    
+
+  updateisReadMessage(String grId) async {
+    print('check can update $checkCanUpdate');
+   
+     var fetchdata = await groupCollection.doc(grId).get();
+     print('xong update');
+    Map<String, dynamic> temp = await fetchdata.data() as Map<String, dynamic>;
+    List<Read>? listread = GroupInfo.fromJson(temp).isReadAr;
+    List<Map<String, dynamic>> listresult = [];
+
+    listread!.forEach((element) {
+      print('before database ${element.Id} ${element.isRead}');
+      if (element.Id ==
+          '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}') {
+        element.isRead = true;
+      }
+      print('after database ${element.Id} ${element.isRead}');
+      listresult.add(element.toJson());
+    });
+    groupCollection.doc(grId).update({'isReadAr': listresult});
+   
+   
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId) {
+    return groupCollection
+        .doc(groupId)
+        .collection('Messages')
+        .orderBy('time')
+        .snapshots();
   }
 }

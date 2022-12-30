@@ -7,8 +7,14 @@ part 'get_chat_message_state.dart';
 
 class GetChatMessageCubit extends Cubit<GetChatMessageState> {
   GetChatMessageCubit() : super(GetChatMessageState());
-  void fetchData(String grId){
-  Stream<QuerySnapshot<Map<String, dynamic>>> result= DatabaseService().fetchMessage(grId);
-  emit(GetChatMessageState(data: result));
+  void fetchData(String grId) async {
+    try {
+      Stream<QuerySnapshot<Map<String, dynamic>>> result =
+          DatabaseService().fetchMessage(grId);
+      emit(GetChatMessageState(data: result));
+      await DatabaseService().updateisReadMessage(grId);
+    } on FirebaseException catch (e) {
+      print('exception da xay ra $e');
+    }
   }
 }

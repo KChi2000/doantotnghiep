@@ -1,6 +1,7 @@
 class GroupInfo {
   String? recentMessageSender;
   String? inviteId;
+  List<Read>? isReadAr;
   List<Members>? members;
   Admin? admin;
   String? groupId;
@@ -9,21 +10,30 @@ class GroupInfo {
   String? groupName;
   String? time;
   bool? checked=false;
-
+  bool? checkIsRead=false;
   GroupInfo(
       {this.recentMessageSender,
       this.inviteId,
+      this.isReadAr,
       this.members,
       this.admin,
       this.groupId,
       this.groupPic,
       this.recentMessage,
       this.groupName,
-      this.time,this.checked});
+      this.time,this.checked,
+      this.checkIsRead
+      });
 
   GroupInfo.fromJson(Map<String, dynamic> json) {
     recentMessageSender = json['recentMessageSender'];
     inviteId = json['inviteId'];
+    if (json['isReadAr'] != null) {
+      isReadAr = <Read>[];
+      json['isReadAr'].forEach((v) {
+        isReadAr!.add(new Read.fromJson(v));
+      });
+    }
     if (json['members'] != null) {
       members = <Members>[];
       json['members'].forEach((v) {
@@ -42,6 +52,9 @@ class GroupInfo {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['recentMessageSender'] = this.recentMessageSender;
     data['inviteId'] = this.inviteId;
+    if (this.isReadAr != null) {
+      data['isReadAr'] = this.isReadAr!.map((v) => v.toJson()).toList();
+    }
     if (this.members != null) {
       data['members'] = this.members!.map((v) => v.toJson()).toList();
     }
@@ -90,6 +103,25 @@ class Admin {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['adminId'] = this.adminId;
     data['adminName'] = this.adminName;
+    return data;
+  }
+}
+
+class Read {
+  String? Id;
+  bool? isRead;
+
+  Read({this.Id, this.isRead});
+
+  Read.fromJson(Map<String, dynamic> json) {
+    Id = json['Id'];
+    isRead = json['isRead'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Id'] = this.Id;
+    data['isRead'] = this.isRead;
     return data;
   }
 }

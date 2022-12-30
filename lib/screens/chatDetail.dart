@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
+import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
@@ -29,25 +30,30 @@ class chatDetail extends StatefulWidget {
   State<chatDetail> createState() => _chatDetailState();
 }
 
-class _chatDetailState extends State<chatDetail> {
+class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
   var listController = ScrollController();
   var messageController = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     context.read<GetChatMessageCubit>().fetchData(widget.groupId);
   }
 
-  void InitialpositionList() {
-    setState(() {
-      listController.animateTo(listController.position.maxScrollExtent,
-          duration: Duration(microseconds: 100), curve: Curves.linear);
-    });
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    if (state == AppLifecycleState.resumed) {
+      print('in the chat detail');
+    } else {
+      print('not in th chat detail');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('run builder');
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -97,6 +103,7 @@ class _chatDetailState extends State<chatDetail> {
           highlightColor: Colors.transparent,
           onTap: () {
             FocusScope.of(context).unfocus();
+            context.read<MessageCubitCubit>().unshowMsgTime();
           },
           child: Container(
             width: screenwidth,
@@ -110,6 +117,14 @@ class _chatDetailState extends State<chatDetail> {
                     return StreamBuilder<QuerySnapshot>(
                         stream: state.data,
                         builder: (context, snapshot) {
+                          state.data!.listen((event) {
+                            if(context.read<SendMessageCubit>().state is SendMessageFlag == false){
+                                DatabaseService()
+                                .updateisReadMessage(widget.groupId);
+                            }
+                            print('listen to stream ${context.read<SendMessageCubit>().state is SendMessageFlag} ');
+                            
+                          });
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Expanded(
@@ -123,14 +138,13 @@ class _chatDetailState extends State<chatDetail> {
                                     child: Text(
                                         'Hãy nhắn gì đó cho các bạn của bạn nào ((:')));
                           }
+
                           context
                               .read<MessageCubitCubit>()
                               .DisplayMessage(snapshot);
                           return BlocConsumer<MessageCubitCubit,
                               MessageCubitState>(
-                            listener: (context, state) {
-                              print('cubit change');
-                            },
+                            listener: (context, state) {},
                             builder: (context, state) {
                               return Expanded(
                                 child: ListView.builder(
@@ -163,9 +177,6 @@ class _chatDetailState extends State<chatDetail> {
                             border: InputBorder.none,
                             hintText: 'send a message...',
                             hintStyle: TextStyle(color: Colors.grey)),
-                        onTap: () {
-                          InitialpositionList();
-                        },
                         onFieldSubmitted: (value) async {
                           Message ms = Message(
                               sender:
@@ -174,8 +185,10 @@ class _chatDetailState extends State<chatDetail> {
                               time: DateTime.now()
                                   .microsecondsSinceEpoch
                                   .toString());
-                          await DatabaseService()
-                              .sendMessage(widget.groupId, ms.toMap());
+                          await context
+                              .read<SendMessageCubit>()
+                              .sendmessage(widget.groupId, ms);
+
                           messageController.clear();
                         },
                       )),
@@ -188,8 +201,9 @@ class _chatDetailState extends State<chatDetail> {
                                 time: DateTime.now()
                                     .microsecondsSinceEpoch
                                     .toString());
-                            await DatabaseService()
-                                .sendMessage(widget.groupId, ms.toMap());
+                            await context
+                                .read<SendMessageCubit>()
+                                .sendmessage(widget.groupId, ms);
                             messageController.clear();
                           },
                           icon: Icon(
@@ -237,6 +251,11 @@ class _chatDetailState extends State<chatDetail> {
           : CrossAxisAlignment.start,
       children: [
         list[index].ontap
+            ? SizedBox(
+                height: 5,
+              )
+            : SizedBox(),
+        list[index].ontap
             ? Center(
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 7),
@@ -248,26 +267,40 @@ class _chatDetailState extends State<chatDetail> {
                       style: TextStyle(fontSize: 12, color: Colors.white),
                     )))
             : SizedBox(),
-        index >= length - 1
+        list[index].ontap
+            ? SizedBox(
+                height: 5,
+              )
+            : SizedBox(),
+        index >= length - 1 && index != 0
             ? index == length - 1 &&
                     Userinfo.userSingleton.uid !=
                         list[index]
                             .sender
-                            .substring(list[index].sender.length - 28) && list[index].sender != list[index - 1].sender
+                            .substring(list[index].sender.length - 28) &&
+                    list[index].sender != list[index - 1].sender
                 ? messageText(list[index].sender, list[index].sender)
-                : SizedBox()
+                : list[index].timesent - list[index - 1].timesent >= 4 &&
+                        Userinfo.userSingleton.uid !=
+                            list[index]
+                                .sender
+                                .substring(list[index].sender.length - 28)
+                    ? messageText(list[index].sender, list[index].sender)
+                    : SizedBox()
             : Userinfo.userSingleton.uid !=
                     list[index].sender.substring(list[index].sender.length - 28)
                 ? index == 0
                     ? messageText(list[index].sender, list[index].sender)
-                    : list[index].sender != list[index - 1].sender 
+                    : list[index].sender != list[index - 1].sender
                         ? messageText(list[index].sender, list[index].sender)
-                        : SizedBox()
+                        : list[index].timesent - list[index - 1].timesent >= 4
+                            ? messageText(
+                                list[index].sender, list[index].sender)
+                            : SizedBox()
                 : SizedBox(),
         GestureDetector(
           onTap: () {
             context.read<MessageCubitCubit>().onTapMsg(index);
-            print('ontappppppp');
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -282,9 +315,11 @@ class _chatDetailState extends State<chatDetail> {
                               .substring(list[index].sender.length - 28)
                   ? list[index].sender != list[index + 1].sender
                       ? itemImage(list[index].sender)
-                      : SizedBox(
-                          width: 30,
-                        )
+                      : list[index + 1].timesent - list[index].timesent >= 4
+                          ? itemImage(list[index].sender)
+                          : SizedBox(
+                              width: 30,
+                            )
                   : index == length - 1 &&
                           Userinfo.userSingleton.uid !=
                               list[index]

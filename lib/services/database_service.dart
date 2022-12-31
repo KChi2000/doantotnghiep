@@ -7,7 +7,7 @@ import 'package:doantotnghiep/model/GroupInfo.dart';
 import 'package:doantotnghiep/model/UserInfo.dart';
 
 class DatabaseService {
-  bool checkCanUpdate =false;
+  bool checkCanUpdate = false;
   final String? uid;
   DatabaseService({this.uid});
   CollectionReference userCollection =
@@ -124,6 +124,22 @@ class DatabaseService {
           {'Id': '${adminName}_${adminId}', 'isRead': false}
         ])
       });
+      // await groupCollection
+      //     .doc(documentRef.id)
+      //     .collection('Messages')
+      //     .doc('TypingStatus')
+      //     .set({
+      //   '$adminId':
+      //     {'isTyping': false}
+
+      // });
+      // await groupCollection.doc(documentRef.id).set({
+      //    'TypingStatus':[
+      //     {
+      //       'UserId': adminId, 'isTyping': false
+      //     }
+      //   ]
+      // });
       return await userCollection.doc(uid).update({
         'groups': FieldValue.arrayUnion([
           {'groupId': documentRef.id, 'GroupName': groupname}
@@ -137,7 +153,7 @@ class DatabaseService {
 
   sendMessage(String groupId, Map<String, dynamic> data) async {
     checkCanUpdate = false;
-   await groupCollection.doc(groupId).collection('Messages').add(data);
+    await groupCollection.doc(groupId).collection('Messages').add(data);
     var fetchdata = await groupCollection.doc(groupId).get();
     Map<String, dynamic> temp = fetchdata.data() as Map<String, dynamic>;
     List<Read>? listread = GroupInfo.fromJson(temp).isReadAr;
@@ -152,37 +168,31 @@ class DatabaseService {
       listresult.add(element.toJson());
     });
 
-   await groupCollection.doc(groupId).update({
+    await groupCollection.doc(groupId).update({
       'recentMessage': data['contentMessage'],
       'recentMessageSender': data['sender'],
       'time': data['time'],
       'isReadAr': listresult
     });
     checkCanUpdate = true;
-    print('xong sending');
   }
 
   updateisReadMessage(String grId) async {
-    print('check can update $checkCanUpdate');
-   
-     var fetchdata = await groupCollection.doc(grId).get();
-     print('xong update');
+    var fetchdata = await groupCollection.doc(grId).get();
+
     Map<String, dynamic> temp = await fetchdata.data() as Map<String, dynamic>;
     List<Read>? listread = GroupInfo.fromJson(temp).isReadAr;
     List<Map<String, dynamic>> listresult = [];
 
     listread!.forEach((element) {
-      print('before database ${element.Id} ${element.isRead}');
       if (element.Id ==
           '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}') {
         element.isRead = true;
       }
-      print('after database ${element.Id} ${element.isRead}');
+
       listresult.add(element.toJson());
     });
     groupCollection.doc(grId).update({'isReadAr': listresult});
-   
-   
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId) {

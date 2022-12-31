@@ -10,6 +10,7 @@ class Message {
   String displaytime='';
   int timesent= 0;
   bool ontap=false;
+  String timelocal='';
   Message({
     required this.sender,
     required this.contentMessage,

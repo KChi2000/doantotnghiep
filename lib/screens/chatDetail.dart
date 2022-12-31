@@ -12,6 +12,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../model/GroupInfo.dart';
 
 class chatDetail extends StatefulWidget {
@@ -53,7 +54,6 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    print('run builder');
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -118,12 +118,12 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                         stream: state.data,
                         builder: (context, snapshot) {
                           state.data!.listen((event) {
-                            if(context.read<SendMessageCubit>().state is SendMessageFlag == false){
-                                DatabaseService()
-                                .updateisReadMessage(widget.groupId);
+                            if (context.read<SendMessageCubit>().state
+                                    is SendMessageFlag ==
+                                false) {
+                              DatabaseService()
+                                  .updateisReadMessage(widget.groupId);
                             }
-                            print('listen to stream ${context.read<SendMessageCubit>().state is SendMessageFlag} ');
-                            
                           });
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -267,6 +267,19 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                       style: TextStyle(fontSize: 12, color: Colors.white),
                     )))
             : SizedBox(),
+        Userinfo.userSingleton.uid ==
+                    list[index]
+                        .sender
+                        .substring(list[index].sender.length - 28) &&
+                index > 0 &&
+                index <= length - 1 &&
+                list[index].timesent - list[index - 1].timesent >= 3
+            ? Center(
+                child: Text(
+                '${list[index].timelocal}',
+                style: TextStyle(fontSize: 12, color: Colors.black45),
+              ))
+            : SizedBox(),
         list[index].ontap
             ? SizedBox(
                 height: 5,
@@ -366,9 +379,25 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             ],
           ),
         ),
+        BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+          builder: (context, state) {
+            return StreamBuilder(
+              stream: state.stream,
+              builder: (context,snashot) {
+                print('status read da change');
+               
+                return messagestatus('đã gửi');
+                
+              }
+            );
+          },
+        )
       ],
     );
   }
+
+  Text messagestatus(String status) =>
+      Text(status, style: TextStyle(fontSize: 11, color: Colors.black54));
 
   Container itemImage(String name) {
     return Container(

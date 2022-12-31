@@ -19,7 +19,7 @@ class MessageCubitCubit extends Cubit<MessageCubitState> {
       (element) {
         var tri = DateTime.fromMicrosecondsSinceEpoch(int.parse(element.time));
         element.timesent = (tri.day * 24 * 60) + (tri.hour * 60) + tri.minute;
-
+        element.timelocal = '${tri.hour}:${tri.minute.toString().padLeft(2, '0')}';
         if (DateTime.now().weekOfMonth == tri.weekOfMonth &&
             DateTime(tri.year, tri.month, tri.day) !=
                 DateTime(DateTime.now().year, DateTime.now().month,

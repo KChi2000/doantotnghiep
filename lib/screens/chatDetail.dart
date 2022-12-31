@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cubit.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
@@ -382,24 +383,34 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
         BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
           builder: (context, state) {
             return StreamBuilder(
-              stream: state.stream,
-              builder: (context,snashot) {
-                print('status read da change');
-               
-                return messagestatus('đã gửi');
-                
-              }
-            );
+                stream: state.stream,
+                builder: (context, snapshot) {
+                  print('status read da change');
+                  context.read<ChangeMessageStatusCubit>().update(snapshot.data,widget.groupId);
+                  return BlocBuilder<ChangeMessageStatusCubit, ChangeMessageStatusState>(
+                    builder: (context, state) {
+                      if(state.viewer!.length == 0){
+                        return messagestatus('đã gửi', index, length);
+                      }
+                      return messagestatus('đã xem', index, length);
+                    },
+                  );
+                });
           },
         )
       ],
     );
   }
 
-  Text messagestatus(String status) =>
-      Text(status, style: TextStyle(fontSize: 11, color: Colors.black54));
+  Widget messagestatus(String status, int index, int length) {
+    if (index == length - 1) {
+      return Text(status,
+          style: TextStyle(fontSize: 11, color: Colors.black54));
+    }
+    return SizedBox();
+  }
 
-  Container itemImage(String name) {
+  Widget itemImage(String name) {
     return Container(
       width: 30,
       height: 30,

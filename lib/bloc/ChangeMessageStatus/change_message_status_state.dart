@@ -1,10 +1,11 @@
 part of 'change_message_status_cubit.dart';
 
-abstract class ChangeMessageStatusState extends Equatable {
-  const ChangeMessageStatusState();
+ class ChangeMessageStatusState extends Equatable {
+  List<String>? viewer;
+   ChangeMessageStatusState({this.viewer});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [viewer!];
 }
 
-class ChangeMessageStatusInitial extends ChangeMessageStatusState {}
+

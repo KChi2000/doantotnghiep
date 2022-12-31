@@ -1,3 +1,4 @@
+import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cubit.dart';
 import 'package:doantotnghiep/bloc/Changetab/changetab_cubit.dart';
 import 'package:doantotnghiep/bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
@@ -99,6 +100,9 @@ class _MyAppState extends State<MyApp> {
         ),
          BlocProvider(
           create: (context) => SendMessageCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ChangeMessageStatusCubit(),
         ),
       ],
       child: MaterialApp(

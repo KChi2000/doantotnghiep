@@ -83,7 +83,7 @@ class DatabaseService {
         ])
       });
     } else {
-      print('vao else');
+     
       await userDoc.update({
         'groups': FieldValue.arrayUnion([
           {'groupId': groupid, 'GroupName': groupname}
@@ -161,10 +161,11 @@ class DatabaseService {
     listread!.forEach((element) {
       if (element.Id != data['sender']) {
         element.isRead = false;
-      } else {
+      }
+       else {
         element.isRead = true;
       }
-      print('from send message ${element.Id} ${element.isRead}');
+   
       listresult.add(element.toJson());
     });
 
@@ -174,7 +175,7 @@ class DatabaseService {
       'time': data['time'],
       'isReadAr': listresult
     });
-    checkCanUpdate = true;
+   print('SEND STATUS MESSAGE');
   }
 
   updateisReadMessage(String grId) async {
@@ -193,6 +194,10 @@ class DatabaseService {
       listresult.add(element.toJson());
     });
     groupCollection.doc(grId).update({'isReadAr': listresult});
+    print('UPDATE STATUS MESSAGE');
+    listread.forEach((element) { 
+      print(element.isRead);
+    });
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId) {

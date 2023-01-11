@@ -3,9 +3,11 @@ import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cub
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
+import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/screens/CallVideo.dart';
 import 'package:doantotnghiep/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +43,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     context.read<GetChatMessageCubit>().fetchData(widget.groupId);
+    context.read<SendMessageCubit>().initialStatusSendMessage();
+    
   }
 
   @override
@@ -69,7 +73,9 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(onPressed: () {}, icon: Icon(Icons.videocam)),
+              child: IconButton(onPressed: () {
+                navigatePush(context, CallVideo());
+              }, icon: Icon(Icons.videocam)),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -118,14 +124,10 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                     return StreamBuilder<QuerySnapshot>(
                         stream: state.data,
                         builder: (context, snapshot) {
-                          state.data!.listen((event) {
-                            if (context.read<SendMessageCubit>().state
-                                    is SendMessageFlag ==
-                                false) {
-                              DatabaseService()
-                                  .updateisReadMessage(widget.groupId);
-                            }
-                          });
+                          // state.data!.listen((event) {
+                          //   DatabaseService().updateisReadMessage(widget.groupId);
+                          // });
+
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Expanded(
@@ -139,7 +141,10 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                     child: Text(
                                         'Hãy nhắn gì đó cho các bạn của bạn nào ((:')));
                           }
-
+                          if (snapshot.data!.docChanges.length != 0) {
+                            DatabaseService()
+                                .updateisReadMessage(widget.groupId);
+                          }
                           context
                               .read<MessageCubitCubit>()
                               .DisplayMessage(snapshot);
@@ -195,6 +200,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                       )),
                       IconButton(
                           onPressed: () async {
+                            // context.read<SendMessageCubit>().initialStatusSendMessage();
                             Message ms = Message(
                                 sender:
                                     '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
@@ -380,24 +386,32 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             ],
           ),
         ),
-        BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-          builder: (context, state) {
-            return StreamBuilder(
-                stream: state.stream,
-                builder: (context, snapshot) {
-                  print('status read da change');
-                  context.read<ChangeMessageStatusCubit>().update(snapshot.data,widget.groupId);
-                  return BlocBuilder<ChangeMessageStatusCubit, ChangeMessageStatusState>(
-                    builder: (context, state) {
-                      if(state.viewer!.length == 0){
-                        return messagestatus('đã gửi', index, length);
-                      }
-                      return messagestatus('đã xem', index, length);
-                    },
-                  );
-                });
-          },
-        )
+        // BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+        //   builder: (context, state) {
+        //     return StreamBuilder(
+        //         stream: state.stream,
+        //         builder: (context, snapshot) {
+        //           state.stream!.listen((event) {
+        //             if (snapshot.hasData) {
+        //               context
+        //                   .read<ChangeMessageStatusCubit>()
+        //                   .update(snapshot.data, widget.groupId);
+        //             }
+        //           });
+
+        //           return BlocBuilder<ChangeMessageStatusCubit,
+        //               ChangeMessageStatusState>(
+        //             builder: (context, state) {
+        //               print('list of string ${state.viewer.length}');
+        //               if (state.viewer.length == 0) {
+        //                 return messagestatus('đã gửi', index, length);
+        //               }
+        //               return messagestatus('đã xem', index, length);
+        //             },
+        //           );
+        //         });
+        //   },
+        // )
       ],
     );
   }

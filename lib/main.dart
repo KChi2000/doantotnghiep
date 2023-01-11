@@ -2,6 +2,7 @@ import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cub
 import 'package:doantotnghiep/bloc/Changetab/changetab_cubit.dart';
 import 'package:doantotnghiep/bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
+import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
@@ -103,6 +104,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (context) => ChangeMessageStatusCubit(),
+        ),
+          BlocProvider(
+          create: (context) => MakeAVideoCallCubit(),
         ),
       ],
       child: MaterialApp(

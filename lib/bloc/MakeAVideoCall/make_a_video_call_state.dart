@@ -12,10 +12,11 @@ class MakeAVideoCallInitial extends MakeAVideoCallState {
 
 }
 class MakeAVideoCallLoaded extends MakeAVideoCallState {
-  RTCVideoRenderer renderer;
-   MakeAVideoCallLoaded({required this.renderer});
+  RTCVideoRenderer localrenderer;
+    RTCVideoRenderer remoterenderer;
+   MakeAVideoCallLoaded({required this.localrenderer,required this.remoterenderer});
 
   @override
-  List<Object> get props => [renderer];
+  List<Object> get props => [localrenderer,remoterenderer];
 }
 

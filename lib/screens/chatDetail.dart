@@ -15,6 +15,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import '../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../model/GroupInfo.dart';
 
@@ -74,7 +75,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(onPressed: () {
-                navigatePush(context, CallVideo());
+                //  context.read<MakeAVideoCallCubit>().getusermedia(widget.groupId);
+                navigatePush(context, CallVideo(groupid: widget.groupId,));
               }, icon: Icon(Icons.videocam)),
             ),
             Padding(

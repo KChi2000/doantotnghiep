@@ -15,7 +15,7 @@ class MakeAVideoCallCubit extends Cubit<MakeAVideoCallState> {
     localVideo.initialize();
     remoteVideo.initialize();
     await DatabaseService.instance.openUserMedia(localVideo, remoteVideo);
-    DatabaseService.instance.createRoom(remoteVideo, groupid);
+   await DatabaseService.instance.createRoom(localVideo, groupid);
     emit(MakeAVideoCallLoaded(
         localrenderer: localVideo, remoterenderer: remoteVideo));
   }

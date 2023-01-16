@@ -25,15 +25,13 @@ class _CallVideoState extends State<CallVideo> {
   @override
   void initState() {
     initValue();
-    signaling.onAddRemoteStream = ((stream) {
-      _remoteRenderer.srcObject = stream;
-     setState(() {
-       
-     });
-    });
+    // signaling.onAddRemoteStream = ((stream) {
+    //   _remoteRenderer.srcObject = stream;
+    //   setState(() {});
+    // });
 
     super.initState();
- setState(() {});
+    // setState(() {});
     //  context.read<MakeAVideoCallCubit>().addRemoteStream();
   }
 
@@ -53,7 +51,7 @@ class _CallVideoState extends State<CallVideo> {
         // ),
         body: BlocBuilder<MakeAVideoCallCubit, MakeAVideoCallState>(
           builder: (context, state) {
-            // if (state is MakeAVideoCallLoaded) {
+            if (state is MakeAVideoCallLoaded) {
             return Container(
                 width: screenwidth,
                 height: screenheight,
@@ -64,23 +62,17 @@ class _CallVideoState extends State<CallVideo> {
                       crossAxisCount: 1,
                       children: [
                         RTCVideoView(
-                          _localRenderer,
+                          state.localrenderer,
                           mirror: true,
                           objectFit:
                               RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                         ),
                         RTCVideoView(
-                          _remoteRenderer,
+                          state.remoterenderer,
                           mirror: true,
                           objectFit:
                               RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                         ),
-                        SizedBox(
-                          width: screenwidth,
-                          child: TextFormField(
-                            controller: textEditingController,
-                          ),
-                        )
                       ],
                     ),
                     IconButton(
@@ -100,92 +92,78 @@ class _CallVideoState extends State<CallVideo> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          TextButton(
-                            style: TextButton.styleFrom(backgroundColor: Colors.amber),
-                              onPressed: () async {
-                                roomId =
-                                    await signaling.createRoom(_remoteRenderer);
-                                textEditingController.text = roomId!;
-                                setState(() {});
-                                // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                              },
-                              child: Text('offer')),
+                          // TextButton(
+                          //     style: TextButton.styleFrom(
+                          //         backgroundColor: Colors.amber),
+                          //     onPressed: () async {
+                               
+
+                          //       // setState(() {});
+                          //       // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
+                          //     },
+                          //     child: Text('offer')),
+                          // SizedBox(
+                          //   width: 30,
+                          // ),
+                          // TextButton(
+                          //     style: TextButton.styleFrom(
+                          //         backgroundColor: Colors.amber),
+                          //     onPressed: () {
+                          //       signaling.joinRoom(
+                          //         "${widget.groupid}", // textEditingController.text,
+                          //         _remoteRenderer,
+                          //       );
+                          //       // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
+                          //     },
+                          //     child: Text('answer')),
+                           itemcall(
+                              Icon(
+                                Icons.phone_enabled,
+                                color: Colors.white,
+                              ), () async {
+                            context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
+                          }, Colors.green),
                           SizedBox(
                             width: 30,
                           ),
-                          TextButton(
-                            style: TextButton.styleFrom(backgroundColor: Colors.amber),
-                              onPressed: () {
-                                signaling.joinRoom(
-                                  "CURRENT", // textEditingController.text,
-                                  _remoteRenderer,
-                                );
-                                // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                              },
-                              child: Text('answer')),
-                               SizedBox(
-                            width: 30,
+                          itemcall(
+                              Icon(
+                                Icons.phone_enabled,
+                                color: Colors.white,
+                              ), () async {
+                            await signaling.hangUp(
+                                _localRenderer, widget.groupid);
+                            Navigator.pop(context);
+                          }, Colors.red),
+                          SizedBox(
+                            width: 15,
                           ),
-                          TextButton(
-                            style: TextButton.styleFrom(backgroundColor: Colors.amber),
-                              onPressed: () {
-                                  signaling.hangUp(_localRenderer);
-                                // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                              },
-                              child: Text('hang up')),
-                          // itemcall(
-                          //     Icon(
-                          //       Icons.flip_camera_ios_outlined,
-                          //       color: Colors.white,
-                          //     ),
-                          //     () {}),
-                          // SizedBox(
-                          //   width: 15,
-                          // ),
-                          // itemcall(
-                          //     Icon(
-                          //       Icons.phone_enabled,
-                          //       color: Colors.white,
-                          //     ),
-                          //     () {}),
-                          // SizedBox(
-                          //   width: 15,
-                          // ),
                         ],
                       ),
                     )
                   ],
                 ));
-            // }
-            // return Container(
-            //   width: screenwidth,
-            //   height: screenheight,
-            //   color: Colors.white,
-            //   child: Center(
-            //     child: Text('Dang thiet lap....'),
-            //   ),
-            // );
+            }
+            return Container(
+              width: screenwidth,
+              height: screenheight,
+              color: Colors.white,
+              child: Center(
+                child: Text('Dang thiet lap....'),
+              ),
+            );
           },
         ),
-       
       ),
     );
   }
 
-  Positioned itemcall(Icon icon, VoidCallback ontap) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: InkWell(
-        // splashColor: Colors.yellow,
-        // highlightColor: Colors.yellowAccent,
-        onTap: ontap,
-        child: CircleAvatar(
-            // backgroundColor: Colors.transparent,
-            radius: 30,
-            child: icon),
-      ),
+  Widget itemcall(Icon icon, VoidCallback ontap, Color color) {
+    return InkWell(
+      // splashColor: Colors.yellow,
+      // highlightColor: Colors.yellowAccent,
+      onTap: ontap,
+      child: CircleAvatar(backgroundColor: color, radius: 30, child: icon),
     );
   }
 

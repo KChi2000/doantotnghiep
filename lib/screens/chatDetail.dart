@@ -6,6 +6,7 @@ import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
+import 'package:doantotnghiep/model/Signaling.dart';
 import 'package:doantotnghiep/model/UserInfo.dart';
 import 'package:doantotnghiep/screens/CallVideo.dart';
 import 'package:doantotnghiep/services/database_service.dart';
@@ -74,8 +75,9 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(onPressed: () {
-                //  context.read<MakeAVideoCallCubit>().getusermedia(widget.groupId);
+              child: IconButton(onPressed: ()async {
+                 context.read<MakeAVideoCallCubit>().getusermedia(widget.groupId);
+                 
                 navigatePush(context, CallVideo(groupid: widget.groupId,));
               }, icon: Icon(Icons.videocam)),
             ),

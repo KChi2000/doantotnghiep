@@ -6,6 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 typedef void StreamStateCallback(MediaStream stream);
 
 class Signaling {
+  static Signaling instance = Signaling();
   Map<String, dynamic> configuration = {
     'iceServers': [
       {
@@ -26,10 +27,10 @@ class Signaling {
   String? roomId;
   String? currentRoomText;
   StreamStateCallback? onAddRemoteStream;
-
-  Future<String> createRoom(RTCVideoRenderer remoteRenderer) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentReference roomRef = db.collection('rooms').doc("CURRENT");
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  Future<String> createRoom(
+      RTCVideoRenderer remoteRenderer, String grid) async {
+    DocumentReference roomRef = db.collection('groups').doc(grid);
 
     print('Create PeerConnection with configuration: $configuration');
 
@@ -57,7 +58,7 @@ class Signaling {
 
     Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
 
-    await roomRef.set(roomWithOffer);
+    await roomRef.update(roomWithOffer);
     var roomId = roomRef.id;
     print('New room created with SDK offer. Room ID: $roomId');
     currentRoomText = 'Current room is $roomId - You are the caller!';
@@ -111,9 +112,8 @@ class Signaling {
     return roomId;
   }
 
-  Future<void> joinRoom(String roomId, RTCVideoRenderer remoteVideo) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentReference roomRef = db.collection('rooms').doc('$roomId');
+  Future<void> joinRoom(String grid, RTCVideoRenderer remoteVideo) async {
+    DocumentReference roomRef = db.collection('groups').doc('$grid');
     var roomSnapshot = await roomRef.get();
     print('Got room ${roomSnapshot.exists}');
 
@@ -142,7 +142,8 @@ class Signaling {
       peerConnection?.onTrack = (RTCTrackEvent event) {
         print('[MyRTC] Got remote track: ${event.streams[0]}');
         event.streams[0].getTracks().forEach((track) {
-          print('[MyRTC] Add a track to the remoteStream: $track $remoteStream ${remoteStream.hashCode}');
+          print(
+              '[MyRTC] Add a track to the remoteStream: $track $remoteStream ${remoteStream.hashCode}');
           remoteStream?.addTrack(track);
         });
       };
@@ -197,7 +198,7 @@ class Signaling {
     remoteVideo.srcObject = await createLocalMediaStream('key');
   }
 
-  Future<void> hangUp(RTCVideoRenderer localVideo) async {
+  Future<void> hangUp(RTCVideoRenderer localVideo, String grid) async {
     List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
     tracks.forEach((track) {
       track.stop();
@@ -208,17 +209,18 @@ class Signaling {
     }
     if (peerConnection != null) peerConnection!.close();
 
-    if (roomId != null) {
-      var db = FirebaseFirestore.instance;
-      var roomRef = db.collection('rooms').doc(roomId);
+  
+      // var db = FirebaseFirestore.instance;
+      var roomRef = db.collection('groups').doc(grid);
       var calleeCandidates = await roomRef.collection('calleeCandidates').get();
       calleeCandidates.docs.forEach((document) => document.reference.delete());
 
       var callerCandidates = await roomRef.collection('callerCandidates').get();
       callerCandidates.docs.forEach((document) => document.reference.delete());
-
-      await roomRef.delete();
-    }
+      await roomRef.update({'answer':FieldValue.delete(),
+      'offer': FieldValue.delete()});
+      // await roomRef.delete();
+   
 
     localStream!.dispose();
     remoteStream?.dispose();

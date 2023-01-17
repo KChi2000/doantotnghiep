@@ -14,23 +14,23 @@ class MakeAVideoCallCubit extends Cubit<MakeAVideoCallState> {
   void getusermedia(String groupid) async {
     localVideo.initialize();
     remoteVideo.initialize();
-    await DatabaseService.instance.openUserMedia(localVideo, remoteVideo);
-   await DatabaseService.instance.createRoom(localVideo, groupid);
+     Signaling.instance.onAddRemoteStream =(stream) {
+    remoteVideo.srcObject=stream;
+  
+  };
+    await Signaling.instance.openUserMedia(localVideo, remoteVideo);
+  String rs= await Signaling.instance.createRoom(localVideo, groupid);
     emit(MakeAVideoCallLoaded(
-        localrenderer: localVideo, remoterenderer: remoteVideo));
+        localrenderer: localVideo, remoterenderer: remoteVideo,calling: rs));
   }
 void joinVideoCall(String groupid){
-  DatabaseService.instance.joinRoom(groupid, remoteVideo);
+  Signaling.instance.joinRoom(groupid, remoteVideo);
 }
 void addRemoteStream(){
-  // DatabaseService.instance.onAddRemoteStream!((stream){
+  // Signaling.instance.onAddRemoteStream!((stream){
   //   remoteVideo.srcObject = stream;
   // });
-  DatabaseService.instance.onAddRemoteStream =(stream) {
-    remoteVideo.srcObject=stream;
-    emit(MakeAVideoCallLoaded(
-        localrenderer: localVideo, remoterenderer: remoteVideo));
-  };
+ 
 }
   void disposevideocall() async {
     print('dispose');
@@ -38,6 +38,6 @@ void addRemoteStream(){
     await localVideo.dispose();
     await remoteVideo.dispose();
     emit(MakeAVideoCallLoaded(
-        localrenderer: localVideo, remoterenderer: remoteVideo));
+        localrenderer: localVideo, remoterenderer: remoteVideo,calling: ''));
   }
 }

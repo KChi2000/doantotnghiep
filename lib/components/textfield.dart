@@ -21,27 +21,25 @@ class textfield extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        width: screenwidth - 100,
-        child: TextFormField(
-          controller: emailCon,
-          decoration: InputDecoration(
-              border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.green)),
-              isDense: true,
-              // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green)),
-              hintText: hint,
-              label: Text(label),
-              prefixIcon: Icon(
-                icon,
-                color: iconcolor,
-              )),
-              validator: (value) {
-                if(value!.isEmpty || value==null){
-                    return error;
-                }
-              },
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-        ));
+    return TextFormField(
+      controller: emailCon,
+      decoration: InputDecoration(
+          border: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.green)),
+          isDense: true,
+          // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green)),
+          hintText: hint,
+          label: Text(label),
+          prefixIcon: Icon(
+            icon,
+            color: iconcolor,
+          )),
+          validator: (value) {
+            if(value!.isEmpty || value==null){
+                return error;
+            }
+          },
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
   }
 }

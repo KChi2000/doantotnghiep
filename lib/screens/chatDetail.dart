@@ -77,7 +77,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(onPressed: ()async {
                  context.read<MakeAVideoCallCubit>().getusermedia(widget.groupId);
-                 
+                //  print('ccccccc : ${(context.read<MakeAVideoCallCubit>().state as MakeAVideoCallLoaded).calling}');
                 navigatePush(context, CallVideo(groupid: widget.groupId,));
               }, icon: Icon(Icons.videocam)),
             ),

@@ -7,12 +7,11 @@ import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
-import 'package:doantotnghiep/model/GroupInfo.dart';
-import 'package:doantotnghiep/model/UserGroup.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/model/Group.dart';
+
 import 'package:doantotnghiep/screens/SearchAndJoined.dart';
 import 'package:doantotnghiep/screens/chatDetail.dart';
-import 'package:doantotnghiep/services/database_service.dart';
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +23,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:rive/rive.dart';
 
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../model/UserInfo.dart';
 
 class ConnectToFriend extends StatefulWidget {
   ConnectToFriend({super.key});

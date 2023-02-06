@@ -1,3 +1,7 @@
+
+
+import 'package:doantotnghiep/model/UserInfo.dart';
+
 class UserGroup {
   String? email;
   String? uid;
@@ -34,21 +38,3 @@ class UserGroup {
   }
 }
 
-class Groups {
-  String? groupId;
-  String? groupName;
-
-  Groups({this.groupId, this.groupName});
-
-  Groups.fromJson(Map<String, dynamic> json) {
-    groupId = json['groupId'];
-    groupName = json['GroupName'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['groupId'] = this.groupId;
-    data['GroupName'] = this.groupName;
-    return data;
-  }
-}

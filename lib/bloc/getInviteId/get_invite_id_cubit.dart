@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:doantotnghiep/model/GroupInfo.dart';
-import 'package:doantotnghiep/services/database_service.dart';
+import 'package:doantotnghiep/model/Group.dart';
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:equatable/equatable.dart';
 
 part 'get_invite_id_state.dart';

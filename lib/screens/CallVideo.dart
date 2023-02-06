@@ -1,12 +1,14 @@
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
-import 'package:doantotnghiep/model/Signaling.dart';
-import 'package:doantotnghiep/services/database_service.dart';
+import 'package:doantotnghiep/helper/Signaling.dart';
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 class CallVideo extends StatefulWidget {
   CallVideo({required this.groupid});
@@ -25,12 +27,13 @@ class _CallVideoState extends State<CallVideo> {
   @override
   void initState() {
     initValue();
-    // signaling.onAddRemoteStream = ((stream) {
-    //   _remoteRenderer.srcObject = stream;
-    //   setState(() {});
-    // });
+    signaling.onAddRemoteStream = ((stream) {
+      _remoteRenderer.srcObject = stream;
+      setState(() {});
+    });
 
     super.initState();
+   
     // setState(() {});
     //  context.read<MakeAVideoCallCubit>().addRemoteStream();
   }
@@ -39,6 +42,7 @@ class _CallVideoState extends State<CallVideo> {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
     signaling.openUserMedia(_localRenderer, _remoteRenderer);
+    await signaling.createRoom(_remoteRenderer, widget.groupid);
     //  setState(() {});
   }
 
@@ -49,121 +53,134 @@ class _CallVideoState extends State<CallVideo> {
         // appBar: AppBar(
         //   title: Text('Video Calling'),
         // ),
-        body: BlocBuilder<MakeAVideoCallCubit, MakeAVideoCallState>(
-          builder: (context, state) {
-            if (state is MakeAVideoCallLoaded) {
-            return Container(
-                width: screenwidth,
-                height: screenheight,
-                // color: Colors.pink,
-                child: Stack(
-                  children: [
-                    GridView.count(
-                      crossAxisCount: 1,
-                      children: [
-                        RTCVideoView(
-                          state.localrenderer,
-                          mirror: true,
-                          objectFit:
-                              RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                        ),
-                        RTCVideoView(
-                          state.remoterenderer,
-                          mirror: true,
-                          objectFit:
-                              RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 28,
-                        )),
-                    Positioned(
-                      bottom: 20.0,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+        body: 
+        // BlocBuilder<MakeAVideoCallCubit, MakeAVideoCallState>(
+        //   builder: (context, state) {
+        //     if (state is MakeAVideoCallLoaded) {
+        //     return 
+            LoaderOverlay(
+              useDefaultLoading: false,
+              overlayWidget: Center(child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  itemImage('Abcs'),
+                  Text("Đang gọi..."),
+                ],
+              )),
+              overlayColor: Colors.grey,
+              child: Container(
+                  width: screenwidth,
+                  height: screenheight,
+                  color: Colors.pink,
+                  child: 
+                  Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Column(
+                        // shrinkWrap: true,
+                        // crossAxisCount: 1,
                         children: [
-                          // TextButton(
-                          //     style: TextButton.styleFrom(
-                          //         backgroundColor: Colors.amber),
-                          //     onPressed: () async {
-                               
-
-                          //       // setState(() {});
-                          //       // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                          //     },
-                          //     child: Text('offer')),
-                          // SizedBox(
-                          //   width: 30,
+                            Flexible(
+                            child: RTCVideoView(
+                             _localRenderer,
+                              mirror: true,
+                              objectFit:
+                                  RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                            ),
+                          ),
+                          // Container(
+                          //   width: screenwidth,
+                          //   height: screenheight/2-10,
+                          //   child: RTCVideoView(
+                          //    _remoteRenderer,
+                          //     mirror: true,
+                          //     objectFit:
+                          //         RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                          //   ),
                           // ),
-                          // TextButton(
-                          //     style: TextButton.styleFrom(
-                          //         backgroundColor: Colors.amber),
-                          //     onPressed: () {
-                          //       signaling.joinRoom(
-                          //         "${widget.groupid}", // textEditingController.text,
-                          //         _remoteRenderer,
-                          //       );
-                          //       // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                          //     },
-                          //     child: Text('answer')),
-                           itemcall(
-                              Icon(
-                                Icons.phone_enabled,
-                                color: Colors.white,
-                              ), () async {
-                            context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                          }, Colors.green),
-                          SizedBox(
-                            width: 30,
-                          ),
-                          itemcall(
-                              Icon(
-                                Icons.phone_enabled,
-                                color: Colors.white,
-                              ), () async {
-                            await signaling.hangUp(
-                                _localRenderer, widget.groupid);
-                            Navigator.pop(context);
-                          }, Colors.red),
-                          SizedBox(
-                            width: 15,
-                          ),
+                        
+                          
                         ],
                       ),
-                    )
-                  ],
-                ));
-            }
-            return Container(
-              width: screenwidth,
-              height: screenheight,
-              color: Colors.white,
-              child: Center(
-                child: Text('Dang thiet lap....'),
-              ),
-            );
-          },
-        ),
+                      // Positioned(
+                      //   top: 0,
+                      //   left: 0,
+                      //   child: IconButton(
+                      //       onPressed: () {
+                      //         Navigator.pop(context);
+                      //       },
+                      //       icon: Icon(
+                      //         Icons.arrow_back,
+                      //         color: Colors.white,
+                      //         size: 28,
+                      //       )),
+                      // ),
+                      Positioned(
+                        bottom: 20.0,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                             itemcall(
+                                'assets/icons/camera-flip.svg', () async {
+                                   context.loaderOverlay.show();
+                                  // signaling.joinRoom(widget.groupid, _remoteRenderer);
+                              // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
+                            }, Colors.white),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            itemcall(
+                               'assets/icons/phone-hangup.svg', () async {
+                              await signaling.hangUp(
+                                  _localRenderer, widget.groupid);
+                              Navigator.pop(context);
+                            }, Colors.red[900]!),
+                            SizedBox(
+                              width: 15,
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  )),
+            )
+        //     }
+        //     return Container(
+        //       width: screenwidth,
+        //       height: screenheight,
+        //       color: Colors.white,
+        //       child: Center(
+        //         child: Text('Dang thiet lap....'),
+        //       ),
+        //     );
+        //   },
+        // ),
       ),
     );
   }
-
-  Widget itemcall(Icon icon, VoidCallback ontap, Color color) {
+ Widget itemImage(String name) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(40),
+          color: Theme.of(context).primaryColor),
+      child: Center(
+          child: Text(
+        '${name}',
+        style: TextStyle(color: Colors.white),
+      )),
+    );
+  }
+  Widget itemcall(String icon, VoidCallback ontap, Color color) {
     return InkWell(
       // splashColor: Colors.yellow,
       // highlightColor: Colors.yellowAccent,
       onTap: ontap,
-      child: CircleAvatar(backgroundColor: color, radius: 30, child: icon),
+      child: CircleAvatar(backgroundColor: color, radius: 30, child: SvgPicture.asset('$icon')),
     );
   }
 

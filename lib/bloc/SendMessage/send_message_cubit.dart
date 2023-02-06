@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../model/Message.dart';
-import '../../services/database_service.dart';
+import '../../NetworkProvider/Networkprovider.dart';
 
 part 'send_message_state.dart';
 

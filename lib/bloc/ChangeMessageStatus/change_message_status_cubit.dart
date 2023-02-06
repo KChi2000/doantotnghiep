@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../model/GroupInfo.dart';
+import '../../model/Group.dart';
 
 part 'change_message_status_state.dart';
 

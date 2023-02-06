@@ -2,9 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/main.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
-import 'package:doantotnghiep/services/auth_service.dart';
+
+import 'package:doantotnghiep/NetworkProvider/NetWorkProvider_Auth.dart';
 import 'package:equatable/equatable.dart';
+
+import '../../model/UserInfo.dart';
 
 part 'register_state.dart';
 

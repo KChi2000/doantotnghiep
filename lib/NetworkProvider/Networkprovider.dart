@@ -4,9 +4,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doantotnghiep/components/showSnackbar.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
-import 'package:doantotnghiep/model/GroupInfo.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/model/Group.dart';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+
+import '../model/UserInfo.dart';
 
 typedef void StreamStateCallback(MediaStream stream);
 

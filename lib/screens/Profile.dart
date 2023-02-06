@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:doantotnghiep/components/pickImage/pick_image_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -13,6 +13,7 @@ import 'package:lottie/lottie.dart';
 import '../components/itemEditProfile.dart';
 import '../helper/helper_function.dart';
 import '../main.dart';
+import '../model/UserInfo.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});

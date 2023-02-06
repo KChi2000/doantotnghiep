@@ -6,10 +6,10 @@ import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
-import 'package:doantotnghiep/model/Signaling.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/helper/Signaling.dart';
+
 import 'package:doantotnghiep/screens/CallVideo.dart';
-import 'package:doantotnghiep/services/database_service.dart';
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -18,7 +18,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import '../bloc/getUserGroup/get_user_group_cubit.dart';
-import '../model/GroupInfo.dart';
+import '../model/Group.dart';
+import '../model/UserInfo.dart';
 
 class chatDetail extends StatefulWidget {
   chatDetail(

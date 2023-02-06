@@ -1,18 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'dart:convert';
-
-
-
 class Userinfo {
   String? uid;
   String? name;
   String? email;
-  static  Userinfo userSingleton = Userinfo();
+  List<Groups>? groups;
+  String? profilePic;
   Userinfo({
-     this.uid,
-     this.name,
-     this.email,
+    this.uid,
+    this.name,
+    this.email,
+    this.groups,
+    this.profilePic,
   });
+  static  Userinfo userSingleton = Userinfo();
+  
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -43,4 +46,22 @@ class Userinfo {
   String toJson() => json.encode(toMap());
 
   factory Userinfo.fromJson(String source) => Userinfo.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+class Groups {
+  String? groupId;
+  String? groupName;
+
+  Groups({this.groupId, this.groupName});
+
+  Groups.fromJson(Map<String, dynamic> json) {
+    groupId = json['groupId'];
+    groupName = json['GroupName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['groupId'] = this.groupId;
+    data['GroupName'] = this.groupName;
+    return data;
+  }
 }

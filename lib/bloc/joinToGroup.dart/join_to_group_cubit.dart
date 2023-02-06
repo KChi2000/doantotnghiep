@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:doantotnghiep/model/GroupInfo.dart';
+import 'package:doantotnghiep/model/Group.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../services/database_service.dart';
+import '../../NetworkProvider/Networkprovider.dart';
 
 part 'join_to_group_state.dart';
 

@@ -5,16 +5,18 @@ import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
-import 'package:doantotnghiep/model/GroupInfo.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/model/Group.dart';
+
 import 'package:doantotnghiep/screens/chatDetail.dart';
-import 'package:doantotnghiep/services/database_service.dart';
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../model/UserInfo.dart';
 
 class SearchAndJoined extends StatefulWidget {
   SearchAndJoined({super.key});

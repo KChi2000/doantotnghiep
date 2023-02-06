@@ -6,7 +6,7 @@ import 'package:doantotnghiep/components/textfield.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/main.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
-import 'package:doantotnghiep/services/auth_service.dart';
+import 'package:doantotnghiep/NetworkProvider/NetWorkProvider_Auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';

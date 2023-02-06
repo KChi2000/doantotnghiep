@@ -17,7 +17,7 @@ import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
 import 'package:doantotnghiep/components/pickImage/pick_image_cubit.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+
 import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
 import 'package:doantotnghiep/screens/Tracking.dart';
@@ -25,6 +25,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'model/UserInfo.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
-import 'package:doantotnghiep/model/Signaling.dart';
+import 'package:doantotnghiep/helper/Signaling.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../services/database_service.dart';
+import '../../NetworkProvider/Networkprovider.dart';
 
 part 'make_a_video_call_state.dart';
 

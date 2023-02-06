@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
-import 'package:doantotnghiep/services/database_service.dart';
+
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../components/showSnackbar.dart';
+import '../model/UserInfo.dart';
 
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;

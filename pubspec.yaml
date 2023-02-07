@@ -60,6 +60,10 @@ dependencies:
   rive: ^0.10.0
   flutter_webrtc: ^0.9.18
   flutter_svg: ^1.1.6
+  google_maps_flutter: ^2.2.3
+  latlng: ^0.2.0
+  latlong: ^0.6.1
+  firebase_messaging: ^14.2.1
 
 dev_dependencies:
   flutter_test:

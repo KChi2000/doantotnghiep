@@ -1,5 +1,6 @@
 import 'package:doantotnghiep/screens/Profile.dart';
 import 'package:doantotnghiep/screens/Tracking.dart';
+import 'package:doantotnghiep/screens/connectToFriend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -9,7 +10,7 @@ import '../bloc/Changetab/changetab_cubit.dart';
 
 class DisplayPage extends StatelessWidget {
   DisplayPage({super.key});
-  List<Widget> listPage = [Tracking(), Profile()];
+  List<Widget> listPage = [Tracking(),ConnectToFriend() ,Profile()];
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ChangetabCubit, ChangetabState>(
@@ -33,6 +34,11 @@ class DisplayPage extends StatelessWidget {
                     icon: Icon(Icons.map_outlined),
                     label: 'Map',
                     backgroundColor: Colors.red,
+                  ),
+                   BottomNavigationBarItem(
+                    icon: Icon(Icons.chat),
+                    label: 'Chat',
+                    backgroundColor: Colors.green,
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),

@@ -10,9 +10,11 @@ import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
 
 import 'package:doantotnghiep/screens/SearchAndJoined.dart';
+import 'package:doantotnghiep/screens/auth/Quenmatkhau.dart';
 import 'package:doantotnghiep/screens/chatDetail.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -34,11 +36,22 @@ class ConnectToFriend extends StatefulWidget {
 
 class _ConnectToFriendState extends State<ConnectToFriend> {
   var groupNameCon = TextEditingController();
-
+  late RiveAnimationController riveAnimationController;
   var formkey = GlobalKey<FormState>();
-
+ late Artboard artboard;
   @override
   void initState() {
+     riveAnimationController = OneShotAnimation('idle', autoplay: true);
+    rootBundle.load('assets/animations/4054-8407-polito (2).riv').then((value) {
+      final file = RiveFile.import(value);
+      final arrb = file.mainArtboard;
+      
+      artboard.addController(riveAnimationController);
+       setState(() {
+      artboard = arrb;
+    });
+    });
+   
     context.read<GetUserGroupCubit>().getUerGroup();
     super.initState();
   }
@@ -76,7 +89,9 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    SizedBox(height: 90,),
+                                    SizedBox(
+                                      height: 90,
+                                    ),
                                     Container(
                                       height: 200,
                                       // width: 200,
@@ -94,14 +109,14 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Align(
-                                        alignment: Alignment.topLeft,
+                                          alignment: Alignment.topLeft,
                                           child: Text(
-                                        'Tạo nhóm',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      )),
+                                            'Tạo nhóm',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          )),
                                       SizedBox(
                                         height: 10,
                                       ),
@@ -128,11 +143,14 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                         height: 5,
                                       ),
                                       Text(
-                                          'Copy mã bên dưới để mời bạn bè tham gia vào nhóm', style: TextStyle(
+                                        'Copy mã bên dưới để mời bạn bè tham gia vào nhóm',
+                                        style: TextStyle(
                                           fontSize: 12,
-                                         
-                                        ),),
-                                          SizedBox(height: 5,),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
                                       Container(
                                         height: 40,
                                         width: 300,
@@ -184,17 +202,18 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: Text('Cancel')),
+                                              child: Text('Hủy')),
                                           SizedBox(
                                             width: 8,
                                           ),
                                           TextButton(
                                               onPressed: () async {
-                                               if(formkey.currentState!.validate()){
-                                                   Navigator.pop(context);
-                                               }
+                                                if (formkey.currentState!
+                                                    .validate()) {
+                                                  Navigator.pop(context);
+                                                }
                                               },
-                                              child: Text('Create'))
+                                              child: Text('Tạo nhóm'))
                                         ],
                                       )
                                     ],
@@ -340,96 +359,122 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
           onTap: () {
             context.read<GroupInfoCubitCubit>().setFalse();
           },
-          child: Container(
-            width: screenwidth,
-            height: screenheight,
-            padding: EdgeInsets.only(top: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            navigatePush(context, SearchAndJoined());
-                          },
-                          child: Container(
-                            height: 45,
-                            margin: EdgeInsets.only(
-                                bottom: 10, left: 15, right: 15),
-                            // padding:
-                            //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                            decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.35),
-                                borderRadius: BorderRadius.circular(30)),
-                            child: TextFormField(
-                              enabled: false,
-                              decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.search),
-                                  border: InputBorder.none,
-                                  hintText: 'Tìm kiếm hoặc nhập mã'),
+          child: Stack(
+            children: [
+              Container(
+                width: screenwidth,
+                height: screenheight,
+                padding: EdgeInsets.only(top: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                navigatePush(context, SearchAndJoined());
+                              },
+                              child: Container(
+                                height: 45,
+                                margin: EdgeInsets.only(
+                                    bottom: 10, left: 15, right: 15),
+                                // padding:
+                                //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(0.35),
+                                    borderRadius: BorderRadius.circular(30)),
+                                child: TextFormField(
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.search),
+                                      border: InputBorder.none,
+                                      hintText: 'Tìm kiếm hoặc nhập mã'),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-                          builder: (context, state) {
-                            return StreamBuilder<dynamic>(
-                                stream: state.stream,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    context
-                                        .read<GroupInfoCubitCubit>()
-                                        .updateGroup(snapshot.data);
-                                    if (snapshot.data?.docs.length == 0) {
+                            BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                              builder: (context, state) {
+                                return StreamBuilder<dynamic>(
+                                    stream: state.stream,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        context
+                                            .read<GroupInfoCubitCubit>()
+                                            .updateGroup(snapshot.data);
+                                        if (snapshot.data?.docs.length == 0) {
+                                          return Center(
+                                            child: Text(
+                                                'oops, bạn chưa có nhóm nào :(('),
+                                          );
+                                        }
+
+                                        return BlocBuilder<GroupInfoCubitCubit,
+                                            GroupInfoCubitState>(
+                                          builder: (context, state) {
+                                            if (state is GroupInfoCubitLoaded) {
+                                              return ListView.builder(
+                                                shrinkWrap: true,
+                                                reverse: true,
+                                                physics:
+                                                    NeverScrollableScrollPhysics(),
+                                                itemCount:
+                                                    state.groupinfo!.length,
+                                                itemBuilder: (context, index) {
+                                                  return messagerow(
+                                                      state.groupinfo![index],
+                                                      index);
+                                                },
+                                              );
+                                            }
+                                            return Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          },
+                                        );
+                                      }
+                                      // return Center(
+                                      //   child: CircularProgressIndicator(),
+                                      // );
                                       return Center(
                                         child: Text(
                                             'oops, bạn chưa có nhóm nào :(('),
                                       );
-                                    }
-
-                                    return BlocBuilder<GroupInfoCubitCubit,
-                                        GroupInfoCubitState>(
-                                      builder: (context, state) {
-                                        if (state is GroupInfoCubitLoaded) {
-                                          return ListView.builder(
-                                            shrinkWrap: true,
-                                            reverse: true,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            itemCount: state.groupinfo!.length,
-                                            itemBuilder: (context, index) {
-                                              return messagerow(
-                                                  state.groupinfo![index],
-                                                  index);
-                                            },
-                                          );
-                                        }
-                                        return Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      },
-                                    );
-                                  }
-                                  // return Center(
-                                  //   child: CircularProgressIndicator(),
-                                  // );
-                                  return Center(
-                                    child:
-                                        Text('oops, bạn chưa có nhóm nào :(('),
-                                  );
-                                });
-                          },
-                        )
-                      ],
+                                    });
+                              },
+                            )
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                  child: Container(
+                      child: RiveAnimation.asset(
+                          'assets/animations/4054-8407-polito (2).riv',
+                          controllers: [riveAnimationController],
+                          animations: ['idle'],
+                          // onInit: (p0) => setState(() {
+                          //   print('animation: ${riveAnimationController.isActive}');
+                          // })
+                          )))
+            ],
           ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            navigatePush(context, Quenmatkhau());
+            String? s = await FirebaseMessaging.instance.getToken();
+            print('FCM: ${s}');
+          },
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(40))),
+          label: Center(child: FittedBox(child: Text('Tham gia nhóm'))),
         ),
       ),
     );
@@ -485,7 +530,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                     children: [
                       Text(
                         group.groupName.toString(),
-                        style: TextStyle(color: Colors.black87, fontSize: 17,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600),
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 17,
+                            fontWeight: group.checkIsRead!
+                                ? FontWeight.w400
+                                : FontWeight.w600),
                       ),
                       Row(mainAxisSize: MainAxisSize.max, children: [
                         Text(
@@ -503,7 +553,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                   ? 'Bạn:'
                                   : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
                               : 'Chưa có tin nhắn nào',
-                          style: TextStyle(color: Colors.black87, fontSize: 14,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600),
+                          style: TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                              fontWeight: group.checkIsRead!
+                                  ? FontWeight.w400
+                                  : FontWeight.w600),
                         ),
                         Flexible(
                           // width: 200,
@@ -514,11 +569,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                             maxLines: 1,
                             softWrap: true,
                             style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14,
-                              overflow: TextOverflow.ellipsis
-                              ,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600
-                            ),
+                                color: Colors.black87,
+                                fontSize: 14,
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: group.checkIsRead!
+                                    ? FontWeight.w400
+                                    : FontWeight.w600),
                           ),
                         ),
                         Text('  '),
@@ -527,10 +583,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               ? ''
                               : '${DateTime.fromMicrosecondsSinceEpoch(int.parse(group.time!)).toString().split(' ').last.substring(0, 5)}',
                           style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 14
-                            ,fontWeight:group.checkIsRead!? FontWeight.w400: FontWeight.w600
-                          ),
+                              color: Colors.black87,
+                              fontSize: 14,
+                              fontWeight: group.checkIsRead!
+                                  ? FontWeight.w400
+                                  : FontWeight.w600),
                         )
                       ])
                     ],
@@ -545,7 +602,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               .read<GroupInfoCubitCubit>()
                               .chooseItemToShow(ind);
                         },
-                        icon: Icon(Icons.more_vert,color: Colors.black54,)))
+                        icon: Icon(
+                          Icons.more_vert,
+                          color: Colors.black54,
+                        )))
               ],
             ),
           ),

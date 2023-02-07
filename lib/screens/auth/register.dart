@@ -43,7 +43,7 @@ class _RegisterState extends State<Register> {
       child: Scaffold(
         // appBar: AppBar(title: Text('Register'),),
         body: Container(
-          // color: Colors.amber,
+          
           width: screenwidth,
           height: screenheight,
           child: Stack(
@@ -81,36 +81,47 @@ class _RegisterState extends State<Register> {
                     SizedBox(
                       height: 100,
                     ),
-                    textfield(
-                      hint: 'abc',
-                      label: 'FullName',
-                      icon: Icons.person,
-                      iconcolor: Colors.pink,
-                      emailCon: fullnameCon,
-                      error: 'Chưa nhập họ tên',
+                    SizedBox(
+                      width: screenwidth - 100,
+                      child: textfield(
+                        
+                        hint: 'abc',
+                        label: 'FullName',
+                        icon: Icons.person,
+                        iconcolor: Colors.pink,
+                        emailCon: fullnameCon,
+                        error: 'Chưa nhập họ tên',
+                      ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    textfield(
-                      hint: 'abc@gmail.com',
-                      label: 'Email',
-                      icon: Icons.email,
-                      iconcolor: Colors.pink,
-                      emailCon: emailCon,
-                      error: 'Chưa nhập email',
+                    SizedBox(
+                      width: screenwidth - 100,
+                      child: textfield(
+                        hint: 'abc@gmail.com',
+                        label: 'Email',
+                        icon: Icons.email,
+                        iconcolor: Colors.pink,
+                        emailCon: emailCon,
+                        error: 'Chưa nhập email',
+                      ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    textfield(
-                      hint: '123456',
-                      label: 'Password',
-                      icon: Icons.lock,
-                      iconcolor: Colors.pink,
-                      emailCon: passwordCon,
-                      error: 'Chưa nhập mật khẩu',
+                    SizedBox(
+                      width: screenwidth - 100,
+                      child: textfield(
+                        hint: '123456',
+                        label: 'Password',
+                        icon: Icons.lock,
+                        iconcolor: Colors.pink,
+                        emailCon: passwordCon,
+                        error: 'Chưa nhập mật khẩu',
+                      ),
                     ),
+                    
                     SizedBox(
                       height: 20,
                     ),

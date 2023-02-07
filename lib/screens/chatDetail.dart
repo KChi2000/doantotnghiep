@@ -229,6 +229,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             ),
           ),
         ));
+       
   }
 
   Widget ItemThanhVien(Members e, int index) {

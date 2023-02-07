@@ -1,6 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'dart:convert';
+
+import 'package:doantotnghiep/constant.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 class Userinfo {
   String? uid;
   String? name;
@@ -64,4 +68,25 @@ class Groups {
     data['GroupName'] = this.groupName;
     return data;
   }
+}
+class CustomClipPath extends CustomClipper<Path> {
+  var radius=5.0;
+  
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    
+    path.lineTo(0, size.height);
+    path.lineTo(size.width, size.height);
+    path.lineTo(size.width, 0);
+    // TODO: implement getClip
+    return path;
+  }
+  
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    // TODO: implement shouldReclip
+    throw false;
+  }
+ 
 }

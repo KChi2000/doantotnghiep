@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 
 import '../model/UserInfo.dart';
 
@@ -39,7 +40,7 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tham gia bằng mã'),
+        title: Text('Tìm kiếm'),
         centerTitle: false,
         actions: [
           Padding(
@@ -54,7 +55,7 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                                 .PassingData(codeCon.text);
                           }
                         : null,
-                    child: Text('Tham gia'));
+                    child: Text('Tìm kiếm'));
               },
             ),
           )
@@ -99,12 +100,26 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                   } else if (state is ErrorState) {
                     return Expanded(
                       child: Center(
-                          child: Text('oops! Không tìm thấy nhóm nào cả :((')),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Lottie.asset('assets/animations/78631-searching (1).json'),
+                              Text('oops! Không tìm thấy nhóm nào cả :(('),
+                              SizedBox(height: 200,)
+                            ],
+                          )),
                     );
                   }
                   return Expanded(
-                    child: Center(
-                        child: Text('oops! Không tìm thấy nhóm nào cả :((')),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text('oops! Không tìm thấy nhóm nào cả :(('),
+                          Lottie.asset('assets/animations/78631-searching (1).json'),
+                          
+                          SizedBox(height: 200,)
+                        ],
+                      ),
                   );
                 },
               ),

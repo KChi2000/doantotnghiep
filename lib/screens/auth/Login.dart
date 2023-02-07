@@ -46,13 +46,13 @@ class _LoginState extends State<Login> {
           child: Stack(
             
             children: [
-              Opacity(
-                opacity: 0.8,
-                child: Image.asset(
-                  'assets/images/Couple travelling by bike flat vector illustration.jpg',
-                  fit: BoxFit.fitHeight,
-                ),
-              ),
+              // Opacity(
+              //   opacity: 0.8,
+              //   child: Image.asset(
+              //     'assets/images/Couple travelling by bike flat vector illustration.jpg',
+              //     fit: BoxFit.fitHeight,
+              //   ),
+              // ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -101,6 +101,17 @@ class _LoginState extends State<Login> {
                       error: 'Chưa điền mật khẩu',
                     ),
                   ),
+                  SizedBox(height: 5,),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Row(
+                      
+                      children: [
+                        SizedBox(width: 220,),
+                        Text('Quên mật khẩu?', style: TextStyle(color: Colors.pink,fontSize: 12),),
+                        
+                      ],
+                    )),
                   SizedBox(
                     height: 20,
                   ),

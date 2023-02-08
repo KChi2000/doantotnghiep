@@ -64,11 +64,18 @@ dependencies:
   latlng: ^0.2.0
   latlong: ^0.6.1
   firebase_messaging: ^14.2.1
+  flutter_launcher_icons: ^0.11.0
+  overlay_support: ^2.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/Cùng Phượt.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

@@ -25,6 +25,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 import 'model/UserInfo.dart';
 
@@ -111,30 +112,32 @@ class _MyAppState extends State<MyApp> {
           create: (context) => MakeAVideoCallCubit(),
         ),
       ],
-      child: MaterialApp(
-        localizationsDelegates: [
-             GlobalMaterialLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-            ],
-            supportedLocales: [Locale('vi', 'VN')],
-            locale: Locale('vi', 'VN'),
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.pink,
-        ),
-        home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
-          builder: (context, state) {
-            print('store id: ${state.uid}');
-            print('store model name ${Userinfo.userSingleton.name}');
-            print('store model name ${Userinfo.userSingleton.uid}');
-            if (state.uid.isNotEmpty) {
-              return DisplayPage();
-            }
-            return Login();
-          },
+      child: OverlaySupport(
+        child: MaterialApp(
+          localizationsDelegates: [
+               GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+              ],
+              supportedLocales: [Locale('vi', 'VN')],
+              locale: Locale('vi', 'VN'),
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            useMaterial3: true,
+            primarySwatch: Colors.pink,
+          ),
+          home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
+            builder: (context, state) {
+              print('store id: ${state.uid}');
+              print('store model name ${Userinfo.userSingleton.name}');
+              print('store model name ${Userinfo.userSingleton.uid}');
+              if (state.uid.isNotEmpty) {
+                return DisplayPage();
+              }
+              return Login();
+            },
+          ),
         ),
       ),
     );

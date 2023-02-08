@@ -36,24 +36,17 @@ class ConnectToFriend extends StatefulWidget {
 
 class _ConnectToFriendState extends State<ConnectToFriend> {
   var groupNameCon = TextEditingController();
-  late RiveAnimationController riveAnimationController;
   var formkey = GlobalKey<FormState>();
- late Artboard artboard;
+  late Artboard artboard;
+  late RiveAnimationController riveAnimationController;
+
   @override
   void initState() {
-     riveAnimationController = OneShotAnimation('idle', autoplay: true);
-    rootBundle.load('assets/animations/4054-8407-polito (2).riv').then((value) {
-      final file = RiveFile.import(value);
-      final arrb = file.mainArtboard;
-      
-      artboard.addController(riveAnimationController);
-       setState(() {
-      artboard = arrb;
-    });
-    });
-   
     context.read<GetUserGroupCubit>().getUerGroup();
     super.initState();
+    riveAnimationController = SimpleAnimation('loading');
+
+    setState(() {});
   }
 
   @override
@@ -453,16 +446,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                   ],
                 ),
               ),
-              Positioned(
-                  child: Container(
-                      child: RiveAnimation.asset(
-                          'assets/animations/4054-8407-polito (2).riv',
-                          controllers: [riveAnimationController],
-                          animations: ['idle'],
-                          // onInit: (p0) => setState(() {
-                          //   print('animation: ${riveAnimationController.isActive}');
-                          // })
-                          )))
+            
             ],
           ),
         ),

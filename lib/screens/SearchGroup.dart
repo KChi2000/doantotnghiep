@@ -1,32 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
-import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
-
-import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
-import 'package:doantotnghiep/components/navigate.dart';
-import 'package:doantotnghiep/constant.dart';
-import 'package:doantotnghiep/model/Group.dart';
-
 import 'package:doantotnghiep/screens/chatDetail.dart';
-import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 
+import '../NetworkProvider/Networkprovider.dart';
+import '../bloc/JoinStatus/join_status_cubit.dart';
+import '../bloc/checkCode.dart/check_code_cubit.dart';
+import '../bloc/joinToGroup.dart/join_to_group_cubit.dart';
+import '../components/navigate.dart';
+import '../constant.dart';
+import '../model/Group.dart';
 import '../model/UserInfo.dart';
 
-class SearchAndJoined extends StatefulWidget {
-  SearchAndJoined({super.key});
-
+class SearchGroup extends StatefulWidget {
+  SearchGroup({super.key});
+  // GroupInfo group;
   @override
-  State<SearchAndJoined> createState() => _SearchAndJoinedState();
+  State<SearchGroup> createState() => _SearchGroupState();
 }
 
-class _SearchAndJoinedState extends State<SearchAndJoined> {
+class _SearchGroupState extends State<SearchGroup> {
   var codeCon = TextEditingController();
   @override
   void initState() {
@@ -43,22 +37,22 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
         title: Text('Tìm kiếm'),
         centerTitle: false,
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-            child: BlocBuilder<CheckCodeCubit, CheckCodeState>(
-              builder: (context, state) {
-                return TextButton(
-                    onPressed: state.canJoined
-                        ? () {
-                            context
-                                .read<JoinToGroupCubit>()
-                                .PassingData(codeCon.text);
-                          }
-                        : null,
-                    child: Text('Tìm kiếm'));
-              },
-            ),
-          )
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+          //   child: BlocBuilder<CheckCodeCubit, CheckCodeState>(
+          //     builder: (context, state) {
+          //       return TextButton(
+          //           onPressed: state.canJoined
+          //               ? () {
+          //                   context
+          //                       .read<JoinToGroupCubit>()
+          //                       .PassingData(codeCon.text);
+          //                 }
+          //               : null,
+          //           child: Text('Tìm kiếm'));
+          //     },
+          //   ),
+          // )
         ],
       ),
       body: Container(
@@ -72,7 +66,7 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       isDense: true,
-                      hintText: 'Ví dụ: e4fH5s'),
+                      hintText: 'Nhập để tìm kiếm'),
                   inputFormatters: [LengthLimitingTextInputFormatter(6)],
                   onChanged: (value) {
                     context.read<CheckCodeCubit>().check(value);
@@ -101,8 +95,9 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                     return Expanded(
                       child: Center(
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.max,
                             children: [
+                              
                               Lottie.asset('assets/animations/78631-searching (1).json'),
                               Text('oops! Không tìm thấy nhóm nào cả :(('),
                               SizedBox(height: 200,)
@@ -114,10 +109,10 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          Text('oops! Không tìm thấy nhóm nào cả :(('),
-                          Lottie.asset('assets/animations/78631-searching (1).json'),
+                          // Text('oops! Không tìm thấy nhóm nào cả :(('),
+                          // Lottie.asset('assets/animations/78631-searching (1).json'),
                           
-                          SizedBox(height: 200,)
+                          // SizedBox(height: 200,)
                         ],
                       ),
                   );
@@ -172,12 +167,12 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                 RichText(
                     text: TextSpan(children: [
                   TextSpan(
-                    text: 'Admin: ${group.admin?.adminName}',
+                    text: 'Người tạo nhóm: ${group.admin?.adminName}',
                     style: TextStyle(color: Colors.black87, fontSize: 14),
                   ),
                 ])),
                 Text(
-                  'Members: ${group.members?.length.toString()}',
+                  'Thành viên: ${group.members?.length.toString()}',
                 )
               ],
             ),
@@ -199,10 +194,10 @@ class _SearchAndJoinedState extends State<SearchAndJoined> {
                     },
                     child: state.joined
                         ? Text(
-                            'Joined',
+                            'Rời nhóm',
                             style: TextStyle(color: Colors.grey[400]),
                           )
-                        : Text('Join now'));
+                        : Text('Tham gia'));
               },
             )
           ],

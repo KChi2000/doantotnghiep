@@ -9,7 +9,8 @@ import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
 
-import 'package:doantotnghiep/screens/SearchAndJoined.dart';
+import 'package:doantotnghiep/screens/JoinGroup.dart';
+import 'package:doantotnghiep/screens/SearchGroup.dart';
 import 'package:doantotnghiep/screens/auth/Quenmatkhau.dart';
 import 'package:doantotnghiep/screens/chatDetail.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
@@ -368,7 +369,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                             GestureDetector(
                               onTap: () {
                                 FocusManager.instance.primaryFocus?.unfocus();
-                                navigatePush(context, SearchAndJoined());
+                                navigatePush(context, SearchGroup());
                               },
                               child: Container(
                                 height: 45,
@@ -452,9 +453,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
-            navigatePush(context, Quenmatkhau());
-            String? s = await FirebaseMessaging.instance.getToken();
-            print('FCM: ${s}');
+            navigatePush(context, JoinGroup());
+           
           },
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(40))),
@@ -612,8 +612,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                     child: Container(
                       padding:
                           EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                         
                       decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.pink,
+                          
                           boxShadow: [
                             BoxShadow(
                                 blurRadius: 4,

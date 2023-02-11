@@ -16,13 +16,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 
 import '../model/UserInfo.dart';
 
 class JoinGroup extends StatefulWidget {
   JoinGroup({super.key});
- 
+
   @override
   State<JoinGroup> createState() => _JoinGroupState();
 }
@@ -40,6 +41,7 @@ class _JoinGroupState extends State<JoinGroup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Tham gia bằng mã'),
         centerTitle: false,
@@ -90,7 +92,7 @@ class _JoinGroupState extends State<JoinGroup> {
                     context
                         .read<JoindStatusCubit>()
                         .setJoinStatus(state.data.groupId.toString());
-                   
+
                     return grouprow(state.data);
                   } else if (state is LoadingGroup) {
                     return Expanded(
@@ -102,26 +104,28 @@ class _JoinGroupState extends State<JoinGroup> {
                     return Expanded(
                       child: Center(
                           child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              
-                              Lottie.asset('assets/animations/78631-searching (1).json'),
-                              Text('oops! Không tìm thấy nhóm nào cả :(('),
-                              SizedBox(height: 200,)
-                            ],
-                          )),
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Lottie.asset(
+                              'assets/animations/78631-searching (1).json'),
+                          Text('oops! Không tìm thấy nhóm nào cả :(('),
+                          SizedBox(
+                            height: 200,
+                          )
+                        ],
+                      )),
                     );
                   }
                   return Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          // Text('oops! Không tìm thấy nhóm nào cả :(('),
-                          // Lottie.asset('assets/animations/78631-searching (1).json'),
-                          
-                          // SizedBox(height: 200,)
-                        ],
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        // Text('oops! Không tìm thấy nhóm nào cả :(('),
+                        // Lottie.asset('assets/animations/78631-searching (1).json'),
+
+                        // SizedBox(height: 200,)
+                      ],
+                    ),
                   );
                 },
               ),
@@ -136,11 +140,11 @@ class _JoinGroupState extends State<JoinGroup> {
         navigatePush(
             context,
             chatDetail(
-                groupId: group.groupId.toString(),
-                groupName: group.groupName.toString(),
-                members: group.members!,
-                admininfo: group.admin!,
-               ));
+              groupId: group.groupId.toString(),
+              groupName: group.groupName.toString(),
+              members: group.members!,
+              admininfo: group.admin!,
+            ));
       },
       onLongPress: () {
         print('nhả ra mau');
@@ -174,7 +178,7 @@ class _JoinGroupState extends State<JoinGroup> {
                 RichText(
                     text: TextSpan(children: [
                   TextSpan(
-                    text: 'Người tạo nhóm: ${group.admin?.adminName}',
+                    text:group.admin!.adminId.toString() == Userinfo.userSingleton.uid?'Người tạo nhóm: bạn' :'Người tạo nhóm: ${group.admin?.adminName}',
                     style: TextStyle(color: Colors.black87, fontSize: 14),
                   ),
                 ])),
@@ -184,20 +188,39 @@ class _JoinGroupState extends State<JoinGroup> {
               ],
             ),
             Spacer(),
-            BlocBuilder<JoindStatusCubit, JoindStatusState>(
+            BlocConsumer<JoindStatusCubit, JoindStatusState>(
+              listener: (context, state) {
+               
+              },
               builder: (context, state) {
                 return TextButton(
                     onPressed: () async {
-                      print(group.groupId);
-                      await DatabaseService(
-                              uid:  Userinfo.userSingleton.uid)
-                          .JoinToGroup(state.joined, group.groupId.toString(),
-                              group.groupName.toString());
-                      
-                      context
+                   
+
+                     await context
                           .read<JoindStatusCubit>()
-                          .setJoinStatus(group.groupId.toString());
-                      context.read<JoinToGroupCubit>().updateData(codeCon.text);
+                          .joinGroup(group.groupId.toString(),group.groupName.toString());
+
+                    await  context.read<JoinToGroupCubit>().updateData(codeCon.text);
+                     if (state.joined) {
+                  Fluttertoast.showToast(
+                      msg: "Đã rời nhóm thành công",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      textColor: Colors.white,
+                       backgroundColor: Colors.pink,
+                      fontSize: 16.0);
+                } else {
+                  Fluttertoast.showToast(
+                      msg: "Đã tham gia thành công",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      textColor: Colors.white,
+                      backgroundColor: Colors.pink,
+                      fontSize: 16.0);
+                }
                     },
                     child: state.joined
                         ? Text(

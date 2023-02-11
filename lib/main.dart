@@ -5,6 +5,7 @@ import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
+import 'package:doantotnghiep/bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
@@ -110,6 +111,9 @@ class _MyAppState extends State<MyApp> {
         ),
           BlocProvider(
           create: (context) => MakeAVideoCallCubit(),
+        ),
+         BlocProvider(
+          create: (context) => TimKiemGroupCubit(),
         ),
       ],
       child: OverlaySupport(

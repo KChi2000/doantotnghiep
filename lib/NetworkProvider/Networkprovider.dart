@@ -179,6 +179,7 @@ class DatabaseService {
       'recentMessage': data['contentMessage'],
       'recentMessageSender': data['sender'],
       'time': data['time'],
+      'type': data['type'],
       'isReadAr': listresult
     });
     print('SEND STATUS MESSAGE');

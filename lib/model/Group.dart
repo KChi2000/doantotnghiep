@@ -1,3 +1,5 @@
+import 'package:doantotnghiep/model/Message.dart';
+
 class GroupInfo {
   String? recentMessageSender;
   String? inviteId;
@@ -11,6 +13,7 @@ class GroupInfo {
   String? time;
   bool? checked=false;
   bool? checkIsRead=false;
+  Type? type;
   GroupInfo(
       {this.recentMessageSender,
       this.inviteId,
@@ -22,7 +25,8 @@ class GroupInfo {
       this.recentMessage,
       this.groupName,
       this.time,this.checked,
-      this.checkIsRead
+      this.checkIsRead,
+      this.type
       });
 
   GroupInfo.fromJson(Map<String, dynamic> json) {
@@ -46,6 +50,7 @@ class GroupInfo {
     recentMessage = json['recentMessage'];
     groupName = json['GroupName'];
     time = json['time'];
+    type = Type.values.elementAt(findenum(json['type']));
   }
 
   Map<String, dynamic> toJson() {
@@ -66,6 +71,7 @@ class GroupInfo {
     data['recentMessage'] = this.recentMessage;
     data['GroupName'] = this.groupName;
     data['time']=this.time;
+    data['type']= this.type!.name;
     return data;
   }
 }

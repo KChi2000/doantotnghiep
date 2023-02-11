@@ -8,6 +8,7 @@ import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
+import 'package:doantotnghiep/model/Message.dart';
 
 import 'package:doantotnghiep/screens/JoinGroup.dart';
 import 'package:doantotnghiep/screens/SearchGroup.dart';
@@ -47,7 +48,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
     super.initState();
     riveAnimationController = SimpleAnimation('loading');
 
-    setState(() {});
+   
   }
 
   @override
@@ -334,11 +335,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                       print('create group thanh cong');
                       context.loaderOverlay.hide();
                       Fluttertoast.showToast(
-                          msg: "This is a Toast message",
+                          msg: "Tạo nhóm thành công",
                           toastLength: Toast.LENGTH_SHORT,
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 1,
                           textColor: Colors.white,
+                          backgroundColor: Colors.pink,
                           fontSize: 16.0);
                     }
                   });
@@ -364,52 +366,68 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                   children: [
                     Expanded(
                       child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                navigatePush(context, SearchGroup());
-                              },
-                              child: Container(
-                                height: 45,
-                                margin: EdgeInsets.only(
-                                    bottom: 10, left: 15, right: 15),
-                                // padding:
-                                //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.35),
-                                    borderRadius: BorderRadius.circular(30)),
-                                child: TextFormField(
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.search),
-                                      border: InputBorder.none,
-                                      hintText: 'Tìm kiếm hoặc nhập mã'),
-                                ),
-                              ),
-                            ),
+                        child:
                             BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-                              builder: (context, state) {
-                                return StreamBuilder<dynamic>(
-                                    stream: state.stream,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        context
-                                            .read<GroupInfoCubitCubit>()
-                                            .updateGroup(snapshot.data);
-                                        if (snapshot.data?.docs.length == 0) {
-                                          return Center(
-                                            child: Text(
-                                                'oops, bạn chưa có nhóm nào :(('),
-                                          );
-                                        }
+                          builder: (context, state) {
+                            return StreamBuilder<dynamic>(
+                                stream: state.stream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    context
+                                        .read<GroupInfoCubitCubit>()
+                                        .updateGroup(snapshot.data);
+                                    if (snapshot.data?.docs.length == 0) {
+                                      return Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 280,
+                                          ),
+                                          Text(
+                                              'oops, bạn chưa có nhóm nào :(('),
+                                        ],
+                                      );
+                                    }
 
-                                        return BlocBuilder<GroupInfoCubitCubit,
-                                            GroupInfoCubitState>(
-                                          builder: (context, state) {
-                                            if (state is GroupInfoCubitLoaded) {
-                                              return ListView.builder(
+                                    return BlocBuilder<GroupInfoCubitCubit,
+                                        GroupInfoCubitState>(
+                                      builder: (context, state) {
+                                        if (state is GroupInfoCubitLoaded) {
+                                          return Column(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  FocusManager
+                                                      .instance.primaryFocus
+                                                      ?.unfocus();
+                                                  navigatePush(context, SearchGroup(group: (context.read<GroupInfoCubitCubit>().state as GroupInfoCubitLoaded).groupinfo!));
+                                                },
+                                                child: Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.only(
+                                                      bottom: 10,
+                                                      left: 15,
+                                                      right: 15),
+                                                  // padding:
+                                                  //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.35),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30)),
+                                                  child: TextFormField(
+                                                    enabled: false,
+                                                    decoration: InputDecoration(
+                                                        prefixIcon:
+                                                            Icon(Icons.search),
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'Nhập để tìm kiếm nhóm đã tham gia'),
+                                                  ),
+                                                ),
+                                              ),
+                                              ListView.builder(
                                                 shrinkWrap: true,
                                                 reverse: true,
                                                 physics:
@@ -421,40 +439,37 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                       state.groupinfo![index],
                                                       index);
                                                 },
-                                              );
-                                            }
-                                            return Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          },
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return Center(
+                                          child: CircularProgressIndicator(),
                                         );
-                                      }
-                                      // return Center(
-                                      //   child: CircularProgressIndicator(),
-                                      // );
-                                      return Center(
-                                        child: Text(
-                                            'oops, bạn chưa có nhóm nào :(('),
-                                      );
-                                    });
-                              },
-                            )
-                          ],
+                                      },
+                                    );
+                                  }
+                                  // return Center(
+                                  //   child: CircularProgressIndicator(),
+                                  // );
+                                  return Center(
+                                    child:
+                                        Text('oops, bạn chưa có nhóm nào :(('),
+                                  );
+                                });
+                          },
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-            
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             navigatePush(context, JoinGroup());
-           
           },
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(40))),
@@ -522,44 +537,63 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 : FontWeight.w600),
                       ),
                       Row(mainAxisSize: MainAxisSize.max, children: [
-                        Text(
-                          group.recentMessageSender != null &&
-                                  group.recentMessageSender
-                                      .toString()
-                                      .isNotEmpty
-                              ? Userinfo.userSingleton.uid ==
-                                      group.recentMessageSender
-                                          .toString()
-                                          .substring(group.recentMessageSender
-                                                  .toString()
-                                                  .length -
-                                              28)
-                                  ? 'Bạn:'
-                                  : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
-                              : 'Chưa có tin nhắn nào',
-                          style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14,
-                              fontWeight: group.checkIsRead!
-                                  ? FontWeight.w400
-                                  : FontWeight.w600),
-                        ),
+                        group.type == Type.announce
+                            ? SizedBox()
+                            : Text(
+                                group.recentMessageSender != null &&
+                                        group.recentMessageSender
+                                            .toString()
+                                            .isNotEmpty
+                                    ? Userinfo.userSingleton.uid ==
+                                            group.recentMessageSender
+                                                .toString()
+                                                .substring(group
+                                                        .recentMessageSender
+                                                        .toString()
+                                                        .length -
+                                                    28)
+                                        ? 'Bạn:'
+                                        : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
+                                    : 'Chưa có tin nhắn nào',
+                                style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: group.checkIsRead!
+                                        ? FontWeight.w400
+                                        : FontWeight.w600),
+                              ),
                         Flexible(
                           // width: 200,
-                          child: Text(
-                            group.recentMessage != null
-                                ? ' ${group.recentMessage.toString()}'
-                                : '',
-                            maxLines: 1,
-                            softWrap: true,
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 14,
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: group.checkIsRead!
-                                    ? FontWeight.w400
-                                    : FontWeight.w600),
-                          ),
+                          child: group.type == Type.announce
+                              ? Text(
+                                  group.recentMessageSender ==
+                                          Userinfo.userSingleton.name
+                                      ? 'bạn ${group.recentMessage.toString()}'
+                                      : '${group.recentMessageSender} ${group.recentMessage.toString()}',
+                                  maxLines: 1,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
+                                      overflow: TextOverflow.ellipsis,
+                                      fontWeight: group.checkIsRead!
+                                          ? FontWeight.w400
+                                          : FontWeight.w600),
+                                )
+                              : Text(
+                                  group.recentMessage != null
+                                      ? '${group.recentMessage.toString()}'
+                                      : '',
+                                  maxLines: 1,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
+                                      overflow: TextOverflow.ellipsis,
+                                      fontWeight: group.checkIsRead!
+                                          ? FontWeight.w400
+                                          : FontWeight.w600),
+                                ),
                         ),
                         Text('  '),
                         Text(
@@ -612,16 +646,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                     child: Container(
                       padding:
                           EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                         
-                      decoration: BoxDecoration(
-                          color: Colors.pink,
-                          
-                          boxShadow: [
-                            BoxShadow(
-                                blurRadius: 4,
-                                spreadRadius: 0.1,
-                                color: Colors.grey.withOpacity(0.2))
-                          ]),
+                      decoration: BoxDecoration(color: Colors.pink, boxShadow: [
+                        BoxShadow(
+                            blurRadius: 4,
+                            spreadRadius: 0.1,
+                            color: Colors.grey.withOpacity(0.2))
+                      ]),
                       child: Text('Copy invite id'),
                     ),
                   ))

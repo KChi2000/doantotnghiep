@@ -23,7 +23,7 @@ class JoinToGroupCubit extends Cubit<JoinToGroupState> {
     }
   }
 
-  void updateData(String codetext) async {
+   updateData(String codetext) async {
     try {
       QuerySnapshot<Object?> data = await DatabaseService().getGroups(codetext);
       GroupInfo groupdata =

@@ -1,3 +1,4 @@
+import 'package:doantotnghiep/bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
 import 'package:doantotnghiep/screens/chatDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,8 +15,8 @@ import '../model/Group.dart';
 import '../model/UserInfo.dart';
 
 class SearchGroup extends StatefulWidget {
-  SearchGroup({super.key});
-  // GroupInfo group;
+  SearchGroup({required this.group});
+  List<GroupInfo> group;
   @override
   State<SearchGroup> createState() => _SearchGroupState();
 }
@@ -26,33 +27,20 @@ class _SearchGroupState extends State<SearchGroup> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    codeCon.clear();
-    context.read<JoinToGroupCubit>().initData();
+ print(widget.group.length);
+  
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Tìm kiếm'),
         centerTitle: false,
         actions: [
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-          //   child: BlocBuilder<CheckCodeCubit, CheckCodeState>(
-          //     builder: (context, state) {
-          //       return TextButton(
-          //           onPressed: state.canJoined
-          //               ? () {
-          //                   context
-          //                       .read<JoinToGroupCubit>()
-          //                       .PassingData(codeCon.text);
-          //                 }
-          //               : null,
-          //           child: Text('Tìm kiếm'));
-          //     },
-          //   ),
-          // )
+         
         ],
       ),
       body: Container(
@@ -69,50 +57,25 @@ class _SearchGroupState extends State<SearchGroup> {
                       hintText: 'Nhập để tìm kiếm'),
                   inputFormatters: [LengthLimitingTextInputFormatter(6)],
                   onChanged: (value) {
-                    context.read<CheckCodeCubit>().check(value);
-                    context.read<JoinToGroupCubit>().refreshData(value.length);
+                    context.read<TimKiemGroupCubit>().TimKiem(widget.group, value);
                   },
                 ),
               ),
               SizedBox(
                 height: 15,
               ),
-              BlocBuilder<JoinToGroupCubit, JoinToGroupState>(
+              BlocBuilder<TimKiemGroupCubit, TimKiemGroupState>(
                 builder: (context, state) {
-                  if (state is LoadedGroup) {
-                    context
-                        .read<JoindStatusCubit>()
-                        .setJoinStatus(state.data.groupId.toString());
-                   
-                    return grouprow(state.data);
-                  } else if (state is LoadingGroup) {
-                    return Expanded(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  } else if (state is ErrorState) {
-                    return Expanded(
-                      child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              
-                              Lottie.asset('assets/animations/78631-searching (1).json'),
-                              Text('oops! Không tìm thấy nhóm nào cả :(('),
-                              SizedBox(height: 200,)
-                            ],
-                          )),
-                    );
-                  }
+                  if (state.filterlist.length > 0) {
+                    return grouprow(state.filterlist.first);
+                  } 
                   return Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          // Text('oops! Không tìm thấy nhóm nào cả :(('),
-                          // Lottie.asset('assets/animations/78631-searching (1).json'),
-                          
-                          // SizedBox(height: 200,)
+                          Lottie.asset('assets/animations/78631-searching (1).json'),
+                          Text('oops! Không tìm thấy nhóm nào cả :(('),
+                          SizedBox(height: 200,)
                         ],
                       ),
                   );
@@ -176,30 +139,7 @@ class _SearchGroupState extends State<SearchGroup> {
                 )
               ],
             ),
-            Spacer(),
-            BlocBuilder<JoindStatusCubit, JoindStatusState>(
-              builder: (context, state) {
-                return TextButton(
-                    onPressed: () async {
-                      print(group.groupId);
-                      await DatabaseService(
-                              uid:  Userinfo.userSingleton.uid)
-                          .JoinToGroup(state.joined, group.groupId.toString(),
-                              group.groupName.toString());
-                      
-                      context
-                          .read<JoindStatusCubit>()
-                          .setJoinStatus(group.groupId.toString());
-                      context.read<JoinToGroupCubit>().updateData(codeCon.text);
-                    },
-                    child: state.joined
-                        ? Text(
-                            'Rời nhóm',
-                            style: TextStyle(color: Colors.grey[400]),
-                          )
-                        : Text('Tham gia'));
-              },
-            )
+           
           ],
         ),
       ),

@@ -27,6 +27,8 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:rive/rive.dart';
 
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../bloc/JoinStatus/join_status_cubit.dart';
+import '../bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
 import '../model/UserInfo.dart';
 
 class ConnectToFriend extends StatefulWidget {
@@ -47,12 +49,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
     context.read<GetUserGroupCubit>().getUerGroup();
     super.initState();
     riveAnimationController = SimpleAnimation('loading');
-
-   
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext ct) {
     return LoaderOverlay(
       useDefaultLoading: false,
       overlayOpacity: 0.6,
@@ -388,8 +388,16 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                       );
                                     }
 
-                                    return BlocBuilder<GroupInfoCubitCubit,
+                                    return BlocConsumer<GroupInfoCubitCubit,
                                         GroupInfoCubitState>(
+                                          listener: (context, state) {
+                                        //     if(state is GroupInfoCubitLoaded){
+                                        //       context.read<TimKiemGroupCubit>().afterchange(
+                                        // state
+                                        //     .groupinfo!,
+                                        // );
+                                        //     }
+                                          },
                                       builder: (context, state) {
                                         if (state is GroupInfoCubitLoaded) {
                                           return Column(
@@ -399,7 +407,15 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                   FocusManager
                                                       .instance.primaryFocus
                                                       ?.unfocus();
-                                                  navigatePush(context, SearchGroup(group: (context.read<GroupInfoCubitCubit>().state as GroupInfoCubitLoaded).groupinfo!));
+                                                  navigatePush(
+                                                      context,
+                                                      SearchGroup(
+                                                          group: (context
+                                                                      .read<
+                                                                          GroupInfoCubitCubit>()
+                                                                      .state
+                                                                  as GroupInfoCubitLoaded)
+                                                              .groupinfo!));
                                                 },
                                                 child: Container(
                                                   height: 45,
@@ -435,9 +451,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                 itemCount:
                                                     state.groupinfo!.length,
                                                 itemBuilder: (context, index) {
-                                                  return messagerow(
-                                                      state.groupinfo![index],
-                                                      index);
+                                                  return groupitem(
+                                                      state.groupinfo![index],ct,true);
                                                 },
                                               ),
                                             ],
@@ -454,7 +469,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                   // );
                                   return Center(
                                     child:
-                                        Text('oops, bạn chưa có nhóm nào :(('),
+                                        Text('oops, bạn chưa có nhóm nào ((:'),
                                   );
                                 });
                           },
@@ -485,12 +500,44 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
 
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+}
 
-  Widget messagerow(GroupInfo group, int ind) {
+class buttonicon extends StatelessWidget {
+  buttonicon({Key? key, required this.icon, required this.click})
+      : super(key: key);
+  IconData icon;
+  VoidCallback click;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        width: 40,
+        height: 40,
+        padding: EdgeInsets.zero,
+        decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.4),
+            borderRadius: BorderRadius.all(Radius.circular(30))),
+        child: IconButton(
+          onPressed: click,
+          icon: Icon(icon),
+        ),
+      ),
+    );
+  }
+}
+
+class groupitem extends StatelessWidget {
+  groupitem(this.group,this.ct,this.margin);
+  GroupInfo group;
+ BuildContext ct;
+  bool margin;
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         context.read<GroupInfoCubitCubit>().setFalse();
-        navigatePush(
+        navigateReplacement(
             context,
             chatDetail(
               groupId: group.groupId.toString(),
@@ -505,7 +552,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
           Container(
             width: screenwidth,
             height: 55,
-            margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+            margin:margin? EdgeInsets.only(left: 10, right: 10, bottom: 10):EdgeInsets.all(0),
             color: Colors.transparent,
             child: Row(
               children: [
@@ -540,10 +587,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                         group.type == Type.announce
                             ? SizedBox()
                             : Text(
-                                group.recentMessageSender != null &&
-                                        group.recentMessageSender
-                                            .toString()
-                                            .isNotEmpty
+                                group.type != Type.announce
                                     ? Userinfo.userSingleton.uid ==
                                             group.recentMessageSender
                                                 .toString()
@@ -552,7 +596,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                         .toString()
                                                         .length -
                                                     28)
-                                        ? 'Bạn:'
+                                        ? 'Bạn: '
                                         : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
                                     : 'Chưa có tin nhắn nào',
                                 style: TextStyle(
@@ -569,7 +613,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                   group.recentMessageSender ==
                                           Userinfo.userSingleton.name
                                       ? 'bạn ${group.recentMessage.toString()}'
-                                      : '${group.recentMessageSender} ${group.recentMessage.toString()}',
+                                      : group.recentMessageSender
+                                                  .toString()
+                                                  .isEmpty ||
+                                              group.recentMessageSender == null
+                                          ? '${group.recentMessage.toString()}'
+                                          : '${group.recentMessageSender} ${group.recentMessage.toString()}',
                                   maxLines: 1,
                                   softWrap: true,
                                   style: TextStyle(
@@ -596,17 +645,21 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 ),
                         ),
                         Text('  '),
-                        Text(
-                          group.time == null || group.time.toString().isEmpty
-                              ? ''
-                              : '${DateTime.fromMicrosecondsSinceEpoch(int.parse(group.time!)).toString().split(' ').last.substring(0, 5)}',
-                          style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14,
-                              fontWeight: group.checkIsRead!
-                                  ? FontWeight.w400
-                                  : FontWeight.w600),
-                        )
+                        group.recentMessageSender.toString().isEmpty ||
+                                group.recentMessageSender == null
+                            ? SizedBox()
+                            : Text(
+                                group.time == null ||
+                                        group.time.toString().isEmpty
+                                    ? ''
+                                    : '${DateTime.fromMicrosecondsSinceEpoch(int.parse(group.time!)).toString().split(' ').last.substring(0, 5)}',
+                                style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: group.checkIsRead!
+                                        ? FontWeight.w400
+                                        : FontWeight.w600),
+                              )
                       ])
                     ],
                   ),
@@ -614,11 +667,62 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                 // Spacer(),
                 Align(
                     alignment: Alignment.topRight,
-                    child: IconButton(
-                        onPressed: () {
-                          context
-                              .read<GroupInfoCubitCubit>()
-                              .chooseItemToShow(ind);
+                    child: PopupMenuButton(
+                        offset: Offset(-30, 30),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        elevation: 10,
+                        padding: EdgeInsets.all(0),
+                        itemBuilder: (context) {
+                          return [
+                            PopupMenuItem(
+                              onTap: () {
+                                Clipboard.setData(
+                                        ClipboardData(text: group.inviteId))
+                                    .then((_) {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text(
+                                        "Invite id copied to clipboard: ${group.inviteId}"),
+                                    duration: Duration(seconds: 2),
+                                  ));
+                                });
+                              },
+                              child: Text('Copy inviteid'),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 5),
+                              // height: 20,
+                              textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontFamily: 'roboto'),
+                            ),
+                            PopupMenuItem(
+                              onTap: () async {
+                                 ct.loaderOverlay.show();
+                                await context
+                                    .read<JoindStatusCubit>()
+                                    .leaveGroup(group.groupId.toString(),
+                                        group.groupName.toString());
+                                 ct.loaderOverlay.hide();
+                                 
+                                Fluttertoast.showToast(
+                                    msg: "Đã rời nhóm thành công",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    textColor: Colors.white,
+                                    backgroundColor: Colors.pink,
+                                    fontSize: 16.0);
+                                  
+                              },
+                              child: Text('Rời nhóm'),
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              // height: 20,
+                              textStyle:
+                                  TextStyle(color: Colors.black, fontSize: 16),
+                            )
+                          ];
                         },
                         icon: Icon(
                           Icons.more_vert,
@@ -627,61 +731,36 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
               ],
             ),
           ),
-          group.checked!
-              ? Positioned(
-                  right: 50,
-                  top: 20,
-                  child: GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: group.inviteId))
-                          .then((_) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              "Invite id copied to clipboard: ${group.inviteId}"),
-                          duration: Duration(seconds: 2),
-                        ));
-                      });
-                      context.read<GroupInfoCubitCubit>().setFalse();
-                    },
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      decoration: BoxDecoration(color: Colors.pink, boxShadow: [
-                        BoxShadow(
-                            blurRadius: 4,
-                            spreadRadius: 0.1,
-                            color: Colors.grey.withOpacity(0.2))
-                      ]),
-                      child: Text('Copy invite id'),
-                    ),
-                  ))
-              : SizedBox()
+          // group.checked!
+          //     ? Positioned(
+          //         right: 50,
+          //         top: 20,
+          //         child: GestureDetector(
+          //           onTap: () {
+          //             Clipboard.setData(ClipboardData(text: group.inviteId))
+          //                 .then((_) {
+          //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          //                 content: Text(
+          //                     "Invite id copied to clipboard: ${group.inviteId}"),
+          //                 duration: Duration(seconds: 2),
+          //               ));
+          //             });
+          //             context.read<GroupInfoCubitCubit>().setFalse();
+          //           },
+          //           child: Container(
+          //             padding:
+          //                 EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          //             decoration: BoxDecoration(color: Colors.pink, boxShadow: [
+          //               BoxShadow(
+          //                   blurRadius: 4,
+          //                   spreadRadius: 0.1,
+          //                   color: Colors.grey.withOpacity(0.2))
+          //             ]),
+          //             child: Text('Copy invite id'),
+          //           ),
+          //         ))
+          //     : SizedBox()
         ],
-      ),
-    );
-  }
-}
-
-class buttonicon extends StatelessWidget {
-  buttonicon({Key? key, required this.icon, required this.click})
-      : super(key: key);
-  IconData icon;
-  VoidCallback click;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 40,
-        height: 40,
-        padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.4),
-            borderRadius: BorderRadius.all(Radius.circular(30))),
-        child: IconButton(
-          onPressed: click,
-          icon: Icon(icon),
-        ),
       ),
     );
   }

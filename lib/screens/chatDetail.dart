@@ -10,12 +10,15 @@ import 'package:doantotnghiep/helper/Signaling.dart';
 
 import 'package:doantotnghiep/screens/CallVideo.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
+import 'package:doantotnghiep/screens/DisplayPage.dart';
+import 'package:doantotnghiep/screens/connectToFriend.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/Changetab/changetab_cubit.dart';
 import '../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import '../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../model/Group.dart';
@@ -68,6 +71,13 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
             widget.groupName,
           ),
           centerTitle: false,
+          leading: IconButton(
+            onPressed: () {
+              context.read<ChangetabCubit>().change(1);
+              navigateReplacement(context, DisplayPage());
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),

@@ -23,37 +23,42 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
             element.Id.toString()
                 .substring(element.Id.toString().length - 28) ==
             '${Userinfo.userSingleton.uid}');
-          if(flag.length != 0){
-            element.checkIsRead = flag.first.isRead;
-          }
-       
+        if (flag.length != 0) {
+          element.checkIsRead = flag.first.isRead;
+        }
       },
     );
-    emit(GroupInfoCubitLoaded(groupinfo: rs));
+    // var sort = rs;
+    //  List<GroupInfo> aaa = rs.sort((a, b) => a.time!.compareTo(b.time!));
+    emit(GroupInfoCubitLoaded(
+        groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!))));
   }
 
-  void chooseItemToShow(int index) {
+  void chooseItemToShow(String value) {
     if (state is GroupInfoCubitLoaded) {
       var list = (state as GroupInfoCubitLoaded).groupinfo;
-      list!.forEach((element) {
-        element.checked = false;
+      int index = list!.indexWhere(
+        (element) => element.groupName == value,
+      );
+      list.forEach((element) {
+        if (element.groupId != list[index].groupId) {
+          element.checked = false;
+        }
       });
-      bool? vl = (state as GroupInfoCubitLoaded).groupinfo![index].checked;
-      list![index].checked = !vl!;
+      list[index].checked = !list[index].checked!;
       emit(GroupInfoCubitLoading());
       emit(GroupInfoCubitLoaded().copyWith(groupinfo: list));
     }
   }
 
   void setFalse() {
-    if(state is GroupInfoCubitLoaded){
+    if (state is GroupInfoCubitLoaded) {
       var list = (state as GroupInfoCubitLoaded).groupinfo;
-       list!.forEach((element) {
-      element.checked = false;
-    });
-    emit(GroupInfoCubitLoading());
-    emit(GroupInfoCubitLoaded().copyWith(groupinfo: list));
+      list!.forEach((element) {
+        element.checked = false;
+      });
+      emit(GroupInfoCubitLoading());
+      emit(GroupInfoCubitLoaded().copyWith(groupinfo: list));
     }
-   
   }
 }

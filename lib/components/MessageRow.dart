@@ -14,7 +14,7 @@ import '../screens/chatDetail.dart';
 class MessageRow extends StatelessWidget {
    MessageRow(this.group,this.ind);
 GroupInfo group;
- int ind;
+ String ind;
   @override
   Widget build(BuildContext context) {
      return GestureDetector(

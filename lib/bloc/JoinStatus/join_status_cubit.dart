@@ -44,4 +44,8 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
 
     emit(JoindStatusState(joined: joined));
   }
+  leaveGroup(String groupId,String groupName)async{
+     await DatabaseService(uid: Userinfo.userSingleton.uid)
+        .JoinToGroup(true, groupId, groupName.toString());
+  }
 }

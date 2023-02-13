@@ -52,7 +52,7 @@ class DatabaseService {
       {'Id': uid, 'Name': name}
     ]).snapshots();
   }
-
+//orderBy('time').
   Future<QuerySnapshot<Object?>> getGroups(String invitedId) async {
     return groupCollection.where('inviteId', isEqualTo: invitedId).get();
   }
@@ -116,11 +116,14 @@ class DatabaseService {
         'members': [],
         'groupId': '',
         'inviteId': invitedId,
-        'recentMessage': '',
+        'recentMessage': 'Chưa có tin nhắn nào',
         'recentMessageSender': '',
-        'time': '',
+        'time': '${DateTime.now()
+                                  .microsecondsSinceEpoch
+                                  .toString()}',
         'isReadAr': [],
-        'offer': {}
+        'offer': {},
+        'type':'announce'
       });
       await documentRef.update({
         'members': FieldValue.arrayUnion([

@@ -38,126 +38,129 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         // appBar: AppBar(title: Text('Login'),),
-        body: Container(
-          // color: Colors.amber,
-          width: screenwidth,
-          height: screenheight,
-          child: Stack(
-            
-            children: [
-              // Opacity(
-              //   opacity: 0.8,
-              //   child: Image.asset(
-              //     'assets/images/Couple travelling by bike flat vector illustration.jpg',
-              //     fit: BoxFit.fitHeight,
-              //   ),
-              // ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: 100,
-                  ),
-                  GradientText(
-                    'Cùng Phượt',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'beautiFont',
-                        fontSize: 45),
-                    colors: [
-                      // Colors.green,
-                      Colors.yellow,
-                      Colors.orange,
-                      Colors.purple,
-                      Colors.pink,
-                    ],
-                  ),
-                  SizedBox(
-                    height: 100,
-                  ),
-                  SizedBox(
-                    width: screenwidth - 100,
-                    child: textfield(
-                      hint: 'abc@gmail.com',
-                      label: 'Email',
-                      icon: Icons.email,
-                      iconcolor: Colors.pink,
-                      emailCon: emailCon,
-                      error: 'Chưa điền email',
+        body: SingleChildScrollView(
+          child: Container(
+            // color: Colors.amber,
+            width: screenwidth,
+            height: screenheight,
+            child: Stack(
+              
+              children: [
+                // Opacity(
+                //   opacity: 0.8,
+                //   child: Image.asset(
+                //     'assets/images/Couple travelling by bike flat vector illustration.jpg',
+                //     fit: BoxFit.fitHeight,
+                //   ),
+                // ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 100,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: screenwidth - 100,
-                    child: textfield(
-                      hint: '123456',
-                      label: 'Password',
-                      icon: Icons.lock,
-                      iconcolor: Colors.pink,
-                      emailCon: passwordCon,
-                      error: 'Chưa điền mật khẩu',
-                    ),
-                  ),
-                  SizedBox(height: 5,),
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      
-                      children: [
-                        SizedBox(width: 220,),
-                        Text('Quên mật khẩu?', style: TextStyle(color: Colors.pink,fontSize: 12),),
-                        
+                    GradientText(
+                      'Cùng Phượt',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'beautiFont',
+                          fontSize: 45),
+                      colors: [
+                        // Colors.green,
+                        Colors.yellow,
+                        Colors.orange,
+                        Colors.purple,
+                        Colors.pink,
                       ],
-                    )),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    constraints: BoxConstraints(minWidth: 100),
-                    child: ElevatedButton(onPressed: () {
-                      context
-                          .read<LoginCubit>()
-                          .login(context, emailCon.text, passwordCon.text);
-                    }, child: BlocBuilder<LoginCubit, LoginState>(
-                      builder: (context, state) {
-                        if (state is LoginLoading) {
-                          return SizedBox(
-                            width: 25,
-                            height: 25,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                    
-                        return Text('Đăng nhập');
-                      },
-                    )),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Chưa có tài khoản?'),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Register()));
+                    ),
+                    SizedBox(
+                      height: 100,
+                    ),
+                    SizedBox(
+                      width: screenwidth - 100,
+                      child: textfield(
+                        hint: 'abc@gmail.com',
+                        label: 'Email',
+                        icon: Icons.email,
+                        iconcolor: Colors.pink,
+                        emailCon: emailCon,
+                        error: 'Chưa điền email',
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: screenwidth - 100,
+                      child: textfield(
+                        hint: '123456',
+                        label: 'Password',
+                        icon: Icons.lock,
+                        iconcolor: Colors.pink,
+                        emailCon: passwordCon,
+                        error: 'Chưa điền mật khẩu',
+                      ),
+                    ),
+                    SizedBox(height: 5,),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Row(
+                        
+                        children: [
+                          SizedBox(width: 220,),
+                          Text('Quên mật khẩu?', style: TextStyle(color: Colors.pink,fontSize: 12),),
+                          
+                        ],
+                      )),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      constraints: BoxConstraints(minWidth: 100),
+                      child: ElevatedButton(onPressed: () {
+                        context
+                            .read<LoginCubit>()
+                            .login(context, emailCon.text, passwordCon.text);
+                      }, child: BlocBuilder<LoginCubit, LoginState>(
+                        builder: (context, state) {
+                          if (state is LoginLoading) {
+                            return SizedBox(
+                              width: 25,
+                              height: 25,
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                      
+                          return Text('Đăng nhập');
                         },
-                        child: Text(
-                          'Đăng kí',
-                          style: TextStyle(
-                            color: Colors.pink,
+                      )),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Chưa có tài khoản?'),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Register()));
+                          },
+                          child: Text(
+                            'Đăng kí',
+                            style: TextStyle(
+                              color: Colors.pink,
+                            ),
                           ),
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              )
-            ],
+                        )
+                      ],
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -31,7 +31,7 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
     // var sort = rs;
     //  List<GroupInfo> aaa = rs.sort((a, b) => a.time!.compareTo(b.time!));
     emit(GroupInfoCubitLoaded(
-        groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!))));
+        groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),selected: rs.first));
   }
 
   void chooseItemToShow(String value) {
@@ -61,4 +61,11 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
       emit(GroupInfoCubitLoaded().copyWith(groupinfo: list));
     }
   }
+   void selectToShowLocation(GroupInfo select) {
+   
+      emit(GroupInfoCubitLoading());
+      emit(GroupInfoCubitLoaded(selected: select));
+       print('CLICKED ${select.groupName}');
+    }
+  
 }

@@ -1,10 +1,15 @@
 import 'dart:async';
 
+import 'package:doantotnghiep/bloc/FetchLocation/fetch_location_cubit.dart';
 import 'package:doantotnghiep/model/UserInfo.dart';
 import 'package:doantotnghiep/screens/connectToFriend.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../bloc/getUserGroup/get_user_group_cubit.dart';
 
 class Tracking extends StatefulWidget {
   Tracking({super.key});
@@ -17,150 +22,169 @@ class _TrackingState extends State<Tracking> {
   // List<LatLng> polylineCoordinates = [];
   late final Completer<GoogleMapController> _controller = Completer();
   BitmapDescriptor icon = BitmapDescriptor.defaultMarker;
+  final GlobalKey globalKey = GlobalKey();
   @override
   void initState() {
+    context.read<FetchLocationCubit>().requestLocation();
+    
     getIcons();
-
+    context.read<GetUserGroupCubit>().getUerGroup();
     super.initState();
   }
 
-  getIcons() {
-    BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(devicePixelRatio: 2.0), "assets/images/Cùng Phượt.png")
-        .then((value) {
-      setState(() {
-        icon = value;
-      });
-    });
+  getIcons() async {
+    // BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
+    //     ImageConfiguration(devicePixelRatio: 2.0), "assets/images/travel.jpeg");
+
+    // setState(() {
+    //   icon = markerbitmap;
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Map',
-          style: TextStyle(color: Colors.black),
-        ),
-        // backgroundColor: Colors.yellow,
-        actions: [
-          SizedBox(
-            width: 100,
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton(items: [
-                DropdownMenuItem(
-                    child: Text(
-                  'Abcs',
-                  style: TextStyle(color: Colors.pink, fontSize: 18),
-                ))
-              ], onChanged: (aa) {}),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          )
-        ],
-      ),
-      body: GoogleMap(
-        initialCameraPosition:
-            CameraPosition(target: LatLng(21.028333, 105.853333), zoom: 14.5),
-        markers: {
-          Marker(
-            infoWindow: InfoWindow(title: 'Chi'),
-            markerId: MarkerId('ABDG'),
-            position: LatLng(21.028333, 105.853333),
-            icon: icon
-          )
-        },
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-      ),
-      // FlutterMap(
-      //   options: MapOptions(
-      //     center: LatLng(21.0117040, 105.8114780),
-      //     zoom: 5,
-      //   ),
-      //   nonRotatedChildren: [
-      //     AttributionWidget.defaultWidget(
-      //       source: 'OpenStreetMap contributors',
-      //       onSourceTapped: null,
-      //     ),
-      //   ],
-      //   children: [
-      //     TileLayer(
-      //       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-      //       userAgentPackageName: 'com.example.map',
-      //     ),
-      //     PolygonLayer(
-      //       polygonCulling: false,
-      //       polygons: [
-      //         Polygon(points: [
-      //           LatLng(30, 40),
-      //           LatLng(20, 50),
-      //           LatLng(25, 45),
-      //         ], color: Colors.blue, borderStrokeWidth: 3),
-      //       ],
-      //     ),
-      //     MarkerLayer(
-      //       markers: [
-      //         Marker(
-      //             point: LatLng(21.0117040, 105.8114780),
-      //             width: 10,
-      //             height: 10,
-      //             rotate: true,
-      //             builder: (context) {
-      //               print('markerrrr');
-      //               return Icon(
-      //                 Icons.location_on,
-      //                 color: Colors.red[700],
-      //                 size: 40,
-      //               );
-      //             }),
-      //         Marker(
-      //             point: LatLng( 21.59422, 105.84817),
-      //             width: 10,
-      //             height: 10,
-      //             rotate: true,
-      //             builder: (context) {
-      //               print('markerrrr');
-      //               return Icon(
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Map',
+                  style: TextStyle(color: Colors.black),
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.pink, width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                      builder: (context, state) {
+                        return StreamBuilder(
+                            stream: state.stream,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                context
+                                    .read<GroupInfoCubitCubit>()
+                                    .updateGroup(snapshot.data);
+                                return BlocBuilder<GroupInfoCubitCubit,
+                                    GroupInfoCubitState>(
+                                  builder: (context, state) {
+                                    if (state is GroupInfoCubitLoaded) {
+                                      return Container(
+                                      
+                                       constraints: BoxConstraints(minWidth: 100,maxWidth: 250),
+                                        child: DropdownButtonFormField(
+                                         
+                                          isExpanded: true,
+                                              value: state.selected,
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              items: state.groupinfo!
+                                                  .map((e) => DropdownMenuItem(
+                                                      value: e,
+                                                      child: Text(
+                                                        '${e.groupName}',
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: TextStyle(
+                                                            color: Colors.pink,
+                                                            fontSize: 18),
+                                                      )))
+                                                  .toList(),
+                                              onChanged: (value) {
+                                              //   print('click on ${value!.groupName.toString()}');
+                                              // context.read<GroupInfoCubitCubit>().selectToShowLocation(value);
+                                              }
+                                        ),
+                                      );
+                                    }
+                                    return DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          hint: Text('Đang tải...',style: TextStyle(color: Colors.grey),),
+                                          items: [
+                                            // DropdownMenuItem(
+                                            //     child: Text(
+                                            //   'Đi phượt',
+                                            //   style: TextStyle(
+                                            //       color: Colors.pink,
+                                            //       fontSize: 18),
+                                            // ))
+                                          ],
+                                          onChanged: (aa) {}),
+                                    );
+                                  },
+                                );
+                              }
 
-      //                 Icons.location_on,
-      //                 color: Colors.red[700],
-      //                 size: 40,
-      //               );
-      //             }),
-      //         Marker(
-      //             point: LatLng( 21.18608, 106.07631),
-      //             width: 10,
-      //             height: 10,
-      //             rotate: true,
-      //             builder: (context) {
-      //               print('markerrrr');
-      //               return
-      //             //  ClipPath(clipper: CustomClipPath(),child: Container(height: 20,width: 20,),);
-      //               Icon(
-      //                 Icons.location_on,
-      //                 color: Colors.red[700],
-      //                 size: 40,
-      //               );
-      //             }),
-      //       ],
-      //     ),
-      //   ],
-      // ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.push(context,
-      //         MaterialPageRoute(builder: (context) => ConnectToFriend()));
-      //   },
-      //   backgroundColor: Colors.yellow,
-      //   child: Icon(
-      //     Icons.message,
-      //     color: Colors.black,
-      //   ),
-      // ),
+                              return DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                    borderRadius: BorderRadius.circular(5),
+                                    value: 'Đang tải...',
+                                    hint: Text('Đang tải...'),
+                                    items: [
+                                      // DropdownMenuItem(
+                                      //     child: Text(
+                                      //   'Đi phượt',
+                                      //   style: TextStyle(
+                                      //       color: Colors.pink,
+                                      //       fontSize: 18),
+                                      // ))
+                                    ],
+                                    onChanged: (aa) {}),
+                              );
+                            });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // backgroundColor: Colors.yellow,
+            actions: [],
+          ),
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              // customMarker(globalKey),
+              Positioned.fill(
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                      target: LatLng(21.5752612 ,105.8281156), zoom: 14.5),
+                  markers: {
+                    Marker(
+                        infoWindow: InfoWindow(title: 'Chi'),
+                        markerId: MarkerId('G'),
+                        position: LatLng(21.5752612 ,105.8281156),
+                        icon: icon),
+                    // Marker(
+                    //   infoWindow: InfoWindow(title: 'Yến'),
+                    //   markerId: MarkerId('A'),
+                    //   position: LatLng(21.000341, 105.842419),
+                    //   // icon: icon
+                    // ),
+                    // Marker(
+                    //   infoWindow: InfoWindow(title: 'Linh'),
+                    //   markerId: MarkerId('AB'),
+                    //   position: LatLng(21.037500, 105.833362),
+                    //   // icon: icon
+                    // )
+                  },
+                  // onMapCreated: (GoogleMapController controller) {
+                  //   _controller.complete(controller);
+                  // },
+                ),
+              ),
+            ],
+          ),
+        
+        ),
+      ],
     );
   }
 }

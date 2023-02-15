@@ -1,5 +1,6 @@
 import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cubit.dart';
 import 'package:doantotnghiep/bloc/Changetab/changetab_cubit.dart';
+import 'package:doantotnghiep/bloc/FetchLocation/fetch_location_cubit.dart';
 import 'package:doantotnghiep/bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
@@ -115,33 +116,34 @@ class _MyAppState extends State<MyApp> {
          BlocProvider(
           create: (context) => TimKiemGroupCubit(),
         ),
+          BlocProvider(
+          create: (context) => FetchLocationCubit(),
+        ),
       ],
-      child: OverlaySupport(
-        child: MaterialApp(
-          localizationsDelegates: [
-               GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-              ],
-              supportedLocales: [Locale('vi', 'VN')],
-              locale: Locale('vi', 'VN'),
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            useMaterial3: true,
-            primarySwatch: Colors.pink,
-          ),
-          home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
-            builder: (context, state) {
-              print('store id: ${state.uid}');
-              print('store model name ${Userinfo.userSingleton.name}');
-              print('store model name ${Userinfo.userSingleton.uid}');
-              if (state.uid.isNotEmpty) {
-                return DisplayPage();
-              }
-              return Login();
-            },
-          ),
+      child: MaterialApp(
+        localizationsDelegates: [
+             GlobalMaterialLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: [Locale('vi', 'VN')],
+            locale: Locale('vi', 'VN'),
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          useMaterial3: true,
+          primarySwatch: Colors.pink,
+        ),
+        home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
+          builder: (context, state) {
+            print('store id: ${state.uid}');
+            print('store model name ${Userinfo.userSingleton.name}');
+            print('store model name ${Userinfo.userSingleton.uid}');
+            if (state.uid.isNotEmpty) {
+              return DisplayPage();
+            }
+            return Login();
+          },
         ),
       ),
     );

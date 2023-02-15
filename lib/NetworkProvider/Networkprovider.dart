@@ -7,6 +7,7 @@ import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:location/location.dart';
 
 import '../model/UserInfo.dart';
 
@@ -217,7 +218,14 @@ class DatabaseService {
         .orderBy('time')
         .snapshots();
   }
-
+  pushLocation(LocationData location)async{
+      await userCollection.doc(Userinfo.userSingleton.uid).update({
+        'location':{
+          'latitude': location.latitude,
+          'longitude': location.longitude
+        }
+      });
+  }
   Map<String, dynamic> configuration = {
     'iceServer': [
       {

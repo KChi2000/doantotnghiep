@@ -390,14 +390,14 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
 
                                     return BlocConsumer<GroupInfoCubitCubit,
                                         GroupInfoCubitState>(
-                                          listener: (context, state) {
+                                      listener: (context, state) {
                                         //     if(state is GroupInfoCubitLoaded){
                                         //       context.read<TimKiemGroupCubit>().afterchange(
                                         // state
                                         //     .groupinfo!,
                                         // );
                                         //     }
-                                          },
+                                      },
                                       builder: (context, state) {
                                         if (state is GroupInfoCubitLoaded) {
                                           return Column(
@@ -452,7 +452,9 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                     state.groupinfo!.length,
                                                 itemBuilder: (context, index) {
                                                   return groupitem(
-                                                      state.groupinfo![index],ct,true);
+                                                      state.groupinfo![index],
+                                                      ct,
+                                                      true);
                                                 },
                                               ),
                                             ],
@@ -528,9 +530,9 @@ class buttonicon extends StatelessWidget {
 }
 
 class groupitem extends StatelessWidget {
-  groupitem(this.group,this.ct,this.margin);
+  groupitem(this.group, this.ct, this.margin);
   GroupInfo group;
- BuildContext ct;
+  BuildContext ct;
   bool margin;
   @override
   Widget build(BuildContext context) {
@@ -552,7 +554,9 @@ class groupitem extends StatelessWidget {
           Container(
             width: screenwidth,
             height: 55,
-            margin:margin? EdgeInsets.only(left: 10, right: 10, bottom: 10):EdgeInsets.all(0),
+            margin: margin
+                ? EdgeInsets.only(left: 10, right: 10, bottom: 10)
+                : EdgeInsets.all(0),
             color: Colors.transparent,
             child: Row(
               children: [
@@ -699,13 +703,13 @@ class groupitem extends StatelessWidget {
                             ),
                             PopupMenuItem(
                               onTap: () async {
-                                 ct.loaderOverlay.show();
+                                ct.loaderOverlay.show();
                                 await context
                                     .read<JoindStatusCubit>()
                                     .leaveGroup(group.groupId.toString(),
                                         group.groupName.toString());
-                                 ct.loaderOverlay.hide();
-                                 
+                                ct.loaderOverlay.hide();
+
                                 Fluttertoast.showToast(
                                     msg: "Đã rời nhóm thành công",
                                     toastLength: Toast.LENGTH_SHORT,
@@ -714,7 +718,6 @@ class groupitem extends StatelessWidget {
                                     textColor: Colors.white,
                                     backgroundColor: Colors.pink,
                                     fontSize: 16.0);
-                                  
                               },
                               child: Text('Rời nhóm'),
                               padding: EdgeInsets.symmetric(horizontal: 5),
@@ -761,6 +764,60 @@ class groupitem extends StatelessWidget {
           //         ))
           //     : SizedBox()
         ],
+      ),
+    );
+  }
+}
+
+class CustomClipPath extends CustomClipper<Path> {
+  var radius = 5.0;
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.moveTo(size.width / 2, 0.0);
+    path.quadraticBezierTo(2, 2, 0, size.height / 2);
+    path.quadraticBezierTo(0, size.height - 20, 10, size.height - 10);
+    path.lineTo(size.width / 2, size.height);
+    path.lineTo(size.width - 10, size.height - 10);
+    path.quadraticBezierTo(
+        size.width, size.height - 20, size.width, size.height / 2);
+    path.lineTo(size.width, size.height / 2);
+    path.quadraticBezierTo(size.width - 2, 2, size.width / 2, 0.0);
+    path.close();
+    return path;
+    // Path path = Path();
+    // path.addOval(Rect.fromCircle(center: Offset(size.width / 2, size.height / 2), radius: size.width / 2));
+    // path.lineTo(size.width/2, size.height);
+    // return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+class customMarker extends StatelessWidget {
+  customMarker(this.globalKeyMyWidget);
+  final GlobalKey globalKeyMyWidget;
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      key: globalKeyMyWidget,
+      child: SizedBox(
+         width: 60,
+              height: 60,
+        child: ClipPath(
+          child: Container(
+              padding: EdgeInsets.all(5),
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.red,
+              ),
+              child: CircleAvatar(
+                backgroundImage: AssetImage('assets/images/Cùng Phượt.png'),
+              )),
+          clipper: CustomClipPath(),
+        ),
       ),
     );
   }

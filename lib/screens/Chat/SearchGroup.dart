@@ -1,22 +1,22 @@
 import 'package:doantotnghiep/bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
-import 'package:doantotnghiep/screens/chatDetail.dart';
-import 'package:doantotnghiep/screens/connectToFriend.dart';
+import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
+import 'package:doantotnghiep/screens/Chat/connectToFriend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:lottie/lottie.dart';
 
-import '../NetworkProvider/Networkprovider.dart';
-import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
-import '../bloc/JoinStatus/join_status_cubit.dart';
-import '../bloc/checkCode.dart/check_code_cubit.dart';
-import '../bloc/getUserGroup/get_user_group_cubit.dart';
-import '../bloc/joinToGroup.dart/join_to_group_cubit.dart';
-import '../components/navigate.dart';
-import '../constant.dart';
-import '../model/Group.dart';
-import '../model/UserInfo.dart';
+import '../../NetworkProvider/Networkprovider.dart';
+import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../../bloc/JoinStatus/join_status_cubit.dart';
+import '../../bloc/checkCode.dart/check_code_cubit.dart';
+import '../../bloc/getUserGroup/get_user_group_cubit.dart';
+import '../../bloc/joinToGroup.dart/join_to_group_cubit.dart';
+import '../../components/navigate.dart';
+import '../../constant.dart';
+import '../../model/Group.dart';
+import '../../model/UserInfo.dart';
 
 class SearchGroup extends StatefulWidget {
   SearchGroup({required this.group});
@@ -70,6 +70,9 @@ class _SearchGroupState extends State<SearchGroup> {
                                   controller: codeCon,
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.black)),
                                       isDense: true,
                                       hintText: 'Nhập để tìm kiếm'),
                                   onChanged: (value) {
@@ -88,7 +91,9 @@ class _SearchGroupState extends State<SearchGroup> {
                 SizedBox(
                   height: 15,
                 ),
-                Divider(),
+                Divider(
+                  color: Colors.grey,
+                ),
                 SizedBox(
                   height: 15,
                 ),

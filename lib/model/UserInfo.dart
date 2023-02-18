@@ -3,90 +3,87 @@
 import 'dart:convert';
 
 import 'package:doantotnghiep/constant.dart';
+import 'package:doantotnghiep/model/Location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+//fuutu
+
 class Userinfo {
   String? uid;
-  String? name;
-  String? email;
-  List<Groups>? groups;
   String? profilePic;
-  Userinfo({
-    this.uid,
-    this.name,
-    this.email,
-    this.groups,
-    this.profilePic,
-  });
-  static  Userinfo userSingleton = Userinfo();
-  
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'uid': uid,
-      'name': name,
-      'email': email,
-    };
+  List<Groups>? groups;
+  String? name;
+  Location? location;
+  String? email;
+  void saveUserInfo(String uid, String name) {
+    this.uid = uid;
+    this.name = name;
   }
 
-  factory Userinfo.fromMap(Map<String, dynamic> map) {
-    return Userinfo(
-      uid: map['uid'] as String,
-      name: map['name'] as String,
-      email: map['email'] as String,
-    );
+  void saveUserUid(String uid) {
+    this.uid = uid;
   }
-  void saveUserInfo(String uid,String name){
-    this.uid=uid;
-    this.name=name;
-  }
-  
-  void saveUserUid(String uid){
-    this.uid=uid;
-  }
-   void saveUserName(String name){
-    this.name=name;
-  }
-  String toJson() => json.encode(toMap());
 
-  factory Userinfo.fromJson(String source) => Userinfo.fromMap(json.decode(source) as Map<String, dynamic>);
-}
-class Groups {
-  String? groupId;
-  String? groupName;
+  void saveUserName(String name) {
+    this.name = name;
+  }
 
-  Groups({this.groupId, this.groupName});
-
-  Groups.fromJson(Map<String, dynamic> json) {
-    groupId = json['groupId'];
-    groupName = json['GroupName'];
+  Userinfo(
+      {this.uid,
+      this.profilePic,
+      this.groups,
+      this.name,
+      this.location,
+      this.email});
+  static Userinfo userSingleton = Userinfo();
+  Userinfo.fromJson(Map<String, dynamic> json) {
+    uid = json['uid'];
+    profilePic = json['profilePic'];
+    if (json['groups'] != null) {
+      groups = <Groups>[];
+      json['groups'].forEach((v) {
+        groups!.add(new Groups.fromJson(v));
+      });
+    }
+    name = json['fullName'];
+    location = json['location'] != null
+        ? new Location.fromJson(json['location'])
+        : null;
+    email = json['email'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['groupId'] = this.groupId;
-    data['GroupName'] = this.groupName;
+    data['uid'] = this.uid;
+    data['profilePic'] = this.profilePic;
+    if (this.groups != null) {
+      data['groups'] = this.groups!.map((v) => v.toJson()).toList();
+    }
+    data['fullName'] = this.name;
+    if (this.location != null) {
+      data['location'] = this.location!.toJson();
+    }
+    data['email'] = this.email;
     return data;
   }
 }
-class CustomClipPath extends CustomClipper<Path> {
-  var radius=5.0;
-  
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    
-    path.lineTo(0, size.height);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0);
-    // TODO: implement getClip
-    return path;
+
+class Groups {
+  String? groupName;
+  String? groupId;
+
+  Groups({this.groupName, this.groupId});
+
+  Groups.fromJson(Map<String, dynamic> json) {
+    groupName = json['GroupName'];
+    groupId = json['groupId'];
   }
-  
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    // TODO: implement shouldReclip
-    throw false;
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['GroupName'] = this.groupName;
+    data['groupId'] = this.groupId;
+    return data;
   }
- 
 }

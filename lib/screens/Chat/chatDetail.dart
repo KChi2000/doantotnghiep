@@ -8,21 +8,21 @@ import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
 
-import 'package:doantotnghiep/screens/CallVideo.dart';
+import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:doantotnghiep/screens/DisplayPage.dart';
-import 'package:doantotnghiep/screens/connectToFriend.dart';
+import 'package:doantotnghiep/screens/Chat/connectToFriend.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/Changetab/changetab_cubit.dart';
-import '../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
-import '../bloc/getUserGroup/get_user_group_cubit.dart';
-import '../model/Group.dart';
-import '../model/UserInfo.dart';
+import '../../bloc/Changetab/changetab_cubit.dart';
+import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
+import '../../bloc/getUserGroup/get_user_group_cubit.dart';
+import '../../model/Group.dart';
+import '../../model/UserInfo.dart';
 
 class chatDetail extends StatefulWidget {
   chatDetail(
@@ -106,12 +106,15 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
+                              backgroundColor: Colors.white,
+                              surfaceTintColor: Colors.white,
                               title:
                                   Text('Thành viên(${widget.members.length})'),
                               content: Container(
                                 constraints: BoxConstraints(
                                     minHeight: 80, maxHeight: 200),
                                 width: 100,
+                                color: Colors.white,
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: widget.members.length,

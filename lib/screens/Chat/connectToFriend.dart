@@ -10,10 +10,10 @@ import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/Message.dart';
 
-import 'package:doantotnghiep/screens/JoinGroup.dart';
-import 'package:doantotnghiep/screens/SearchGroup.dart';
+import 'package:doantotnghiep/screens/Chat/JoinGroup.dart';
+import 'package:doantotnghiep/screens/Chat/SearchGroup.dart';
 import 'package:doantotnghiep/screens/auth/Quenmatkhau.dart';
-import 'package:doantotnghiep/screens/chatDetail.dart';
+import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -26,10 +26,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:rive/rive.dart';
 
-import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
-import '../bloc/JoinStatus/join_status_cubit.dart';
-import '../bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
-import '../model/UserInfo.dart';
+import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../../bloc/JoinStatus/join_status_cubit.dart';
+import '../../bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
+import '../../model/UserInfo.dart';
 
 class ConnectToFriend extends StatefulWidget {
   ConnectToFriend({super.key});
@@ -59,13 +59,20 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
       overlayWidget: Center(child: CircularProgressIndicator()),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Chat'),
+          title: Text(
+            'Chat',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white,
           elevation: 3,
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: .0),
               child: IconButton(
-                icon: Icon(Icons.group_add_rounded),
+                icon: Icon(
+                  Icons.group_add_rounded,
+                  color: Colors.black,
+                ),
                 onPressed: () {
                   String invitedId = getRandomString(6);
                   groupNameCon.clear();
@@ -108,9 +115,9 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                           child: Text(
                                             'Tạo nhóm',
                                             style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black),
                                           )),
                                       SizedBox(
                                         height: 10,
@@ -119,10 +126,20 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                         key: formkey,
                                         child: TextFormField(
                                           controller: groupNameCon,
+                                          style: TextStyle(color: Colors.black),
+                                          cursorColor: Colors.grey,
                                           decoration: InputDecoration(
                                               hintText: 'group\'s name',
                                               isDense: true,
-                                              border: OutlineInputBorder()),
+                                              border: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.black)),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.black)),
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.black))),
                                           validator: (value) {
                                             if (groupNameCon.text.isEmpty ||
                                                 groupNameCon.text.length == 0) {
@@ -140,8 +157,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                       Text(
                                         'Copy mã bên dưới để mời bạn bè tham gia vào nhóm',
                                         style: TextStyle(
-                                          fontSize: 12,
-                                        ),
+                                            fontSize: 12, color: Colors.black),
                                       ),
                                       SizedBox(
                                         height: 5,
@@ -349,136 +365,120 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
             ),
           ],
         ),
-        body: InkWell(
-          highlightColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          onTap: () {
-            context.read<GroupInfoCubitCubit>().setFalse();
-          },
-          child: Stack(
+        body: Container(
+          width: screenwidth,
+          height: screenheight,
+          padding: EdgeInsets.only(top: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: screenwidth,
-                height: screenheight,
-                padding: EdgeInsets.only(top: 10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child:
-                            BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-                          builder: (context, state) {
-                            return StreamBuilder<dynamic>(
-                                stream: state.stream,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    context
-                                        .read<GroupInfoCubitCubit>()
-                                        .updateGroup(snapshot.data);
-                                    if (snapshot.data?.docs.length == 0) {
-                                      return Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 280,
-                                          ),
-                                          Text(
-                                              'oops, bạn chưa có nhóm nào :(('),
-                                        ],
-                                      );
-                                    }
+              Expanded(
+                child: SingleChildScrollView(
+                  child: BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                    builder: (context, state) {
+                      return StreamBuilder<dynamic>(
+                          stream: state.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              context
+                                  .read<GroupInfoCubitCubit>()
+                                  .updateGroup(snapshot.data);
+                              if (snapshot.data?.docs.length == 0) {
+                                return Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 280,
+                                    ),
+                                    Text('oops, bạn chưa có nhóm nào :(('),
+                                  ],
+                                );
+                              }
 
-                                    return BlocConsumer<GroupInfoCubitCubit,
-                                        GroupInfoCubitState>(
-                                      listener: (context, state) {
-                                        //     if(state is GroupInfoCubitLoaded){
-                                        //       context.read<TimKiemGroupCubit>().afterchange(
-                                        // state
-                                        //     .groupinfo!,
-                                        // );
-                                        //     }
-                                      },
-                                      builder: (context, state) {
-                                        if (state is GroupInfoCubitLoaded) {
-                                          return Column(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  FocusManager
-                                                      .instance.primaryFocus
-                                                      ?.unfocus();
-                                                  navigatePush(
-                                                      context,
-                                                      SearchGroup(
-                                                          group: (context
-                                                                      .read<
-                                                                          GroupInfoCubitCubit>()
-                                                                      .state
-                                                                  as GroupInfoCubitLoaded)
-                                                              .groupinfo!));
-                                                },
-                                                child: Container(
-                                                  height: 45,
-                                                  margin: EdgeInsets.only(
-                                                      bottom: 10,
-                                                      left: 15,
-                                                      right: 15),
-                                                  // padding:
-                                                  //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.35),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30)),
-                                                  child: TextFormField(
-                                                    enabled: false,
-                                                    decoration: InputDecoration(
-                                                        prefixIcon:
-                                                            Icon(Icons.search),
-                                                        border:
-                                                            InputBorder.none,
-                                                        hintText:
-                                                            'Nhập để tìm kiếm nhóm đã tham gia'),
+                              return BlocConsumer<GroupInfoCubitCubit,
+                                  GroupInfoCubitState>(
+                                listener: (context, state) {
+                                  //     if(state is GroupInfoCubitLoaded){
+                                  //       context.read<TimKiemGroupCubit>().afterchange(
+                                  // state
+                                  //     .groupinfo!,
+                                  // );
+                                  //     }
+                                },
+                                builder: (context, state) {
+                                  if (state is GroupInfoCubitLoaded) {
+                                    return Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
+                                            navigatePush(
+                                                context,
+                                                SearchGroup(
+                                                    group: (context
+                                                                .read<
+                                                                    GroupInfoCubitCubit>()
+                                                                .state
+                                                            as GroupInfoCubitLoaded)
+                                                        .groupinfo!));
+                                          },
+                                          child: Container(
+                                            height: 45,
+                                            margin: EdgeInsets.only(
+                                                bottom: 10,
+                                                left: 15,
+                                                right: 15),
+                                            // padding:
+                                            //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey
+                                                    .withOpacity(0.35),
+                                                borderRadius:
+                                                    BorderRadius.circular(30)),
+                                            child: TextFormField(
+                                              enabled: false,
+                                              decoration: InputDecoration(
+                                                  prefixIcon: Icon(
+                                                    Icons.search,
+                                                    color: Colors.grey,
                                                   ),
-                                                ),
-                                              ),
-                                              ListView.builder(
-                                                shrinkWrap: true,
-                                                reverse: true,
-                                                physics:
-                                                    NeverScrollableScrollPhysics(),
-                                                itemCount:
-                                                    state.groupinfo!.length,
-                                                itemBuilder: (context, index) {
-                                                  return groupitem(
-                                                      state.groupinfo![index],
-                                                      ct,
-                                                      true);
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        }
-                                        return Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      },
+                                                  border: InputBorder.none,
+                                                  hintText:
+                                                      'Nhập để tìm kiếm nhóm đã tham gia'),
+                                            ),
+                                          ),
+                                        ),
+                                        ListView.builder(
+                                          shrinkWrap: true,
+                                          reverse: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          itemCount: state.groupinfo!.length,
+                                          itemBuilder: (context, index) {
+                                            return groupitem(
+                                                state.groupinfo![index],
+                                                ct,
+                                                true);
+                                          },
+                                        ),
+                                      ],
                                     );
                                   }
-                                  // return Center(
-                                  //   child: CircularProgressIndicator(),
-                                  // );
                                   return Center(
-                                    child:
-                                        Text('oops, bạn chưa có nhóm nào ((:'),
+                                    child: CircularProgressIndicator(),
                                   );
-                                });
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
+                                },
+                              );
+                            }
+                            // return Center(
+                            //   child: CircularProgressIndicator(),
+                            // );
+                            return Center(
+                              child: Text('oops, bạn chưa có nhóm nào ((:'),
+                            );
+                          });
+                    },
+                  ),
                 ),
               ),
             ],
@@ -490,7 +490,12 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
           },
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(40))),
-          label: Center(child: FittedBox(child: Text('Tham gia nhóm'))),
+          label: Center(
+              child: FittedBox(
+                  child: Text(
+            'Tham gia nhóm',
+            style: TextStyle(color: Colors.white),
+          ))),
         ),
       ),
     );
@@ -538,7 +543,6 @@ class groupitem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.read<GroupInfoCubitCubit>().setFalse();
         navigateReplacement(
             context,
             chatDetail(
@@ -564,7 +568,10 @@ class groupitem extends StatelessWidget {
                   minRadius: 30,
                   child: Container(
                     child: Center(
-                      child: Text(group.groupName.toString().substring(0, 1)),
+                      child: Text(
+                        group.groupName.toString().substring(0, 1),
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
@@ -677,6 +684,7 @@ class groupitem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(5)),
                         elevation: 10,
                         padding: EdgeInsets.all(0),
+                        surfaceTintColor: Colors.white,
                         itemBuilder: (context) {
                           return [
                             PopupMenuItem(
@@ -692,10 +700,12 @@ class groupitem extends StatelessWidget {
                                   ));
                                 });
                               },
-                              child: Text('Copy inviteid'),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                              // height: 20,
+                              child: Text(
+                                'Copy inviteid',
+                                style: TextStyle(color: Colors.pink),
+                              ),
+                              padding:
+                                  EdgeInsets.only(top: 5, bottom: 5, left: 10),
                               textStyle: TextStyle(
                                   color: Colors.black,
                                   fontSize: 16,
@@ -719,8 +729,10 @@ class groupitem extends StatelessWidget {
                                     backgroundColor: Colors.pink,
                                     fontSize: 16.0);
                               },
-                              child: Text('Rời nhóm'),
-                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              child: Text('Rời nhóm',
+                                  style: TextStyle(color: Colors.pink)),
+                              padding:
+                                  EdgeInsets.only(top: 5, bottom: 5, left: 10),
                               // height: 20,
                               textStyle:
                                   TextStyle(color: Colors.black, fontSize: 16),
@@ -734,35 +746,6 @@ class groupitem extends StatelessWidget {
               ],
             ),
           ),
-          // group.checked!
-          //     ? Positioned(
-          //         right: 50,
-          //         top: 20,
-          //         child: GestureDetector(
-          //           onTap: () {
-          //             Clipboard.setData(ClipboardData(text: group.inviteId))
-          //                 .then((_) {
-          //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          //                 content: Text(
-          //                     "Invite id copied to clipboard: ${group.inviteId}"),
-          //                 duration: Duration(seconds: 2),
-          //               ));
-          //             });
-          //             context.read<GroupInfoCubitCubit>().setFalse();
-          //           },
-          //           child: Container(
-          //             padding:
-          //                 EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-          //             decoration: BoxDecoration(color: Colors.pink, boxShadow: [
-          //               BoxShadow(
-          //                   blurRadius: 4,
-          //                   spreadRadius: 0.1,
-          //                   color: Colors.grey.withOpacity(0.2))
-          //             ]),
-          //             child: Text('Copy invite id'),
-          //           ),
-          //         ))
-          //     : SizedBox()
         ],
       ),
     );
@@ -803,8 +786,8 @@ class customMarker extends StatelessWidget {
     return RepaintBoundary(
       key: globalKeyMyWidget,
       child: SizedBox(
-         width: 60,
-              height: 60,
+        width: 60,
+        height: 60,
         child: ClipPath(
           child: Container(
               padding: EdgeInsets.all(5),

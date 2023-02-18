@@ -28,44 +28,15 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
         }
       },
     );
-    // var sort = rs;
-    //  List<GroupInfo> aaa = rs.sort((a, b) => a.time!.compareTo(b.time!));
     emit(GroupInfoCubitLoaded(
-        groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),selected: rs.first));
+        groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),
+        selectedGroup: rs.last));
   }
 
-  void chooseItemToShow(String value) {
-    if (state is GroupInfoCubitLoaded) {
-      var list = (state as GroupInfoCubitLoaded).groupinfo;
-      int index = list!.indexWhere(
-        (element) => element.groupName == value,
-      );
-      list.forEach((element) {
-        if (element.groupId != list[index].groupId) {
-          element.checked = false;
-        }
-      });
-      list[index].checked = !list[index].checked!;
-      emit(GroupInfoCubitLoading());
-      emit(GroupInfoCubitLoaded().copyWith(groupinfo: list));
-    }
+  changeSelectedGroup(GroupInfo group) {
+    emit(GroupInfoCubitLoading());
+    emit(GroupInfoCubitLoaded(
+        groupinfo: (state as GroupInfoCubitLoaded).groupinfo,
+        selectedGroup: group));
   }
-
-  void setFalse() {
-    if (state is GroupInfoCubitLoaded) {
-      var list = (state as GroupInfoCubitLoaded).groupinfo;
-      list!.forEach((element) {
-        element.checked = false;
-      });
-      emit(GroupInfoCubitLoading());
-      emit(GroupInfoCubitLoaded().copyWith(groupinfo: list));
-    }
-  }
-   void selectToShowLocation(GroupInfo select) {
-   
-      emit(GroupInfoCubitLoading());
-      emit(GroupInfoCubitLoaded(selected: select));
-       print('CLICKED ${select.groupName}');
-    }
-  
 }

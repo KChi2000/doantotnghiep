@@ -9,26 +9,30 @@ import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
+import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
+import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getInviteId/get_invite_id_cubit.dart';
+import 'package:doantotnghiep/bloc/getProfile/get_profile_cubit.dart';
 import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'dart:async';
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
-import 'package:doantotnghiep/components/pickImage/pick_image_cubit.dart';
+
 import 'package:doantotnghiep/helper/helper_function.dart';
 
 import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
-import 'package:doantotnghiep/screens/Tracking.dart';
+import 'package:doantotnghiep/screens/Map.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+import 'bloc/pickImage/pick_image_cubit.dart';
 import 'model/UserInfo.dart';
 
 void main() async {
@@ -65,7 +69,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-         BlocProvider(
+        BlocProvider(
           create: (context) => RegisterCubit(),
         ),
         BlocProvider(
@@ -92,48 +96,71 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => GetUserGroupCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => GroupInfoCubitCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => MessageCubitCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => ChangetabCubit(),
         ),
         BlocProvider(
           create: (context) => PickImageCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => SendMessageCubit(),
         ),
         BlocProvider(
           create: (context) => ChangeMessageStatusCubit(),
         ),
-          BlocProvider(
+        BlocProvider(
           create: (context) => MakeAVideoCallCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => TimKiemGroupCubit(),
         ),
-          BlocProvider(
+        BlocProvider(
           create: (context) => FetchLocationCubit(),
+        ),
+        BlocProvider(
+          create: (context) => FetchLocationToShowCubit(),
+        ),
+        BlocProvider(
+          create: (context) => GetProfileCubit(),
+        ),
+        BlocProvider(
+          create: (context) => FetchImageCubit(),
         ),
       ],
       child: MaterialApp(
         localizationsDelegates: [
-             GlobalMaterialLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-            ],
-            supportedLocales: [Locale('vi', 'VN')],
-            locale: Locale('vi', 'VN'),
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        color: Colors.pink,
+        supportedLocales: [Locale('vi', 'VN')],
+        locale: Locale('vi', 'VN'),
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.pink,
-        ),
+            // appBarTheme: AppBarTheme(color: Colors.pink),
+            useMaterial3: true,
+            colorScheme: ColorScheme(
+                brightness: Brightness.light,
+                primary: Colors.pink,
+                onPrimary: Colors.pink,
+                secondary: Colors.white,
+                onSecondary: Colors.black,
+                error: Colors.pink,
+                onError: Colors.pink,
+                background: Colors.white,
+                onBackground: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.black),
+            cardColor: Colors.pink,
+            primaryColor: Colors.pink),
         home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
           builder: (context, state) {
             print('store id: ${state.uid}');

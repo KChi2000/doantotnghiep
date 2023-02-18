@@ -10,13 +10,11 @@ abstract class GroupInfoCubitState extends Equatable {
 
 class GroupInfoCubitLoaded extends GroupInfoCubitState {
   List<GroupInfo>? groupinfo;
-  GroupInfo? selected;
-  GroupInfoCubitLoaded({this.groupinfo,this.selected});
+  GroupInfo? selectedGroup;
+  GroupInfoCubitLoaded({this.groupinfo, this.selectedGroup});
 
   @override
-  List<Object> get props => [groupinfo!,selected!];
-
- 
+  List<Object> get props => [groupinfo!, selectedGroup!];
 
   GroupInfoCubitLoaded copyWith({
     List<GroupInfo>? groupinfo,
@@ -24,7 +22,6 @@ class GroupInfoCubitLoaded extends GroupInfoCubitState {
   }) {
     return GroupInfoCubitLoaded(
       groupinfo: groupinfo ?? this.groupinfo,
-      selected: selected ?? this.selected,
     );
   }
 }
@@ -35,6 +32,7 @@ class GroupInfoCubitLoading extends GroupInfoCubitState {
   @override
   List<Object> get props => [];
 }
+
 class GroupInfoCubitinitial extends GroupInfoCubitState {
   GroupInfoCubitinitial();
 

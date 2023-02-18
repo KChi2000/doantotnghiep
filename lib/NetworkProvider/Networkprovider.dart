@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doantotnghiep/components/showSnackbar.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:location/location.dart';
@@ -22,6 +25,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference groupCollection =
       FirebaseFirestore.instance.collection('groups');
+  final storageRef =
+      FirebaseStorage.instance.ref('${Userinfo.userSingleton.uid}');
   Future addUserData(String fullname, String email) async {
     var result = await userCollection.doc(uid).set({
       'fullName': fullname,
@@ -53,6 +58,7 @@ class DatabaseService {
       {'Id': uid, 'Name': name}
     ]).snapshots();
   }
+
 //orderBy('time').
   Future<QuerySnapshot<Object?>> getGroups(String invitedId) async {
     return groupCollection.where('inviteId', isEqualTo: invitedId).get();
@@ -119,12 +125,10 @@ class DatabaseService {
         'inviteId': invitedId,
         'recentMessage': 'Chưa có tin nhắn nào',
         'recentMessageSender': '',
-        'time': '${DateTime.now()
-                                  .microsecondsSinceEpoch
-                                  .toString()}',
+        'time': '${DateTime.now().microsecondsSinceEpoch.toString()}',
         'isReadAr': [],
         'offer': {},
-        'type':'announce'
+        'type': 'announce'
       });
       await documentRef.update({
         'members': FieldValue.arrayUnion([
@@ -158,7 +162,6 @@ class DatabaseService {
       });
     } on FirebaseException catch (e) {
       // showSnackbar(context, message, color)
-
     }
   }
 
@@ -218,14 +221,49 @@ class DatabaseService {
         .orderBy('time')
         .snapshots();
   }
-  pushLocation(LocationData location)async{
-      await userCollection.doc(Userinfo.userSingleton.uid).update({
-        'location':{
-          'latitude': location.latitude,
-          'longitude': location.longitude
-        }
-      });
+
+  pushLocation(LocationData location) async {
+    await userCollection.doc(Userinfo.userSingleton.uid).update({
+      'location': {
+        'latitude': location.latitude,
+        'longitude': location.longitude
+      }
+    });
   }
+
+  Future<List<Userinfo>> fetchGrouplocation(GroupInfo group) async {
+    var members = group.members;
+    DocumentSnapshot location;
+    List<Userinfo> list = [];
+    await Future.forEach(
+      members!,
+      (element) async {
+        location = await userCollection.doc(element.Id).get();
+        Userinfo userinfo =
+            Userinfo.fromJson(location.data() as Map<String, dynamic>);
+        list.add(userinfo);
+        // print('get from firebase ${userinfo.toJson()}');
+      },
+    );
+    // print('complete!!!!!!!!!!!!!!');
+    return list;
+  }
+
+  Future<String> uploadImage(File image) async {
+    var uploadTask = storageRef.putFile(image);
+    final snapshot = await uploadTask.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    await userCollection
+        .doc(Userinfo.userSingleton.uid)
+        .update({'profilePic': '$urlDownload'});
+    print('download link: ${urlDownload}');
+    return urlDownload;
+  }
+
+  Stream<DocumentSnapshot<Object?>> getProfileImage() {
+    return userCollection.doc(Userinfo.userSingleton.uid).snapshots();
+  }
+
   Map<String, dynamic> configuration = {
     'iceServer': [
       {

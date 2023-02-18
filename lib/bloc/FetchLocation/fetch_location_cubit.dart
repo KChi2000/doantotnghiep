@@ -30,18 +30,19 @@ class FetchLocationCubit extends Cubit<FetchLocationState> {
         return;
       }
     }
-    if(_permissionGranted == PermissionStatus.granted){
-         LocationData currentLocation = await location.getLocation();
-         await DatabaseService().pushLocation(currentLocation);
-  print('YOUR LOCATIONn : ${currentLocation.latitude} ${currentLocation.longitude}');
-    }
-  
+    // if (_permissionGranted == PermissionStatus.granted) {
+    //   LocationData currentLocation = await location.getLocation();
+    //   await DatabaseService().pushLocation(currentLocation);
+    //   print(
+    //       'YOUR LOCATIONn : ${currentLocation.latitude} ${currentLocation.longitude}');
+    // }
   }
-  getYourLocation()async{
-     Location location = Location();
-      
+
+  getYourLocation() async {
+    Location location = Location();
+
     //  Timer.periodic(Duration(seconds: 5), (timer) {
-  
+
     //  },);
   }
 }

@@ -3,12 +3,12 @@ import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
-import 'package:doantotnghiep/components/MessageRow.dart';
+
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Group.dart';
 
-import 'package:doantotnghiep/screens/chatDetail.dart';
+import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 
-import '../model/UserInfo.dart';
+import '../../model/UserInfo.dart';
 
 class JoinGroup extends StatefulWidget {
   JoinGroup({super.key});
@@ -74,6 +74,8 @@ class _JoinGroupState extends State<JoinGroup> {
                   controller: codeCon,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
                       isDense: true,
                       hintText: 'Nhập để tìm kiếm'),
                   inputFormatters: [LengthLimitingTextInputFormatter(6)],

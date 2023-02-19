@@ -19,6 +19,7 @@ import 'dart:async';
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
+import 'package:doantotnghiep/bloc/resetEmail/reset_email_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
 
 import 'package:doantotnghiep/helper/helper_function.dart';
@@ -131,6 +132,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (context) => FetchImageCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ResetEmailCubit(),
         ),
       ],
       child: MaterialApp(

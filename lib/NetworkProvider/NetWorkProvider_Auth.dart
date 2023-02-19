@@ -4,6 +4,7 @@ import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../components/showSnackbar.dart';
 import '../model/UserInfo.dart';
 
@@ -22,36 +23,35 @@ class AuthService {
           email: email, password: pass);
 
       if (user != null) {
-        await DatabaseService(uid: user.user!.uid)
-            .addUserData(fullName, email);  
+        await DatabaseService(uid: user.user!.uid).addUserData(fullName, email);
         await HelperFunctions.saveLoggedUserUid(user.user!.uid);
-       Userinfo.userSingleton.uid = user.user!.uid;
+        Userinfo.userSingleton.uid = user.user!.uid;
         return true;
       }
     } on FirebaseAuthException catch (e) {
-       switch (e.code) {
-         case "email-already-in-use":
-          showSnackbar(context,
-              'Error: Email already in use. Please try another email!', Colors.pink);
+      switch (e.code) {
+        case "email-already-in-use":
+          showSnackbar(
+              context,
+              'Error: Email này đã được sử dụng. Xin hãy sử dụng email khác!',
+              Colors.pink);
           break;
-           case "invalid-email":
-          showSnackbar(context,
-              'Enter a valid email!', Colors.pink);
+        case "invalid-email":
+          showSnackbar(context, 'Email không hợp lệ!', Colors.pink);
           break;
         case "weak-password":
-          showSnackbar(context, 'Error: Password must longer than 6', Colors.pink);
+          showSnackbar(
+              context, 'Error: Mật khẩu nên có tối thiểu 6 ký tự', Colors.pink);
           break;
         case "network-request-failed":
-          showSnackbar(context,
-              'No network connected!!', Colors.pink);
+          showSnackbar(context, 'Không có kết nối Internet!!', Colors.pink);
           break;
-       
+
         default:
           showSnackbar(context, e.toString(), Colors.pink);
       }
-       print(' sevice: ${e.code}');
+      print(' sevice: ${e.code}');
       return e;
-     
     }
   }
 
@@ -64,24 +64,27 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "wrong-password":
-          showSnackbar(context, 'Error: Wrong password!', Colors.pink);
+          showSnackbar(
+              context, 'Error: Sai tài khoản hoặc mật khẩu!', Colors.pink);
           break;
         case "user-not-found":
-          showSnackbar(context,
-              'Error: User doesn\'t exists. Try another Account!', Colors.pink);
+          showSnackbar(
+              context,
+              'Error: Tài khoản không tồn tại. Xin hãy thử 1 tài khoản khác!',
+              Colors.pink);
           break;
         case "invalid-email":
-          showSnackbar(context,
-              'Enter a valid email!', Colors.pink);
+          showSnackbar(context, 'Email không hợp lệ!', Colors.pink);
           break;
-          case "too-many-requests":
-          showSnackbar(context,
-              'Too many requests at the same time. Pls try it after 1 minutes!', Colors.pink);
+        case "too-many-requests":
+          showSnackbar(
+              context,
+              'Quá nhiều yêu cầu trong một lần. Hãy thử lại sau 1 phút!',
+              Colors.pink);
           break;
-         
-            case "network-request-failed":
-          showSnackbar(context,
-              'No network connected!!', Colors.pink);
+
+        case "network-request-failed":
+          showSnackbar(context, 'Không có kết nối Internet!!', Colors.pink);
           break;
         default:
           showSnackbar(context, e.toString(), Colors.pink);
@@ -92,5 +95,12 @@ class AuthService {
     }
   }
 
-  
+  Future<String> ResetPassword(String email) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email);
+      return 'success';
+    } on FirebaseAuthException catch (e) {
+      return e.toString();
+    }
+  }
 }

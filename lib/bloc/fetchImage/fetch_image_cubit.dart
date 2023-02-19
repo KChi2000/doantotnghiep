@@ -10,7 +10,7 @@ class FetchImageCubit extends Cubit<FetchImageState> {
   void getFromStream(Map<String, dynamic> snapshot) {
     emit(FetchImageLoading());
     var rs = Userinfo.fromJson(snapshot);
-
+    print('get data from stream');
     emit(FetchImageComplete(image: rs));
   }
 }

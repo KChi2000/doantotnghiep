@@ -38,11 +38,37 @@ class FetchLocationCubit extends Cubit<FetchLocationState> {
     // }
   }
 
-  getYourLocation() async {
-    Location location = Location();
+  UpdateLocation() async {
+    Timer.periodic(
+      Duration(minutes: 5),
+      (timer) async {
+        bool _serviceEnabled;
+        PermissionStatus _permissionGranted;
+        Location location = Location();
+        _serviceEnabled = await location.serviceEnabled();
 
-    //  Timer.periodic(Duration(seconds: 5), (timer) {
+        if (!_serviceEnabled) {
+          _serviceEnabled = await location.requestService();
 
-    //  },);
+          if (!_serviceEnabled) {
+            return;
+          }
+        }
+
+        _permissionGranted = await location.hasPermission();
+        if (_permissionGranted == PermissionStatus.denied) {
+          _permissionGranted = await location.requestPermission();
+          if (_permissionGranted != PermissionStatus.granted) {
+            return;
+          }
+        }
+        if (_permissionGranted == PermissionStatus.granted) {
+          LocationData currentLocation = await location.getLocation();
+          await DatabaseService().pushLocation(currentLocation);
+          print(
+              'Update LOCATION : ${currentLocation.latitude} ${currentLocation.longitude}');
+        }
+      },
+    );
   }
 }

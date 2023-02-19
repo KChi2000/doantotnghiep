@@ -28,9 +28,13 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
         }
       },
     );
-    emit(GroupInfoCubitLoaded(
-        groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),
-        selectedGroup: rs.last));
+    if (rs.length == 0) {
+      emit(GroupInfoCubitLoaded(groupinfo: [], selectedGroup: GroupInfo()));
+    } else {
+      emit(GroupInfoCubitLoaded(
+          groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),
+          selectedGroup: rs.last));
+    }
   }
 
   changeSelectedGroup(GroupInfo group) {

@@ -29,6 +29,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   void initState() {
+    context.read<GetProfileCubit>().getStreamProfile();
     super.initState();
   }
 
@@ -97,19 +98,43 @@ class _ProfileState extends State<Profile> {
                                         FetchImageState>(
                                       builder: (context, state) {
                                         if (state is FetchImageComplete) {
+                                          if (state.image.profilePic
+                                                      .toString() ==
+                                                  null ||
+                                              state.image.profilePic
+                                                  .toString()
+                                                  .isEmpty) {
+                                            return CircleAvatar(
+                                                // backgroundColor: Colors.teal,
+                                                maxRadius: 80,
+                                                child: Center(
+                                                  child: Text(
+                                                    '${Userinfo.userSingleton.name.toString().substring(0, 1)}',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 40),
+                                                  ),
+                                                ));
+                                          }
+                                          print(
+                                              'stream have data ${state.image.profilePic}');
                                           return CircleAvatar(
-                                              maxRadius: 80,
-                                              backgroundImage: Image.network(
-                                                '${state.image.profilePic}',
-                                                fit: BoxFit.cover,
-                                              ).image);
+                                            backgroundColor: Colors.grey,
+                                            maxRadius: 80,
+                                            backgroundImage: Image.network(
+                                              '${state.image.profilePic}',
+                                              fit: BoxFit.fill,
+                                            ).image,
+                                          );
                                         }
-                                        print('stream have data');
+
                                         return CircleAvatar(
                                             // backgroundColor: Colors.teal,
                                             maxRadius: 80,
                                             child: Image.asset(
-                                                'assets/images/accoun image.png'));
+                                              'assets/images/loading_image.png',
+                                              fit: BoxFit.fill,
+                                            ));
                                       },
                                     );
                                   }
@@ -117,13 +142,9 @@ class _ProfileState extends State<Profile> {
                                   return CircleAvatar(
                                       // backgroundColor: Colors.teal,
                                       maxRadius: 80,
-                                      child: Center(
-                                        child: Text(
-                                          '${Userinfo.userSingleton.name.toString().substring(0, 1)}',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 40),
-                                        ),
+                                      child: Image.asset(
+                                        'assets/images/loading_image.png',
+                                        fit: BoxFit.fill,
                                       ));
                                 });
                           },
@@ -276,7 +297,7 @@ class _ProfileState extends State<Profile> {
                             },
                             icon: Icon(
                               Icons.camera_alt,
-                              color: Colors.pink,
+                              color: Colors.black,
                               size: 30,
                             )))
                   ],

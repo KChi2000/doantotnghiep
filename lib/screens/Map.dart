@@ -30,19 +30,10 @@ class _TrackingState extends State<Tracking> {
   void initState() {
     context.read<FetchLocationCubit>().requestLocation();
 
-    getIcons();
     context.read<GetUserGroupCubit>().getUerGroup();
-    context.read<GetProfileCubit>().getStreamProfile();
+    // context.read<FetchLocationCubit>().UpdateLocation();
+
     super.initState();
-  }
-
-  getIcons() async {
-    // BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
-    //     ImageConfiguration(devicePixelRatio: 2.0), "assets/images/travel.jpeg");
-
-    // setState(() {
-    //   icon = markerbitmap;
-    // });
   }
 
   @override
@@ -93,6 +84,9 @@ class _TrackingState extends State<Tracking> {
                                   GroupInfoCubitState>(
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
+                                    if (state.groupinfo!.length == 0) {
+                                      return SizedBox();
+                                    }
                                     context
                                         .read<FetchLocationToShowCubit>()
                                         .fetchFromDb(state.groupinfo!.last);

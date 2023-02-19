@@ -535,10 +535,11 @@ class buttonicon extends StatelessWidget {
 }
 
 class groupitem extends StatelessWidget {
-  groupitem(this.group, this.ct, this.margin);
+  groupitem(this.group, this.ct, this.margin, {this.focusNode});
   GroupInfo group;
   BuildContext ct;
   bool margin;
+  FocusNode? focusNode;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -689,6 +690,7 @@ class groupitem extends StatelessWidget {
                           return [
                             PopupMenuItem(
                               onTap: () {
+                                focusNode?.unfocus();
                                 Clipboard.setData(
                                         ClipboardData(text: group.inviteId))
                                     .then((_) {

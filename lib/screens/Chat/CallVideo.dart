@@ -23,7 +23,7 @@ class _CallVideoState extends State<CallVideo> {
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   String? roomId;
   TextEditingController textEditingController = TextEditingController(text: '');
-
+  bool isAudioOn = true, isVideoOn = true, isFrontCameraSelected = true;
   @override
   void initState() {
     initValue();
@@ -33,16 +33,17 @@ class _CallVideoState extends State<CallVideo> {
     });
 
     super.initState();
-   
-    // setState(() {});
+
+    setState(() {});
     //  context.read<MakeAVideoCallCubit>().addRemoteStream();
   }
 
   initValue() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    signaling.openUserMedia(_localRenderer, _remoteRenderer);
-    await signaling.createRoom(_remoteRenderer, widget.groupid);
+    signaling.openUserMedia(_localRenderer, _remoteRenderer, isVideoOn,
+        isAudioOn, isFrontCameraSelected);
+    // await signaling.createRoom(_remoteRenderer, widget.groupid);
     //  setState(() {});
   }
 
@@ -50,31 +51,19 @@ class _CallVideoState extends State<CallVideo> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: Text('Video Calling'),
-        // ),
-        body: 
-        // BlocBuilder<MakeAVideoCallCubit, MakeAVideoCallState>(
-        //   builder: (context, state) {
-        //     if (state is MakeAVideoCallLoaded) {
-        //     return 
-            LoaderOverlay(
-              useDefaultLoading: false,
-              overlayWidget: Center(child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  itemImage('A'),
-                  Text("Abcs",style: TextStyle(color: Colors.white,fontSize: 22),),
-                  Text("đang gọi...",style: TextStyle(color: Colors.black)),
-                ],
-              )),
-              overlayColor: Colors.grey,
-              child: Container(
+          // appBar: AppBar(
+          //   title: Text('Video Calling'),
+          // ),
+          body:
+              // BlocBuilder<MakeAVideoCallCubit, MakeAVideoCallState>(
+              //   builder: (context, state) {
+              //     if (state is MakeAVideoCallLoaded) {
+              //     return
+              Container(
                   width: screenwidth,
                   height: screenheight,
                   color: Colors.black,
-                  child: 
-                  Stack(
+                  child: Stack(
                     fit: StackFit.expand,
                     children: [
                       Column(
@@ -84,26 +73,22 @@ class _CallVideoState extends State<CallVideo> {
                           Container(
                             // color: Colors.amber,
                             width: screenwidth,
-                            height: screenheight/2-10,
-                            // child: RTCVideoView(
-                            //  _remoteRenderer,
-                            //   mirror: true,
-                            //   objectFit:
-                            //       RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                            // ),
+                            height: screenheight / 2 - 10,
+                            child: RTCVideoView(
+                              _remoteRenderer,
+                              mirror: true,
+                              objectFit: RTCVideoViewObjectFit
+                                  .RTCVideoViewObjectFitCover,
+                            ),
                           ),
-                            Flexible(
-                            child: Container()
-                            // RTCVideoView(
-                            //  _localRenderer,
-                            //   mirror: true,
-                            //   objectFit:
-                            //       RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                            // ),
+                          Flexible(
+                            child: RTCVideoView(
+                              _localRenderer,
+                              mirror: true,
+                              objectFit: RTCVideoViewObjectFit
+                                  .RTCVideoViewObjectFitCover,
+                            ),
                           ),
-                          
-                        
-                          
                         ],
                       ),
                       // Positioned(
@@ -127,21 +112,41 @@ class _CallVideoState extends State<CallVideo> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            //  itemcall(
-                            //     'assets/icons/camera-flip.svg', () async {
-                            //        context.loaderOverlay.show();
-                            //       // signaling.joinRoom(widget.groupid, _remoteRenderer);
-                            //   // context.read<MakeAVideoCallCubit>().joinVideoCall(widget.groupid);
-                            // }, Colors.white),
-                            // SizedBox(
-                            //   width: 30,
-                            // ),
                             itemcall(
-                               'assets/icons/phone-hangup.svg', () async {
-                              await signaling.hangUp(
-                                  _localRenderer, widget.groupid);
-                              Navigator.pop(context);
-                            }, Colors.red[900]!),
+                                Icon(
+                                  Icons.mic,
+                                  color: Colors.black,
+                                ),
+                                () async {},
+                                Colors.white),
+                            SizedBox(
+                              width: 30,
+                            ),
+                             itemcall(
+                                Icon(
+                                  Icons.video_call_rounded,
+                                  color: Colors.black,
+                                ),
+                                () async {},
+                                Colors.white),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            itemcall(
+                                SvgPicture.asset(
+                                    'assets/icons/camera-flip.svg'),
+                                () async {},
+                                Colors.white),
+                            SizedBox(
+                              width: 30,
+                            ),
+                            itemcall(
+                                SvgPicture.asset(
+                                  'assets/icons/phone-hangup.svg',
+                                  color: Colors.white,
+                                ),
+                                () async {},
+                                Colors.red[900]!),
                             SizedBox(
                               width: 15,
                             ),
@@ -149,23 +154,23 @@ class _CallVideoState extends State<CallVideo> {
                         ),
                       )
                     ],
-                  )),
-            )
-        //     }
-        //     return Container(
-        //       width: screenwidth,
-        //       height: screenheight,
-        //       color: Colors.white,
-        //       child: Center(
-        //         child: Text('Dang thiet lap....'),
-        //       ),
-        //     );
-        //   },
-        // ),
-      ),
+                  ))
+          //     }
+          //     return Container(
+          //       width: screenwidth,
+          //       height: screenheight,
+          //       color: Colors.white,
+          //       child: Center(
+          //         child: Text('Dang thiet lap....'),
+          //       ),
+          //     );
+          //   },
+          // ),
+          ),
     );
   }
- Widget itemImage(String name) {
+
+  Widget itemImage(String name) {
     return Container(
       width: 80,
       height: 80,
@@ -179,12 +184,13 @@ class _CallVideoState extends State<CallVideo> {
       )),
     );
   }
-  Widget itemcall(String icon, VoidCallback ontap, Color color) {
+
+  Widget itemcall(Widget icon, VoidCallback ontap, Color color) {
     return InkWell(
       // splashColor: Colors.yellow,
       // highlightColor: Colors.yellowAccent,
       onTap: ontap,
-      child: CircleAvatar(backgroundColor: color, radius: 30, child: SvgPicture.asset('$icon')),
+      child: CircleAvatar(backgroundColor: color, radius: 30, child: icon),
     );
   }
 

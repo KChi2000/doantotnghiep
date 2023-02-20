@@ -18,7 +18,7 @@ class MakeAVideoCallCubit extends Cubit<MakeAVideoCallState> {
     remoteVideo.srcObject=stream;
   
   };
-    await Signaling.instance.openUserMedia(localVideo, remoteVideo);
+ //   await Signaling.instance.openUserMedia(localVideo, remoteVideo);
   String rs= await Signaling.instance.createRoom(localVideo, groupid);
     emit(MakeAVideoCallLoaded(
         localrenderer: localVideo, remoterenderer: remoteVideo,calling: rs));

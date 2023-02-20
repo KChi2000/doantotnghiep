@@ -196,9 +196,14 @@ class Signaling {
   Future<void> openUserMedia(
     RTCVideoRenderer localVideo,
     RTCVideoRenderer remoteVideo,
+    bool isVideoOn,bool isAudioOn,isFrontCameraSelected
   ) async {
     var stream = await navigator.mediaDevices
-        .getUserMedia({'video': true, 'audio': false});
+        .getUserMedia({
+          'video': isVideoOn
+          ? {'facingMode': isFrontCameraSelected ? 'user' : 'environment'}
+          : false, 
+        'audio': isAudioOn});
 
     localVideo.srcObject = stream;
     localStream = stream;

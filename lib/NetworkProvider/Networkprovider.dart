@@ -9,7 +9,6 @@ import 'package:doantotnghiep/model/Group.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:location/location.dart';
 
@@ -58,6 +57,18 @@ class DatabaseService {
     return groupCollection.where('members', arrayContainsAny: [
       {'Id': uid, 'Name': name}
     ]).snapshots();
+  }
+
+  Future deleteGroup(String groupid, String groupname) async {
+    await groupCollection.doc(groupid).update({
+      'status': 'deleted',
+      'time': DateTime.now().add(Duration(minutes: 30)).microsecondsSinceEpoch
+    });
+    await userCollection.doc(Userinfo.userSingleton.uid).update({
+      'groups': FieldValue.arrayRemove([
+        {'groupId': groupid, 'GroupName': groupname}
+      ])
+    });
   }
 
 //orderBy('time').
@@ -130,7 +141,7 @@ class DatabaseService {
         'isReadAr': [],
         'offer': {},
         'type': 'announce',
-        'callStatus':''
+        'callStatus': ''
       });
       await documentRef.update({
         'members': FieldValue.arrayUnion([

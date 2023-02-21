@@ -379,14 +379,14 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                       return StreamBuilder<dynamic>(
                           stream: state.stream,
                           builder: (context, snapshot) {
-                             Fluttertoast.showToast(
-                                    msg: "some one is calling",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 1,
-                                    textColor: Colors.white,
-                                    backgroundColor: Colors.pink,
-                                    fontSize: 16.0);
+                            Fluttertoast.showToast(
+                                msg: "some one is calling",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                textColor: Colors.white,
+                                backgroundColor: Colors.pink,
+                                fontSize: 16.0);
                             if (snapshot.hasData) {
                               context
                                   .read<GroupInfoCubitCubit>()
@@ -723,23 +723,46 @@ class groupitem extends StatelessWidget {
                             ),
                             PopupMenuItem(
                               onTap: () async {
-                                ct.loaderOverlay.show();
-                                await context
-                                    .read<JoindStatusCubit>()
-                                    .leaveGroup(group.groupId.toString(),
-                                        group.groupName.toString());
-                                ct.loaderOverlay.hide();
+                                if (Userinfo.userSingleton.uid !=
+                                    group.admin!.adminId.toString()) {
+                                  ct.loaderOverlay.show();
+                                  await context
+                                      .read<JoindStatusCubit>()
+                                      .leaveGroup(group.groupId.toString(),
+                                          group.groupName.toString());
+                                  ct.loaderOverlay.hide();
 
-                                Fluttertoast.showToast(
-                                    msg: "Đã rời nhóm thành công",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 1,
-                                    textColor: Colors.white,
-                                    backgroundColor: Colors.pink,
-                                    fontSize: 16.0);
+                                  Fluttertoast.showToast(
+                                      msg: "Đã rời nhóm thành công",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      textColor: Colors.white,
+                                      backgroundColor: Colors.pink,
+                                      fontSize: 16.0);
+                                } else {
+                                  ct.loaderOverlay.show();
+                                  await context
+                                      .read<JoindStatusCubit>()
+                                      .deleteGroup(group.groupId.toString(),
+                                          group.groupName.toString());
+                                  ct.loaderOverlay.hide();
+
+                                  Fluttertoast.showToast(
+                                      msg: "Đã xóa nhóm thành công",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      textColor: Colors.white,
+                                      backgroundColor: Colors.pink,
+                                      fontSize: 16.0);
+                                }
                               },
-                              child: Text('Rời nhóm',
+                              child: Text(
+                                  Userinfo.userSingleton.uid ==
+                                          group.admin!.adminId.toString()
+                                      ? 'Xoá nhóm'
+                                      : 'Rời nhóm',
                                   style: TextStyle(color: Colors.pink)),
                               padding:
                                   EdgeInsets.only(top: 5, bottom: 5, left: 10),

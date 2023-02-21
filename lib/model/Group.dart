@@ -11,10 +11,11 @@ class GroupInfo {
   String? recentMessage;
   String? groupName;
   String? time;
-  bool? checked=false;
-  bool? checkIsRead=false;
+  bool? checked = false;
+  bool? checkIsRead = false;
   Type? type;
   String? callStatus;
+  String? status;
   GroupInfo(
       {this.recentMessageSender,
       this.inviteId,
@@ -25,10 +26,12 @@ class GroupInfo {
       this.groupPic,
       this.recentMessage,
       this.groupName,
-      this.time,this.checked,
+      this.time,
+      this.checked,
       this.checkIsRead,
-      this.type,this.callStatus
-      });
+      this.type,
+      this.callStatus,
+      this.status});
 
   GroupInfo.fromJson(Map<String, dynamic> json) {
     recentMessageSender = json['recentMessageSender'];
@@ -53,6 +56,7 @@ class GroupInfo {
     time = json['time'];
     type = Type.values.elementAt(findenum(json['type']));
     callStatus = json['callStatus'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,9 +76,10 @@ class GroupInfo {
     data['groupPic'] = this.groupPic;
     data['recentMessage'] = this.recentMessage;
     data['GroupName'] = this.groupName;
-    data['time']=this.time;
-    data['type']= this.type!.name;
-    data['callStatus']= this.callStatus;
+    data['time'] = this.time;
+    data['type'] = this.type!.name;
+    data['callStatus'] = this.callStatus;
+    data['status'] = this.status;
     return data;
   }
 }
@@ -97,6 +102,7 @@ class Members {
     return data;
   }
 }
+
 class Admin {
   String? adminId;
   String? adminName;

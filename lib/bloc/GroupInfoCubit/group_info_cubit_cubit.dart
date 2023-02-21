@@ -14,13 +14,11 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
   GroupInfoCubitCubit() : super(GroupInfoCubitinitial());
   void updateGroup(QuerySnapshot snapshot) {
     emit(GroupInfoCubitLoading());
-    var rs = snapshot.docs
-        .map((e) {
-           print('DATA FROM FIREBASE: ${e.data()}');
-          return GroupInfo.fromJson(e.data() as Map<String, dynamic>);
-        } )
-        .toList();
-       
+    var rs = snapshot.docs.map((e) {
+      // print('DATA FROM FIREBASE: ${e.data()}');
+      return GroupInfo.fromJson(e.data() as Map<String, dynamic>);
+    }).toList();
+
     rs.forEach(
       (element) {
         var flag = element.isReadAr!.where((element) =>
@@ -34,6 +32,8 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
     );
     if (rs.length == 0) {
       emit(GroupInfoCubitLoaded(groupinfo: [], selectedGroup: GroupInfo()));
+    } else if (rs.length == 1) {
+      emit(GroupInfoCubitLoaded(groupinfo: rs, selectedGroup: rs.first));
     } else {
       emit(GroupInfoCubitLoaded(
           groupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),

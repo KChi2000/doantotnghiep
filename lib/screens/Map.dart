@@ -84,6 +84,8 @@ class _TrackingState extends State<Tracking> {
                                   GroupInfoCubitState>(
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
+                                    print(
+                                        'DATA FROM FIREBASE: ${state.groupinfo!.length}');
                                     if (state.groupinfo!.length == 0) {
                                       return SizedBox();
                                     }

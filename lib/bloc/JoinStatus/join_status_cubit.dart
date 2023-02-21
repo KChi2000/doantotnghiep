@@ -34,9 +34,8 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
         Message(
                 sender: '${Userinfo.userSingleton.name}',
                 contentMessage: content,
-                time:  DateTime.now()
-                                  .microsecondsSinceEpoch
-                                  .toString(),type: Type.announce)
+                time: DateTime.now().microsecondsSinceEpoch.toString(),
+                type: Type.announce)
             .toMap());
     var joined =
         await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
@@ -44,8 +43,13 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
 
     emit(JoindStatusState(joined: joined));
   }
-  leaveGroup(String groupId,String groupName)async{
-     await DatabaseService(uid: Userinfo.userSingleton.uid)
+
+  leaveGroup(String groupId, String groupName) async {
+    await DatabaseService(uid: Userinfo.userSingleton.uid)
         .JoinToGroup(true, groupId, groupName.toString());
+  }
+
+  deleteGroup(String groupId, String groupname) async {
+    await DatabaseService.instance.deleteGroup(groupId.toString(), groupname);
   }
 }

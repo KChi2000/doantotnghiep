@@ -129,7 +129,8 @@ class DatabaseService {
         'time': '${DateTime.now().microsecondsSinceEpoch.toString()}',
         'isReadAr': [],
         'offer': {},
-        'type': 'announce'
+        'type': 'announce',
+        'callStatus':''
       });
       await documentRef.update({
         'members': FieldValue.arrayUnion([

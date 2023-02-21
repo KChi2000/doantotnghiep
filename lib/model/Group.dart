@@ -14,6 +14,7 @@ class GroupInfo {
   bool? checked=false;
   bool? checkIsRead=false;
   Type? type;
+  String? callStatus;
   GroupInfo(
       {this.recentMessageSender,
       this.inviteId,
@@ -26,7 +27,7 @@ class GroupInfo {
       this.groupName,
       this.time,this.checked,
       this.checkIsRead,
-      this.type
+      this.type,this.callStatus
       });
 
   GroupInfo.fromJson(Map<String, dynamic> json) {
@@ -51,6 +52,7 @@ class GroupInfo {
     groupName = json['GroupName'];
     time = json['time'];
     type = Type.values.elementAt(findenum(json['type']));
+    callStatus = json['callStatus'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,6 +74,7 @@ class GroupInfo {
     data['GroupName'] = this.groupName;
     data['time']=this.time;
     data['type']= this.type!.name;
+    data['callStatus']= this.callStatus;
     return data;
   }
 }

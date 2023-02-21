@@ -15,8 +15,12 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
   void updateGroup(QuerySnapshot snapshot) {
     emit(GroupInfoCubitLoading());
     var rs = snapshot.docs
-        .map((e) => GroupInfo.fromJson(e.data() as Map<String, dynamic>))
+        .map((e) {
+           print('DATA FROM FIREBASE: ${e.data()}');
+          return GroupInfo.fromJson(e.data() as Map<String, dynamic>);
+        } )
         .toList();
+       
     rs.forEach(
       (element) {
         var flag = element.isReadAr!.where((element) =>

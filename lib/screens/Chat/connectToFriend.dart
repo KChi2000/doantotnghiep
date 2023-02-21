@@ -379,6 +379,14 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                       return StreamBuilder<dynamic>(
                           stream: state.stream,
                           builder: (context, snapshot) {
+                             Fluttertoast.showToast(
+                                    msg: "some one is calling",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    textColor: Colors.white,
+                                    backgroundColor: Colors.pink,
+                                    fontSize: 16.0);
                             if (snapshot.hasData) {
                               context
                                   .read<GroupInfoCubitCubit>()

@@ -1,4 +1,5 @@
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
+import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
@@ -23,7 +24,8 @@ class _CallVideoState extends State<CallVideo> {
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   String? roomId;
   TextEditingController textEditingController = TextEditingController(text: '');
-  bool isAudioOn = true, isVideoOn = true, isFrontCameraSelected = true;
+  // bool isAudioOn = true, isVideoOn = true,
+  bool isFrontCameraSelected = true;
   @override
   void initState() {
     initValue();
@@ -31,7 +33,7 @@ class _CallVideoState extends State<CallVideo> {
       _remoteRenderer.srcObject = stream;
       setState(() {});
     });
-
+    signaling.createRoom(_remoteRenderer, widget.groupid);
     super.initState();
 
     setState(() {});
@@ -41,8 +43,12 @@ class _CallVideoState extends State<CallVideo> {
   initValue() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    signaling.openUserMedia(_localRenderer, _remoteRenderer, isVideoOn,
-        isAudioOn, isFrontCameraSelected);
+    signaling.openUserMedia(
+        _localRenderer,
+        _remoteRenderer,
+        context.read<ToggleCmCubit>().state.openCamera,
+        context.read<ToggleCmCubit>().state.enableMic,
+        isFrontCameraSelected);
     // await signaling.createRoom(_remoteRenderer, widget.groupid);
     //  setState(() {});
   }
@@ -108,49 +114,65 @@ class _CallVideoState extends State<CallVideo> {
                         bottom: 20.0,
                         left: 0,
                         right: 0,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            itemcall(
-                                Icon(
-                                  Icons.mic,
-                                  color: Colors.black,
+                        child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
+                          listener: (context, state) {
+                            
+                          },
+                          builder: (context, state) {
+                            return Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                itemcall(
+                                    Icon(
+                                      state.openCamera
+                                          ? Icons.videocam
+                                          : Icons.videocam_off,
+                                      color: Colors.black,
+                                    ), () async {
+                                     await context.read<ToggleCmCubit>().toggleCamera();
+                                  signaling.toggleCamera(state.openCamera);
+                                 
+                                }, Colors.white),
+                                SizedBox(
+                                  width: 30,
                                 ),
-                                () async {},
-                                Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                             itemcall(
-                                Icon(
-                                  Icons.video_call_rounded,
-                                  color: Colors.black,
+                                itemcall(
+                                    Icon(
+                                      state.enableMic ? Icons.mic : Icons.mic_off,
+                                      color: Colors.black,
+                                    ), () async {
+                                  await context.read<ToggleCmCubit>().toggleMic();
+                                  signaling.toggleMic(state.enableMic);
+                                }, Colors.white),
+                                SizedBox(
+                                  width: 30,
                                 ),
-                                () async {},
-                                Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            itemcall(
-                                SvgPicture.asset(
-                                    'assets/icons/camera-flip.svg'),
-                                () async {},
-                                Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            itemcall(
-                                SvgPicture.asset(
-                                  'assets/icons/phone-hangup.svg',
-                                  color: Colors.white,
+                                itemcall(
+                                    SvgPicture.asset(
+                                        'assets/icons/camera-flip.svg'),
+                                    () async {
+                                  await context.read<ToggleCmCubit>().switchCamera();
+                                  signaling.switchCamera(state.useFrontCamera);
+                                }, Colors.white),
+                                SizedBox(
+                                  width: 30,
                                 ),
-                                () async {},
-                                Colors.red[900]!),
-                            SizedBox(
-                              width: 15,
-                            ),
-                          ],
+                                itemcall(
+                                    SvgPicture.asset(
+                                      'assets/icons/phone-hangup.svg',
+                                      color: Colors.white,
+                                    ), () async {
+                                  await signaling.hangUp(
+                                      _localRenderer, widget.groupid);
+                                  Navigator.pop(context);
+                                }, Colors.red[900]!),
+                                SizedBox(
+                                  width: 15,
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       )
                     ],
@@ -196,7 +218,6 @@ class _CallVideoState extends State<CallVideo> {
 
   @override
   void dispose() {
-    print('disposeeeeeee');
     // context.read<MakeAVideoCallCubit>().disposevideocall();
     _localRenderer.dispose();
     _remoteRenderer.dispose();

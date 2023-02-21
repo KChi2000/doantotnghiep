@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 typedef void StreamStateCallback(MediaStream stream);
@@ -35,7 +37,7 @@ class Signaling {
       (value) async {
         var rs = value.data() as Map<String, dynamic>;
         print(
-            'OO Create PeerConnection with configuration: $configuration :${rs['offer']}');
+            ' Create PeerConnection with configuration: $configuration :${rs['offer']}');
         if (rs['offer'] == null || rs['offer'].toString().isEmpty) {
           peerConnection = await createPeerConnection(configuration);
 
@@ -60,7 +62,15 @@ class Signaling {
           await peerConnection!.setLocalDescription(offer);
           print('Created offer: $offer');
 
-          Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
+          Map<String, dynamic> roomWithOffer = {
+            'offer': offer.toMap(),
+            'callStatus': 'calling',
+            'recentMessageSender':
+                '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
+            'recentMessage':'dang goi',
+            'time': '${DateTime.now().microsecondsSinceEpoch.toString()}',
+            'type':'callvideo'
+          };
 
           await roomRef.update(roomWithOffer);
 
@@ -194,16 +204,17 @@ class Signaling {
   }
 
   Future<void> openUserMedia(
-    RTCVideoRenderer localVideo,
-    RTCVideoRenderer remoteVideo,
-    bool isVideoOn,bool isAudioOn,isFrontCameraSelected
-  ) async {
-    var stream = await navigator.mediaDevices
-        .getUserMedia({
-          'video': isVideoOn
+      RTCVideoRenderer localVideo,
+      RTCVideoRenderer remoteVideo,
+      bool isVideoOn,
+      bool isAudioOn,
+      isFrontCameraSelected) async {
+    var stream = await navigator.mediaDevices.getUserMedia({
+      'video': isVideoOn
           ? {'facingMode': isFrontCameraSelected ? 'user' : 'environment'}
-          : false, 
-        'audio': isAudioOn});
+          : false,
+      'audio': isAudioOn
+    });
 
     localVideo.srcObject = stream;
     localStream = stream;
@@ -211,7 +222,38 @@ class Signaling {
     remoteVideo.srcObject = await createLocalMediaStream('key');
   }
 
+  switchCamera(bool isFrontCameraSelected) {
+    // change status
+    // isFrontCameraSelected = !isFrontCameraSelected;
+
+    // switch camera
+    localStream?.getVideoTracks().forEach((track) {
+      // ignore: deprecated_member_use
+      track.switchCamera();
+    });
+  }
+
+  toggleMic(bool isAudioOn) {
+    // change status
+    // isAudioOn = !isAudioOn;
+    // enable or disable audio track
+    localStream?.getAudioTracks().forEach((track) {
+      track.enabled = !isAudioOn;
+    });
+  }
+
+  toggleCamera(bool isVideoOn) {
+    // // change status
+    // isVideoOn = !isVideoOn;
+
+    // enable or disable video track
+    localStream?.getVideoTracks().forEach((track) {
+      track.enabled = !isVideoOn;
+    });
+  }
+
   Future<void> hangUp(RTCVideoRenderer localVideo, String grid) async {
+    final batch = db.batch();
     List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
     tracks.forEach((track) {
       track.stop();
@@ -224,13 +266,20 @@ class Signaling {
 
     // var db = FirebaseFirestore.instance;
     var roomRef = db.collection('groups').doc(grid);
+    await roomRef.collection('calleeCandidates');
     var calleeCandidates = await roomRef.collection('calleeCandidates').get();
-    calleeCandidates.docs.forEach((document) => document.reference.delete());
+    calleeCandidates.docs
+        .forEach((document) => batch.delete(document.reference));
 
     var callerCandidates = await roomRef.collection('callerCandidates').get();
-    callerCandidates.docs.forEach((document) => document.reference.delete());
-    await roomRef
-        .update({'answer': FieldValue.delete(), 'offer': FieldValue.delete()});
+    callerCandidates.docs
+        .forEach((document) => batch.delete(document.reference));
+    await batch.commit();
+    await roomRef.update({
+      'answer': FieldValue.delete(),
+      'offer': FieldValue.delete(),
+      'callStatus': 'nocall'
+    });
     // await roomRef.delete();
 
     localStream!.dispose();

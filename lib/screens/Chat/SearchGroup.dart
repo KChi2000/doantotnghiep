@@ -18,7 +18,7 @@ import '../../bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import '../../components/navigate.dart';
 import '../../constant.dart';
 import '../../model/Group.dart';
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 class SearchGroup extends StatefulWidget {
   SearchGroup({required this.group});
@@ -47,10 +47,10 @@ class _SearchGroupState extends State<SearchGroup> {
         mainAxisSize: MainAxisSize.min,
         children: [
           CircularProgressIndicator(),
-          Text(
-            'Đang rời nhóm...',
-            style: TextStyle(color: Colors.white),
-          )
+          // Text(
+          //   'Đang rời nhóm...',
+          //   style: TextStyle(color: Colors.white),
+          // )
         ],
       )),
       child: Scaffold(
@@ -80,8 +80,6 @@ class _SearchGroupState extends State<SearchGroup> {
                                 GroupInfoCubitState>(
                               listener: (context, state) {
                                 if (state is GroupInfoCubitLoaded) {
-                                  print(
-                                      'GROUP CHANGEEEEEEEEEEEEEEEEE:  ${codeCon.text} ${state.groupinfo!.length}');
                                   context
                                       .read<TimKiemGroupCubit>()
                                       .TimKiem(state.groupinfo!, codeCon.text);
@@ -222,7 +220,9 @@ class _SearchGroupState extends State<SearchGroup> {
 Widget groupitems(
     GroupInfo group, BuildContext ct, bool margin, FocusNode focusNode) {
   return GestureDetector(
-    onTap: () {
+    onTap: group.status == 'deleted'
+          ? null
+          : () {
       navigateReplacement(
           ct,
           chatDetail(
@@ -240,7 +240,7 @@ Widget groupitems(
           height: 55,
           margin: margin
               ? EdgeInsets.only(left: 10, right: 10, bottom: 10)
-              : EdgeInsets.all(0),
+              : EdgeInsets.only(bottom: 10),
           color: Colors.transparent,
           child: Row(
             children: [
@@ -268,13 +268,23 @@ Widget groupitems(
                     Text(
                       group.groupName.toString(),
                       style: TextStyle(
-                          color: Colors.black87,
+                          color:group.status == 'deleted'
+                          ? Colors.grey: Colors.black87,
                           fontSize: 17,
-                          fontWeight: group.checkIsRead!
+                          fontWeight: group.status == 'deleted'
+                          ?  FontWeight.normal: group.checkIsRead!
                               ? FontWeight.w400
                               : FontWeight.w600),
                     ),
-                    Row(mainAxisSize: MainAxisSize.max, children: [
+                    group.status == 'deleted'
+                          ? Text(
+                              Userinfo.userSingleton.uid ==
+                                      group.admin!.adminId.toString()
+                                  ? 'Nhóm đã bị xóa bởi bạn'
+                                  : 'Nhóm đã bị xóa bởi Admin',
+                              style: TextStyle(color: Colors.grey),
+                            )
+                          :  Row(mainAxisSize: MainAxisSize.max, children: [
                       group.type == Type.announce
                           ? SizedBox()
                           : Text(
@@ -356,7 +366,9 @@ Widget groupitems(
                 ),
               ),
               // Spacer(),
-              Align(
+            group.status == 'deleted'
+                    ? SizedBox()
+                    :  Align(
                   alignment: Alignment.topRight,
                   child: PopupMenuButton(
                       offset: Offset(-30, 30),
@@ -394,22 +406,46 @@ Widget groupitems(
                           ),
                           PopupMenuItem(
                             onTap: () async {
-                              ct.loaderOverlay.show();
-                              await context.read<JoindStatusCubit>().leaveGroup(
-                                  group.groupId.toString(),
-                                  group.groupName.toString());
-                              ct.loaderOverlay.hide();
+                                 if (Userinfo.userSingleton.uid !=
+                                        group.admin!.adminId.toString()) {
+                                      ct.loaderOverlay.show();
+                                      await context
+                                          .read<JoindStatusCubit>()
+                                          .leaveGroup(group.groupId.toString(),
+                                              group.groupName.toString());
+                                      ct.loaderOverlay.hide();
 
-                              Fluttertoast.showToast(
-                                  msg: "Đã rời nhóm thành công",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  textColor: Colors.white,
-                                  backgroundColor: Colors.pink,
-                                  fontSize: 16.0);
+                                      Fluttertoast.showToast(
+                                          msg: "Đã rời nhóm thành công",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          textColor: Colors.white,
+                                          backgroundColor: Colors.pink,
+                                          fontSize: 16.0);
+                                    } else {
+                                      ct.loaderOverlay.show();
+                                      await context
+                                          .read<JoindStatusCubit>()
+                                          .deleteGroup(group.groupId.toString(),
+                                              group.groupName.toString());
+                                      ct.loaderOverlay.hide();
+
+                                      Fluttertoast.showToast(
+                                          msg: "Đã xóa nhóm thành công",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          textColor: Colors.white,
+                                          backgroundColor: Colors.pink,
+                                          fontSize: 16.0);
+                                    }
                             },
-                            child: Text('Rời nhóm',
+                            child: Text(
+                                Userinfo.userSingleton.uid ==
+                                        group.admin!.adminId.toString()
+                                    ? 'Xoá nhóm'
+                                    : 'Rời nhóm',
                                 style: TextStyle(color: Colors.pink)),
                             padding:
                                 EdgeInsets.only(top: 5, bottom: 5, left: 10),

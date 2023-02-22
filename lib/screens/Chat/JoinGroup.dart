@@ -19,7 +19,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 class JoinGroup extends StatefulWidget {
   JoinGroup({super.key});
@@ -196,7 +196,7 @@ class _JoinGroupState extends State<JoinGroup> {
             BlocConsumer<JoindStatusCubit, JoindStatusState>(
               listener: (context, state) {},
               builder: (context, state) {
-                return TextButton(
+                return  Userinfo.userSingleton.uid == group.admin!.adminId.toString()?  SizedBox(): TextButton(
                     onPressed: () async {
                       await context.read<JoindStatusCubit>().joinGroup(
                           group.groupId.toString(), group.groupName.toString());
@@ -226,7 +226,7 @@ class _JoinGroupState extends State<JoinGroup> {
                     },
                     child: state.joined
                         ? Text(
-                            'Rời nhóm',
+                         'Rời nhóm',
                             style: TextStyle(color: Colors.grey[400]),
                           )
                         : Text('Tham gia'));

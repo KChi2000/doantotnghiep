@@ -7,8 +7,10 @@ import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
+import 'package:doantotnghiep/bloc/canCreateGroup/can_create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
+import 'package:doantotnghiep/bloc/createGroup/create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
@@ -35,7 +37,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 import 'bloc/pickImage/pick_image_cubit.dart';
-import 'model/UserInfo.dart';
+import 'model/User.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -139,6 +141,12 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (context) => ToggleCmCubit(),
+        ),
+         BlocProvider(
+          create: (context) => CreateGroupCubit(),
+        ),
+         BlocProvider(
+          create: (context) => CanCreateGroupCubit(),
         ),
       ],
       child: MaterialApp(

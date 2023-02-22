@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 part 'fetch_image_state.dart';
 

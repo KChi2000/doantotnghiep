@@ -16,8 +16,12 @@ class JoinToGroupCubit extends Cubit<JoinToGroupState> {
 
       GroupInfo groupdata =
           GroupInfo.fromJson(data.docs[0].data() as Map<String, dynamic>);
-       
-      emit(LoadedGroup(groupdata));
+      if(groupdata.status != 'deleted'){
+        emit(LoadedGroup(groupdata));
+      } 
+      else{
+         emit(ErrorState());
+      }
     } catch (e) {
       emit(ErrorState());
     }

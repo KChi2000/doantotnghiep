@@ -17,7 +17,7 @@ import '../bloc/pickImage/pick_image_cubit.dart';
 import '../components/itemEditProfile.dart';
 import '../helper/helper_function.dart';
 import '../main.dart';
-import '../model/UserInfo.dart';
+import '../model/User.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});

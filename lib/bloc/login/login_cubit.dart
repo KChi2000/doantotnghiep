@@ -10,7 +10,7 @@ import 'package:doantotnghiep/NetworkProvider/NetWorkProvider_Auth.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 part 'login_state.dart';
 

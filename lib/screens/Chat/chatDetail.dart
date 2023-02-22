@@ -22,7 +22,7 @@ import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import '../../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../../model/Group.dart';
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 class chatDetail extends StatefulWidget {
   chatDetail(

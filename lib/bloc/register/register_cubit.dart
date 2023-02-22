@@ -6,7 +6,7 @@ import 'package:doantotnghiep/main.dart';
 import 'package:doantotnghiep/NetworkProvider/NetWorkProvider_Auth.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 part 'register_state.dart';
 

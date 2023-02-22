@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:doantotnghiep/bloc/FetchLocation/fetch_location_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
-import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/model/User.dart';
 import 'package:doantotnghiep/screens/Chat/connectToFriend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../bloc/fetchImage/fetch_image_cubit.dart';
 import '../bloc/getProfile/get_profile_cubit.dart';
 import '../bloc/getUserGroup/get_user_group_cubit.dart';
 
@@ -28,8 +29,8 @@ class _TrackingState extends State<Tracking> {
   final GlobalKey globalKey = GlobalKey();
   @override
   void initState() {
-    context.read<FetchLocationCubit>().requestLocation();
-
+    // context.read<FetchLocationCubit>().requestLocation();
+    context.read<GetProfileCubit>().getStreamProfile();
     context.read<GetUserGroupCubit>().getUerGroup();
     // context.read<FetchLocationCubit>().UpdateLocation();
 
@@ -84,56 +85,62 @@ class _TrackingState extends State<Tracking> {
                                   GroupInfoCubitState>(
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
-                                    print(
-                                        'DATA FROM FIREBASE: ${state.groupinfo!.length}');
                                     if (state.groupinfo!.length == 0) {
+                                      context
+                                          .read<FetchLocationToShowCubit>()
+                                          .backToInitial();
                                       return SizedBox();
+                                    } else {
+                                      var filterlist = state.groupinfo!.where(
+                                        (element) =>
+                                            element.status != 'deleted',
+                                      );
+
+                                      if (filterlist.length == 0) {
+                                        context
+                                            .read<FetchLocationToShowCubit>()
+                                            .backToInitial();
+                                        return SizedBox();
+                                      }
+                                      context
+                                          .read<FetchLocationToShowCubit>()
+                                          .fetchFromDb(filterlist.last);
+                                      return Container(
+                                        constraints:
+                                            BoxConstraints(maxWidth: 200),
+                                        child: DropdownButtonFormField(
+                                            isExpanded: true,
+                                            value: filterlist.last,
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            items: filterlist
+                                                .map((e) => DropdownMenuItem(
+                                                    value: e,
+                                                    child: Text(
+                                                      '${e.groupName}',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                          color: Colors.pink,
+                                                          fontSize: 18),
+                                                    )))
+                                                .toList(),
+                                            decoration: InputDecoration(
+                                                border: UnderlineInputBorder(
+                                                    borderSide:
+                                                        BorderSide.none)),
+                                            onChanged: (value) {
+                                              if (value!.groupId.toString() !=
+                                                  (context
+                                                              .read<
+                                                                  FetchLocationToShowCubit>()
+                                                              .state
+                                                          as FetchLocationToShowLoaded)
+                                                      .selectedGroup
+                                                      .groupId) {}
+                                            }),
+                                      );
                                     }
-                                    context
-                                        .read<FetchLocationToShowCubit>()
-                                        .fetchFromDb(state.groupinfo!.last);
-                                    return Container(
-                                      constraints:
-                                          BoxConstraints(maxWidth: 200),
-                                      child: DropdownButtonFormField(
-                                          isExpanded: true,
-                                          value: state.groupinfo!.last,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          items: state.groupinfo!
-                                              .map((e) => DropdownMenuItem(
-                                                  value: e,
-                                                  child: Text(
-                                                    '${e.groupName}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        color: Colors.pink,
-                                                        fontSize: 18),
-                                                  )))
-                                              .toList(),
-                                          decoration: InputDecoration(
-                                              border: UnderlineInputBorder(
-                                                  borderSide: BorderSide.none)),
-                                          onChanged: (value) {
-                                            if (value!.groupId.toString() !=
-                                                (context
-                                                            .read<
-                                                                FetchLocationToShowCubit>()
-                                                            .state
-                                                        as FetchLocationToShowLoaded)
-                                                    .selectedGroup
-                                                    .groupId) {
-                                              context
-                                                  .read<
-                                                      FetchLocationToShowCubit>()
-                                                  .fetchFromDb(value!);
-                                              // context
-                                              //     .read<GroupInfoCubitCubit>()
-                                              //     .changeSelectedGroup(value!);
-                                            }
-                                          }),
-                                    );
                                   }
                                   return DropdownButtonHideUnderline(
                                     child: DropdownButton(
@@ -169,55 +176,105 @@ class _TrackingState extends State<Tracking> {
           ),
           actions: [],
         ),
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Positioned.fill(
-              child: BlocBuilder<FetchLocationToShowCubit,
-                  FetchLocationToShowState>(
-                builder: (context, state) {
-                  if (state is FetchLocationToShowLoading) {
-                    context.loaderOverlay.show();
-                  } else if (state is FetchLocationToShowLoaded) {
-                    context.loaderOverlay.hide();
-                    return GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: CameraPosition(
-                          target: LatLng(21.5752612, 105.8281156), zoom: 8),
-                      markers: state.list
-                          .map(
-                            (e) => Marker(
-                                infoWindow: InfoWindow(
-                                    title: Userinfo.userSingleton.uid == e.uid
-                                        ? 'bạn'
-                                        : '${e.name}'),
-                                markerId: MarkerId('${e.uid}'),
-                                position: LatLng(e.location!.latitude!,
-                                    e.location!.longitude!),
-                                icon: Userinfo.userSingleton.uid == e.uid
-                                    ? BitmapDescriptor.defaultMarkerWithHue(
-                                        BitmapDescriptor.hueRose)
-                                    : icon),
-                          )
-                          .toSet(),
+        body: LoaderOverlay(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned.fill(
+                child: BlocBuilder<FetchLocationToShowCubit,
+                    FetchLocationToShowState>(
+                  builder: (context, state) {
+                    if (state is FetchLocationToShowLoading) {
+                      context.loaderOverlay.show();
+                    } else if (state is FetchLocationToShowLoaded) {
+                      print('MAP LOADED ${state.list.length}');
+                      context.loaderOverlay.hide();
+                      return GoogleMap(
+                        mapType: MapType.normal,
+                        initialCameraPosition: CameraPosition(
+                            target: LatLng(21.5752612, 105.8281156), zoom: 5),
+                        markers: state.list
+                            .map(
+                              (e) => Marker(
+                                  infoWindow: InfoWindow(
+                                      title: Userinfo.userSingleton.uid == e.uid
+                                          ? 'bạn'
+                                          : '${e.name}'),
+                                  markerId: MarkerId('${e.uid}'),
+                                  position: LatLng(e.location!.latitude!,
+                                      e.location!.longitude!),
+                                  icon: Userinfo.userSingleton.uid == e.uid
+                                      ? BitmapDescriptor.defaultMarkerWithHue(
+                                          BitmapDescriptor.hueRose)
+                                      : icon),
+                            )
+                            .toSet(),
+                      );
+                    }
+                    print('MAP NOT LOADED ');
+                    return BlocBuilder<GetProfileCubit, GetProfileState>(
+                      builder: (context, state) {
+                        return StreamBuilder<dynamic>(
+                            stream: state.stream,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                context
+                                    .read<FetchImageCubit>()
+                                    .getFromStream(snapshot.data.data());
+                              }
+                              return BlocBuilder<FetchImageCubit,
+                                  FetchImageState>(
+                                builder: (context, state) {
+                                  context.loaderOverlay.show();
+                                  if (state is FetchImageComplete) {
+                                    context.loaderOverlay.hide();
+                                    return GoogleMap(
+                                      mapType: MapType.normal,
+                                      initialCameraPosition: CameraPosition(
+                                          target:
+                                              LatLng(21.5752612, 105.8281156),
+                                          zoom: 5),
+                                      markers: {
+                                        Marker(
+                                            infoWindow:
+                                                InfoWindow(title: 'bạn'),
+                                            markerId: MarkerId('you'),
+                                            position: LatLng(
+                                                state.image.location!.latitude!,
+                                                state.image.location!
+                                                    .longitude!),
+                                            icon: BitmapDescriptor
+                                                .defaultMarkerWithHue(
+                                                    BitmapDescriptor.hueRose)),
+                                      },
+                                    );
+                                  }
+                                  return GoogleMap(
+                                    mapType: MapType.normal,
+                                    initialCameraPosition: CameraPosition(
+                                        target: LatLng(21.5752612, 105.8281156),
+                                        zoom: 5),
+                                    markers: {
+                                      // Marker(
+                                      //     infoWindow: InfoWindow(title: 'bạn'),
+                                      //     markerId: MarkerId('you'),
+                                      //     position:
+                                      //         LatLng(21.5752612, 105.8281156),
+                                      //     icon: BitmapDescriptor
+                                      //         .defaultMarkerWithHue(
+                                      //             BitmapDescriptor.hueRose)),
+                                    },
+                                  );
+                                },
+                              );
+                            });
+                      },
                     );
-                  }
-                  return GoogleMap(
-                    mapType: MapType.normal,
-                    initialCameraPosition: CameraPosition(
-                        target: LatLng(21.5752612, 105.8281156), zoom: 8),
-                    markers: {
-                      // Marker(
-                      //     infoWindow: InfoWindow(title: 'Chi'),
-                      //     markerId: MarkerId('G'),
-                      //     position: LatLng(21.5752612, 105.8281156),
-                      //     icon: icon),
-                    },
-                  );
-                },
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

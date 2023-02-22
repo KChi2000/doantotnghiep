@@ -12,7 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:location/location.dart';
 
-import '../model/UserInfo.dart';
+import '../model/User.dart';
 
 typedef void StreamStateCallback(MediaStream stream);
 
@@ -59,11 +59,49 @@ class DatabaseService {
     ]).snapshots();
   }
 
+  // deleteGroupInUser(String groupid, String groupname) async {
+  //   // await userCollection.doc(Userinfo.userSingleton.uid).update({
+  //   //   'groups': FieldValue.arrayRemove([
+  //   //     {'groupId': groupid, 'GroupName': groupname}
+  //   //   ])
+  //   // });
+  //  var userdocdata=await userCollection.get();
+  //  userdocdata.docs.forEach((element) { 
+  //   element.reference.update({
+  //      'groups': FieldValue.arrayRemove([
+  //       {'groupId': groupid, 'GroupName': groupname}
+  //     ])
+  //   });
+  //  });
+  // }
+
   Future deleteGroup(String groupid, String groupname) async {
     await groupCollection.doc(groupid).update({
       'status': 'deleted',
-      'time': DateTime.now().add(Duration(minutes: 30)).microsecondsSinceEpoch
+      'time':
+          '${DateTime.now().add(Duration(minutes: 5)).microsecondsSinceEpoch}',
+      'recentMessage': 'đã xóa nhóm'
     });
+    var userdocdata=await userCollection.get();
+   userdocdata.docs.forEach((element) { 
+    element.reference.update({
+       'groups': FieldValue.arrayRemove([
+        {'groupId': groupid, 'GroupName': groupname}
+      ])
+    });
+   });
+    
+  }
+
+  Future deleteDataInFB(String groupid, String groupname) async {
+    final batch = FirebaseFirestore.instance.batch();
+    var messagedata =
+        await groupCollection.doc(groupid).collection('Messages').get();
+    messagedata.docs.forEach((element) {
+      batch.delete(element.reference);
+    });
+    await batch.commit();
+    await groupCollection.doc(groupid).delete();
     await userCollection.doc(Userinfo.userSingleton.uid).update({
       'groups': FieldValue.arrayRemove([
         {'groupId': groupid, 'GroupName': groupname}
@@ -125,8 +163,8 @@ class DatabaseService {
     }
   }
 
-  Future CreateGroup(String groupname, String adminId, String adminName,
-      String invitedId) async {
+  CreateGroup(String groupname, String adminId, String adminName,
+      String inviteid) async {
     try {
       var documentRef = await groupCollection.add({
         'GroupName': groupname,
@@ -134,7 +172,7 @@ class DatabaseService {
         'admin': {'adminId': adminId, 'adminName': adminName},
         'members': [],
         'groupId': '',
-        'inviteId': invitedId,
+        'inviteId': inviteid,
         'recentMessage': 'Chưa có tin nhắn nào',
         'recentMessageSender': '',
         'time': '${DateTime.now().microsecondsSinceEpoch.toString()}',

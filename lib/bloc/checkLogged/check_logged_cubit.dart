@@ -6,7 +6,7 @@ import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 part 'check_logged_state.dart';
 

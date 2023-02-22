@@ -1,6 +1,6 @@
 
 
-import 'package:doantotnghiep/model/UserInfo.dart';
+import 'package:doantotnghiep/model/User.dart';
 
 class UserGroup {
   String? email;

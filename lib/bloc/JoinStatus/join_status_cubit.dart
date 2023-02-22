@@ -5,7 +5,7 @@ import 'package:doantotnghiep/model/Message.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../model/UserInfo.dart';
+import '../../model/User.dart';
 
 part 'join_status_state.dart';
 
@@ -29,7 +29,7 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
     } else {
       content = 'đã tham gia nhóm';
     }
-    await DatabaseService().sendMessage(
+     await DatabaseService().sendMessage(
         groupId,
         Message(
                 sender: '${Userinfo.userSingleton.name}',
@@ -47,6 +47,14 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
   leaveGroup(String groupId, String groupName) async {
     await DatabaseService(uid: Userinfo.userSingleton.uid)
         .JoinToGroup(true, groupId, groupName.toString());
+         await DatabaseService().sendMessage(
+        groupId,
+        Message(
+                sender: '${Userinfo.userSingleton.name}',
+                contentMessage: 'đã rời nhóm',
+                time: DateTime.now().microsecondsSinceEpoch.toString(),
+                type: Type.announce)
+            .toMap());
   }
 
   deleteGroup(String groupId, String groupname) async {

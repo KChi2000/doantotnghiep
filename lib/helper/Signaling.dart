@@ -179,7 +179,8 @@ class Signaling {
       await peerConnection!.setLocalDescription(answer);
 
       Map<String, dynamic> roomWithAnswer = {
-        'answer': {'type': answer.type, 'sdp': answer.sdp}
+        'answer': {'type': answer.type, 'sdp': answer.sdp},
+        'callStatus': 'happening'
       };
 
       await roomRef.update(roomWithAnswer);
@@ -278,7 +279,8 @@ class Signaling {
     await roomRef.update({
       'answer': FieldValue.delete(),
       'offer': FieldValue.delete(),
-      'callStatus': 'nocall'
+      'callStatus': 'call end',
+      'recentMessage':'kết thúc cuộc gọi'
     });
     // await roomRef.delete();
 

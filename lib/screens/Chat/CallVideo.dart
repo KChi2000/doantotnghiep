@@ -7,13 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 class CallVideo extends StatefulWidget {
-  CallVideo({required this.groupid});
+  CallVideo({required this.groupid, this.answere});
   String groupid;
+  bool? answere;
   @override
   State<CallVideo> createState() => _CallVideoState();
 }
@@ -28,12 +30,13 @@ class _CallVideoState extends State<CallVideo> {
   bool isFrontCameraSelected = true;
   @override
   void initState() {
+    signaling.createRoom(_remoteRenderer, widget.groupid);
     initValue();
     signaling.onAddRemoteStream = ((stream) {
       _remoteRenderer.srcObject = stream;
       setState(() {});
     });
-    signaling.createRoom(_remoteRenderer, widget.groupid);
+    
     super.initState();
 
     setState(() {});
@@ -43,23 +46,24 @@ class _CallVideoState extends State<CallVideo> {
   initValue() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    signaling.openUserMedia(
+    await signaling.openUserMedia(
         _localRenderer,
         _remoteRenderer,
         context.read<ToggleCmCubit>().state.openCamera,
         context.read<ToggleCmCubit>().state.enableMic,
         isFrontCameraSelected);
-    // await signaling.createRoom(_remoteRenderer, widget.groupid);
-    //  setState(() {});
+    if (widget.answere! == true) {
+      signaling.joinRoom(widget.groupid, _remoteRenderer);
+      setState(() {
+        
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          // appBar: AppBar(
-          //   title: Text('Video Calling'),
-          // ),
           body:
               // BlocBuilder<MakeAVideoCallCubit, MakeAVideoCallState>(
               //   builder: (context, state) {
@@ -97,27 +101,12 @@ class _CallVideoState extends State<CallVideo> {
                           ),
                         ],
                       ),
-                      // Positioned(
-                      //   top: 0,
-                      //   left: 0,
-                      //   child: IconButton(
-                      //       onPressed: () {
-                      //         Navigator.pop(context);
-                      //       },
-                      //       icon: Icon(
-                      //         Icons.arrow_back,
-                      //         color: Colors.white,
-                      //         size: 28,
-                      //       )),
-                      // ),
                       Positioned(
                         bottom: 20.0,
                         left: 0,
                         right: 0,
                         child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
-                          listener: (context, state) {
-                            
-                          },
+                          listener: (context, state) {},
                           builder: (context, state) {
                             return Row(
                               mainAxisSize: MainAxisSize.max,
@@ -130,19 +119,24 @@ class _CallVideoState extends State<CallVideo> {
                                           : Icons.videocam_off,
                                       color: Colors.black,
                                     ), () async {
-                                     await context.read<ToggleCmCubit>().toggleCamera();
+                                  await context
+                                      .read<ToggleCmCubit>()
+                                      .toggleCamera();
                                   signaling.toggleCamera(state.openCamera);
-                                 
                                 }, Colors.white),
                                 SizedBox(
                                   width: 30,
                                 ),
                                 itemcall(
                                     Icon(
-                                      state.enableMic ? Icons.mic : Icons.mic_off,
+                                      state.enableMic
+                                          ? Icons.mic
+                                          : Icons.mic_off,
                                       color: Colors.black,
                                     ), () async {
-                                  await context.read<ToggleCmCubit>().toggleMic();
+                                  await context
+                                      .read<ToggleCmCubit>()
+                                      .toggleMic();
                                   signaling.toggleMic(state.enableMic);
                                 }, Colors.white),
                                 SizedBox(
@@ -152,7 +146,9 @@ class _CallVideoState extends State<CallVideo> {
                                     SvgPicture.asset(
                                         'assets/icons/camera-flip.svg'),
                                     () async {
-                                  await context.read<ToggleCmCubit>().switchCamera();
+                                  await context
+                                      .read<ToggleCmCubit>()
+                                      .switchCamera();
                                   signaling.switchCamera(state.useFrontCamera);
                                 }, Colors.white),
                                 SizedBox(
@@ -163,6 +159,7 @@ class _CallVideoState extends State<CallVideo> {
                                       'assets/icons/phone-hangup.svg',
                                       color: Colors.white,
                                     ), () async {
+                                      await FlutterCallkitIncoming.endAllCalls();
                                   await signaling.hangUp(
                                       _localRenderer, widget.groupid);
                                   Navigator.pop(context);
@@ -207,15 +204,6 @@ class _CallVideoState extends State<CallVideo> {
     );
   }
 
-  Widget itemcall(Widget icon, VoidCallback ontap, Color color) {
-    return InkWell(
-      // splashColor: Colors.yellow,
-      // highlightColor: Colors.yellowAccent,
-      onTap: ontap,
-      child: CircleAvatar(backgroundColor: color, radius: 30, child: icon),
-    );
-  }
-
   @override
   void dispose() {
     // context.read<MakeAVideoCallCubit>().disposevideocall();
@@ -223,4 +211,13 @@ class _CallVideoState extends State<CallVideo> {
     _remoteRenderer.dispose();
     super.dispose();
   }
+}
+
+Widget itemcall(Widget icon, VoidCallback ontap, Color color) {
+  return InkWell(
+    // splashColor: Colors.yellow,
+    // highlightColor: Colors.yellowAccent,
+    onTap: ontap,
+    child: CircleAvatar(backgroundColor: color, radius: 30, child: icon),
+  );
 }

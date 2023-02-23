@@ -11,6 +11,8 @@ import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/Message.dart';
+import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
+import 'package:doantotnghiep/screens/Chat/IncomingCall.dart';
 
 import 'package:doantotnghiep/screens/Chat/JoinGroup.dart';
 import 'package:doantotnghiep/screens/Chat/SearchGroup.dart';
@@ -24,6 +26,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:rive/rive.dart';
@@ -51,7 +59,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
   void initState() {
     context.read<GetUserGroupCubit>().getUerGroup();
     super.initState();
-    riveAnimationController = SimpleAnimation('loading');
   }
 
   @override
@@ -83,7 +90,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                       context: context,
                       builder: (context) {
                         return Dialog(
-                          child: BlocBuilder<CreateGroupCubit, CreateGroupState>(
+                          child:
+                              BlocBuilder<CreateGroupCubit, CreateGroupState>(
                             builder: (context, state) {
                               return Container(
                                 decoration: BoxDecoration(
@@ -197,8 +205,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                     onPressed: () {
                                                       Clipboard.setData(
                                                               ClipboardData(
-                                                                  text:
-                                                                      state.inviteid))
+                                                                  text: state
+                                                                      .inviteid))
                                                           .then((_) {
                                                         ScaffoldMessenger.of(
                                                                 context)
@@ -228,7 +236,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                             children: [
                                               TextButton(
                                                   onPressed: () {
-                                                    context.read<CanCreateGroupCubit>().toggleFalse();
+                                                    context
+                                                        .read<
+                                                            CanCreateGroupCubit>()
+                                                        .toggleFalse();
                                                     Navigator.pop(context);
                                                   },
                                                   child: Text('Hủy')),
@@ -239,7 +250,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                   onPressed: () async {
                                                     if (formkey.currentState!
                                                         .validate()) {
-                                                      context.read<CanCreateGroupCubit>().toggleTrue();
+                                                      context
+                                                          .read<
+                                                              CanCreateGroupCubit>()
+                                                          .toggleTrue();
                                                       Navigator.pop(context);
                                                     }
                                                   },
@@ -256,22 +270,24 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                           ),
                         );
                       }).whenComplete(() async {
-                    if(context.read<CanCreateGroupCubit>().state.canCreate){
+                    if (context.read<CanCreateGroupCubit>().state.canCreate) {
                       if (formkey.currentState!.validate()) {
-                      context.loaderOverlay.show();
-                      context.read<CreateGroupCubit>().creategroup(groupNameCon.text.trim());
+                        context.loaderOverlay.show();
+                        context
+                            .read<CreateGroupCubit>()
+                            .creategroup(groupNameCon.text.trim());
 
-                      print('create group thanh cong');
-                      context.loaderOverlay.hide();
-                      Fluttertoast.showToast(
-                          msg: "Tạo nhóm thành công",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          textColor: Colors.white,
-                          backgroundColor: Colors.pink,
-                          fontSize: 16.0);
-                    }
+                        print('create group thanh cong');
+                        context.loaderOverlay.hide();
+                        Fluttertoast.showToast(
+                            msg: "Tạo nhóm thành công",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            textColor: Colors.white,
+                            backgroundColor: Colors.pink,
+                            fontSize: 16.0);
+                      }
                     }
                   });
                 },
@@ -293,14 +309,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                       return StreamBuilder<dynamic>(
                           stream: state.stream,
                           builder: (context, snapshot) {
-                            // Fluttertoast.showToast(
-                            //     msg: "some one is calling",
-                            //     toastLength: Toast.LENGTH_SHORT,
-                            //     gravity: ToastGravity.BOTTOM,
-                            //     timeInSecForIosWeb: 1,
-                            //     textColor: Colors.white,
-                            //     backgroundColor: Colors.pink,
-                            //     fontSize: 16.0);
                             if (snapshot.hasData) {
                               context
                                   .read<GroupInfoCubitCubit>()
@@ -319,7 +327,113 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
-                                 
+                                  if (state is GroupInfoCubitLoaded) {
+                                    state.groupinfo!.forEach((element) async {
+                                      if (element.callStatus == 'calling') {
+                                        final params = CallKitParams(
+                                          id: '${Userinfo.userSingleton.uid}',
+                                          nameCaller:
+                                              'Nhóm ${element.groupName}',
+                                          appName: 'Cùng Phượt',
+                                          avatar:
+                                              'assets/images/Cùng Phượt.png',
+                                          handle: 'đang gọi video',
+                                          type: 0,
+                                          duration: 30000,
+                                          textAccept: 'Trả lời',
+                                          textDecline: 'Từ chối',
+                                          textMissedCall: 'Missed call',
+                                          textCallback: 'Gọi lại',
+                                          extra: <String, dynamic>{
+                                            'userId':
+                                                '${Userinfo.userSingleton.uid}'
+                                          },
+                                          headers: <String, dynamic>{
+                                            'apiKey': 'Abc@123!',
+                                            'platform': 'flutter'
+                                          },
+                                          android: AndroidParams(
+                                            isCustomNotification: true,
+                                            // isShowLogo: true,
+                                            isShowCallback: true,
+                                            isShowMissedCallNotification: true,
+                                            ringtonePath:
+                                                'system_ringtone_default',
+                                            backgroundColor: '#0955fa',
+                                            backgroundUrl: 'assets/test.png',
+                                            actionColor: '#4CAF50',
+                                          ),
+                                          ios: IOSParams(
+                                            iconName: 'Cùng Phượt',
+                                            handleType: '',
+                                            supportsVideo: true,
+                                            maximumCallGroups: 2,
+                                            maximumCallsPerCallGroup: 1,
+                                            audioSessionMode: 'default',
+                                            audioSessionActive: true,
+                                            audioSessionPreferredSampleRate:
+                                                44100.0,
+                                            audioSessionPreferredIOBufferDuration:
+                                                0.005,
+                                            supportsDTMF: true,
+                                            supportsHolding: true,
+                                            supportsGrouping: false,
+                                            supportsUngrouping: false,
+                                            ringtonePath:
+                                                'system_ringtone_default',
+                                          ),
+                                        );
+                                        await FlutterCallkitIncoming
+                                            .showCallkitIncoming(params);
+                                        FlutterCallkitIncoming.onEvent
+                                            .listen((event) {
+                                          switch (event!.event) {
+                                            case Event.ACTION_CALL_INCOMING:
+                                              print('user click goi');
+                                              break;
+                                            case Event.ACTION_CALL_START:
+                                              break;
+                                            case Event.ACTION_CALL_ACCEPT:
+                                              navigatePush(context, CallVideo(groupid: element.groupId.toString(),answere: true,));
+                                              break;
+                                            case Event.ACTION_CALL_DECLINE:
+                                              print('user click TU Choi');
+                                              break;
+                                            case Event.ACTION_CALL_ENDED:
+                                              // TODO: ended an incoming/outgoing call
+                                              break;
+                                            case Event.ACTION_CALL_TIMEOUT:
+                                              // TODO: missed an incoming call
+                                              break;
+                                            case Event.ACTION_CALL_CALLBACK:
+                                              // TODO: only Android - click action `Call back` from missed call notification
+                                              break;
+                                            case Event.ACTION_CALL_TOGGLE_HOLD:
+                                              // TODO: only iOS
+                                              break;
+                                            case Event.ACTION_CALL_TOGGLE_MUTE:
+                                              // TODO: only iOS
+                                              break;
+                                            case Event.ACTION_CALL_TOGGLE_DMTF:
+                                              // TODO: only iOS
+                                              break;
+                                            case Event.ACTION_CALL_TOGGLE_GROUP:
+                                              // TODO: only iOS
+                                              break;
+                                            case Event
+                                                .ACTION_CALL_TOGGLE_AUDIO_SESSION:
+                                              // TODO: only iOS
+                                              break;
+                                            case Event
+                                                .ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+                                              // TODO: only iOS
+                                              break;
+                                          }
+                                        });
+                                        
+                                      }
+                                    });
+                                  }
                                 },
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {

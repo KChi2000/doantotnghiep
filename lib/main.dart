@@ -26,15 +26,22 @@ import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart
 import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 
 import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
 import 'package:doantotnghiep/screens/Map.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:uuid/uuid.dart';
 
 import 'bloc/pickImage/pick_image_cubit.dart';
 import 'model/User.dart';
@@ -57,17 +64,26 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
+   late final Uuid _uuid;
+  String? _currentUuid;
+
+  late final FirebaseMessaging _firebaseMessaging;
   @override
   void initState() {
     // TODO: implement initState
     checkUserLoggedIn();
+    
+    WidgetsBinding.instance.addObserver(this);
+  
     super.initState();
+    
   }
 
   void checkUserLoggedIn() async {
     context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +176,16 @@ class _MyAppState extends State<MyApp> {
         locale: Locale('vi', 'VN'),
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
+        // onGenerateRoute: (settings) {
+        //   final arguments = settings.arguments;
+        //   switch(settings.name){
+        //      case '/callScreen':
+        //     if (arguments is String) {
+        //       // the details page for one specific user
+        //       return CallVideo(arguments);
+        //     }
+        //   }
+        // },
         theme: ThemeData(
             // appBarTheme: AppBarTheme(color: Colors.pink),
             useMaterial3: true,

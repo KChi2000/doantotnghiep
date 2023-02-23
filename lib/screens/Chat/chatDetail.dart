@@ -17,6 +17,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 
 import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
@@ -50,6 +55,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     context.read<GetChatMessageCubit>().fetchData(widget.groupId);
     context.read<SendMessageCubit>().initialStatusSendMessage();
+    
   }
 
   @override
@@ -81,12 +87,25 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(onPressed: () {}, icon: Icon(Icons.call)),
+              child: IconButton(
+                  onPressed: () async {
+                  
+                  },
+                  icon: Icon(Icons.call)),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(
                   onPressed: () async {
+                    // CallKitParams params = CallKitParams(
+                    //     id: '1',
+                    //     nameCaller: 'aaaa',
+                    //     handle: '12345',
+                    //     type: 1,
+                    //     textMissedCall: 'Call back',
+                    //     extra: {'userId': '1234'});
+                    // await FlutterCallkitIncoming.showMissCallNotification(
+                    //     params);
                     // context
                     //     .read<MakeAVideoCallCubit>()
                     //     .getusermedia(widget.groupId);

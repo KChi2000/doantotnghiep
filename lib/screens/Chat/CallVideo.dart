@@ -10,7 +10,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+
+import '../../bloc/Changetab/changetab_cubit.dart';
+import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../../components/navigate.dart';
+import '../DisplayPage.dart';
 
 class CallVideo extends StatefulWidget {
   CallVideo({required this.groupid, this.answere});
@@ -36,7 +42,7 @@ class _CallVideoState extends State<CallVideo> {
       _remoteRenderer.srcObject = stream;
       setState(() {});
     });
-    
+
     super.initState();
 
     setState(() {});
@@ -54,9 +60,7 @@ class _CallVideoState extends State<CallVideo> {
         isFrontCameraSelected);
     if (widget.answere! == true) {
       signaling.joinRoom(widget.groupid, _remoteRenderer);
-      setState(() {
-        
-      });
+      setState(() {});
     }
   }
 
@@ -159,7 +163,7 @@ class _CallVideoState extends State<CallVideo> {
                                       'assets/icons/phone-hangup.svg',
                                       color: Colors.white,
                                     ), () async {
-                                      await FlutterCallkitIncoming.endAllCalls();
+                                  await FlutterCallkitIncoming.endAllCalls();
                                   await signaling.hangUp(
                                       _localRenderer, widget.groupid);
                                   Navigator.pop(context);
@@ -171,21 +175,33 @@ class _CallVideoState extends State<CallVideo> {
                             );
                           },
                         ),
+                      ),
+                      BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
+                        listener: (context, state) {
+                          if (state is GroupInfoCubitLoaded) {
+                            state.groupinfo!.forEach((element) async {
+                              if (element.groupId.toString() ==
+                                  widget.groupid) {
+                                if (element.callStatus == 'call end') {
+                                  context.read<ChangetabCubit>().change(1);
+                                  navigateReplacement(context, DisplayPage());
+                                  Fluttertoast.showToast(
+                                      msg: "Kết thúc cuộc gọi",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      textColor: Colors.white,
+                                      backgroundColor: Colors.pink,
+                                      fontSize: 16.0);
+                                }
+                              }
+                            });
+                          }
+                        },
+                        child: SizedBox(),
                       )
                     ],
-                  ))
-          //     }
-          //     return Container(
-          //       width: screenwidth,
-          //       height: screenheight,
-          //       color: Colors.white,
-          //       child: Center(
-          //         child: Text('Dang thiet lap....'),
-          //       ),
-          //     );
-          //   },
-          // ),
-          ),
+                  ))),
     );
   }
 

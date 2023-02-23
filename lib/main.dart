@@ -37,6 +37,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_callkit_incoming/entities/android_params.dart';
 import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -64,8 +65,8 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
-   late final Uuid _uuid;
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  late final Uuid _uuid;
   String? _currentUuid;
 
   late final FirebaseMessaging _firebaseMessaging;
@@ -73,17 +74,66 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void initState() {
     // TODO: implement initState
     checkUserLoggedIn();
-    
+
     WidgetsBinding.instance.addObserver(this);
-  
+
     super.initState();
-    
+    listenerEvent();
   }
 
   void checkUserLoggedIn() async {
     context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
- 
+
+  Future<void> listenerEvent() async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      FlutterCallkitIncoming.onEvent.listen((event) {
+        if (!mounted) return;
+        switch (event!.event) {
+          case Event.ACTION_CALL_INCOMING:
+            // TODO: received an incoming call
+            break;
+          case Event.ACTION_CALL_START:
+            // TODO: started an outgoing call
+            // TODO: show screen calling in Flutter
+            break;
+          case Event.ACTION_CALL_ACCEPT:
+            // TODO: accepted an incoming call
+            // TODO: show screen calling in Flutter
+            break;
+          case Event.ACTION_CALL_DECLINE:
+            // TODO: declined an incoming call
+            break;
+          case Event.ACTION_CALL_ENDED:
+            // TODO: ended an incoming/outgoing call
+            break;
+          case Event.ACTION_CALL_TIMEOUT:
+            // TODO: missed an incoming call
+            break;
+          case Event.ACTION_CALL_CALLBACK:
+            // TODO: only Android - click action `Call back` from missed call notification
+            break;
+          case Event.ACTION_CALL_TOGGLE_HOLD:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_MUTE:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_DMTF:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_GROUP:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+            // TODO: only iOS
+            break;
+        }
+      });
+    } on Exception {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,10 +208,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         BlocProvider(
           create: (context) => ToggleCmCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => CreateGroupCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => CanCreateGroupCubit(),
         ),
       ],

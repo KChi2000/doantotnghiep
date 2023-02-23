@@ -66,7 +66,7 @@ class DatabaseService {
   //   //   ])
   //   // });
   //  var userdocdata=await userCollection.get();
-  //  userdocdata.docs.forEach((element) { 
+  //  userdocdata.docs.forEach((element) {
   //   element.reference.update({
   //      'groups': FieldValue.arrayRemove([
   //       {'groupId': groupid, 'GroupName': groupname}
@@ -82,15 +82,14 @@ class DatabaseService {
           '${DateTime.now().add(Duration(minutes: 5)).microsecondsSinceEpoch}',
       'recentMessage': 'đã xóa nhóm'
     });
-    var userdocdata=await userCollection.get();
-   userdocdata.docs.forEach((element) { 
-    element.reference.update({
-       'groups': FieldValue.arrayRemove([
-        {'groupId': groupid, 'GroupName': groupname}
-      ])
+    var userdocdata = await userCollection.get();
+    userdocdata.docs.forEach((element) {
+      element.reference.update({
+        'groups': FieldValue.arrayRemove([
+          {'groupId': groupid, 'GroupName': groupname}
+        ])
+      });
     });
-   });
-    
   }
 
   Future deleteDataInFB(String groupid, String groupname) async {

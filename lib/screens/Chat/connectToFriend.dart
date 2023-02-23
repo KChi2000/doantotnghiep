@@ -329,7 +329,19 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 listener: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
                                     state.groupinfo!.forEach((element) async {
-                                      if (element.callStatus == 'calling') {
+                                      if (element.callStatus == 'calling' &&
+                                          element.recentMessageSender
+                                                  .toString()
+                                                  .substring(
+                                                      element.recentMessageSender
+                                                              .toString()
+                                                              .length -
+                                                          29,
+                                                      element
+                                                          .recentMessageSender
+                                                          .toString()
+                                                          .length) !=
+                                              Userinfo.userSingleton.uid) {
                                         final params = CallKitParams(
                                           id: '${Userinfo.userSingleton.uid}',
                                           nameCaller:
@@ -385,52 +397,57 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                         );
                                         await FlutterCallkitIncoming
                                             .showCallkitIncoming(params);
-                                        FlutterCallkitIncoming.onEvent
-                                            .listen((event) {
-                                          switch (event!.event) {
-                                            case Event.ACTION_CALL_INCOMING:
-                                              print('user click goi');
-                                              break;
-                                            case Event.ACTION_CALL_START:
-                                              break;
-                                            case Event.ACTION_CALL_ACCEPT:
-                                              navigatePush(context, CallVideo(groupid: element.groupId.toString(),answere: true,));
-                                              break;
-                                            case Event.ACTION_CALL_DECLINE:
-                                              print('user click TU Choi');
-                                              break;
-                                            case Event.ACTION_CALL_ENDED:
-                                              // TODO: ended an incoming/outgoing call
-                                              break;
-                                            case Event.ACTION_CALL_TIMEOUT:
-                                              // TODO: missed an incoming call
-                                              break;
-                                            case Event.ACTION_CALL_CALLBACK:
-                                              // TODO: only Android - click action `Call back` from missed call notification
-                                              break;
-                                            case Event.ACTION_CALL_TOGGLE_HOLD:
-                                              // TODO: only iOS
-                                              break;
-                                            case Event.ACTION_CALL_TOGGLE_MUTE:
-                                              // TODO: only iOS
-                                              break;
-                                            case Event.ACTION_CALL_TOGGLE_DMTF:
-                                              // TODO: only iOS
-                                              break;
-                                            case Event.ACTION_CALL_TOGGLE_GROUP:
-                                              // TODO: only iOS
-                                              break;
-                                            case Event
-                                                .ACTION_CALL_TOGGLE_AUDIO_SESSION:
-                                              // TODO: only iOS
-                                              break;
-                                            case Event
-                                                .ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-                                              // TODO: only iOS
-                                              break;
-                                          }
-                                        });
-                                        
+                                        // FlutterCallkitIncoming.onEvent
+                                        //     .listen((event) {
+                                        //   switch (event!.event) {
+                                        //     case Event.ACTION_CALL_INCOMING:
+                                        //       print('user click goi');
+                                        //       break;
+                                        //     case Event.ACTION_CALL_START:
+                                        //       break;
+                                        //     case Event.ACTION_CALL_ACCEPT:
+                                        //       navigatePush(
+                                        //           context,
+                                        //           CallVideo(
+                                        //             groupid: element.groupId
+                                        //                 .toString(),
+                                        //             answere: true,
+                                        //           ));
+                                        //       break;
+                                        //     case Event.ACTION_CALL_DECLINE:
+                                        //       print('user click TU Choi');
+                                        //       break;
+                                        //     case Event.ACTION_CALL_ENDED:
+                                        //       // TODO: ended an incoming/outgoing call
+                                        //       break;
+                                        //     case Event.ACTION_CALL_TIMEOUT:
+                                        //       // TODO: missed an incoming call
+                                        //       break;
+                                        //     case Event.ACTION_CALL_CALLBACK:
+                                        //       // TODO: only Android - click action `Call back` from missed call notification
+                                        //       break;
+                                        //     case Event.ACTION_CALL_TOGGLE_HOLD:
+                                        //       // TODO: only iOS
+                                        //       break;
+                                        //     case Event.ACTION_CALL_TOGGLE_MUTE:
+                                        //       // TODO: only iOS
+                                        //       break;
+                                        //     case Event.ACTION_CALL_TOGGLE_DMTF:
+                                        //       // TODO: only iOS
+                                        //       break;
+                                        //     case Event.ACTION_CALL_TOGGLE_GROUP:
+                                        //       // TODO: only iOS
+                                        //       break;
+                                        //     case Event
+                                        //         .ACTION_CALL_TOGGLE_AUDIO_SESSION:
+                                        //       // TODO: only iOS
+                                        //       break;
+                                        //     case Event
+                                        //         .ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
+                                        //       // TODO: only iOS
+                                        //       break;
+                                        //   }
+                                        // });
                                       }
                                     });
                                   }

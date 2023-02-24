@@ -20,6 +20,7 @@ import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'dart:async';
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
+import 'package:doantotnghiep/bloc/onHaveRemoteRender/on_have_remote_render_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/resetEmail/reset_email_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
@@ -45,6 +46,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:uuid/uuid.dart';
 
 import 'bloc/pickImage/pick_image_cubit.dart';
+import 'components/navigate.dart';
 import 'model/User.dart';
 
 void main() async {
@@ -78,62 +80,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
-    listenerEvent();
+    
   }
 
   void checkUserLoggedIn() async {
     context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
 
-  Future<void> listenerEvent() async {
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      FlutterCallkitIncoming.onEvent.listen((event) {
-        if (!mounted) return;
-        switch (event!.event) {
-          case Event.ACTION_CALL_INCOMING:
-            // TODO: received an incoming call
-            break;
-          case Event.ACTION_CALL_START:
-            // TODO: started an outgoing call
-            // TODO: show screen calling in Flutter
-            break;
-          case Event.ACTION_CALL_ACCEPT:
-            // TODO: accepted an incoming call
-            // TODO: show screen calling in Flutter
-            break;
-          case Event.ACTION_CALL_DECLINE:
-            // TODO: declined an incoming call
-            break;
-          case Event.ACTION_CALL_ENDED:
-            // TODO: ended an incoming/outgoing call
-            break;
-          case Event.ACTION_CALL_TIMEOUT:
-            // TODO: missed an incoming call
-            break;
-          case Event.ACTION_CALL_CALLBACK:
-            // TODO: only Android - click action `Call back` from missed call notification
-            break;
-          case Event.ACTION_CALL_TOGGLE_HOLD:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_MUTE:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_DMTF:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_GROUP:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-            // TODO: only iOS
-            break;
-        }
-      });
-    } on Exception {}
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -213,6 +167,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => CanCreateGroupCubit(),
+        ),
+         BlocProvider(
+          create: (context) => OnHaveRemoteRenderCubit(),
         ),
       ],
       child: MaterialApp(

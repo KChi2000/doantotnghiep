@@ -342,112 +342,29 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                           .toString()
                                                           .length) !=
                                               Userinfo.userSingleton.uid) {
-                                        final params = CallKitParams(
-                                          id: '${Userinfo.userSingleton.uid}',
-                                          nameCaller:
-                                              'Nhóm ${element.groupName}',
-                                          appName: 'Cùng Phượt',
-                                          avatar:
-                                              'assets/images/Cùng Phượt.png',
-                                          handle: 'đang gọi video',
-                                          type: 0,
-                                          duration: 30000,
-                                          textAccept: 'Trả lời',
-                                          textDecline: 'Từ chối',
-                                          textMissedCall: 'Missed call',
-                                          textCallback: 'Gọi lại',
-                                          extra: <String, dynamic>{
-                                            'userId':
-                                                '${Userinfo.userSingleton.uid}'
-                                          },
-                                          headers: <String, dynamic>{
-                                            'apiKey': 'Abc@123!',
-                                            'platform': 'flutter'
-                                          },
-                                          android: AndroidParams(
-                                            isCustomNotification: true,
-                                            // isShowLogo: true,
-                                            isShowCallback: true,
-                                            isShowMissedCallNotification: true,
-                                            ringtonePath:
-                                                'system_ringtone_default',
-                                            backgroundColor: '#0955fa',
-                                            backgroundUrl: 'assets/test.png',
-                                            actionColor: '#4CAF50',
-                                          ),
-                                          ios: IOSParams(
-                                            iconName: 'Cùng Phượt',
-                                            handleType: '',
-                                            supportsVideo: true,
-                                            maximumCallGroups: 2,
-                                            maximumCallsPerCallGroup: 1,
-                                            audioSessionMode: 'default',
-                                            audioSessionActive: true,
-                                            audioSessionPreferredSampleRate:
-                                                44100.0,
-                                            audioSessionPreferredIOBufferDuration:
-                                                0.005,
-                                            supportsDTMF: true,
-                                            supportsHolding: true,
-                                            supportsGrouping: false,
-                                            supportsUngrouping: false,
-                                            ringtonePath:
-                                                'system_ringtone_default',
-                                          ),
-                                        );
+
+                                      Fluttertoast.showToast(
+                                          msg: "Đang co ai do goi",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          textColor: Colors.white,
+                                          backgroundColor: Colors.pink,
+                                          fontSize: 16.0);
+                                        listenerEvent(ct);
                                         await FlutterCallkitIncoming
-                                            .showCallkitIncoming(params);
-                                        // FlutterCallkitIncoming.onEvent
-                                        //     .listen((event) {
-                                        //   switch (event!.event) {
-                                        //     case Event.ACTION_CALL_INCOMING:
-                                        //       print('user click goi');
-                                        //       break;
-                                        //     case Event.ACTION_CALL_START:
-                                        //       break;
-                                        //     case Event.ACTION_CALL_ACCEPT:
-                                        //       navigatePush(
-                                        //           context,
-                                        //           CallVideo(
-                                        //             groupid: element.groupId
-                                        //                 .toString(),
-                                        //             answere: true,
-                                        //           ));
-                                        //       break;
-                                        //     case Event.ACTION_CALL_DECLINE:
-                                        //       print('user click TU Choi');
-                                        //       break;
-                                        //     case Event.ACTION_CALL_ENDED:
-                                        //       // TODO: ended an incoming/outgoing call
-                                        //       break;
-                                        //     case Event.ACTION_CALL_TIMEOUT:
-                                        //       // TODO: missed an incoming call
-                                        //       break;
-                                        //     case Event.ACTION_CALL_CALLBACK:
-                                        //       // TODO: only Android - click action `Call back` from missed call notification
-                                        //       break;
-                                        //     case Event.ACTION_CALL_TOGGLE_HOLD:
-                                        //       // TODO: only iOS
-                                        //       break;
-                                        //     case Event.ACTION_CALL_TOGGLE_MUTE:
-                                        //       // TODO: only iOS
-                                        //       break;
-                                        //     case Event.ACTION_CALL_TOGGLE_DMTF:
-                                        //       // TODO: only iOS
-                                        //       break;
-                                        //     case Event.ACTION_CALL_TOGGLE_GROUP:
-                                        //       // TODO: only iOS
-                                        //       break;
-                                        //     case Event
-                                        //         .ACTION_CALL_TOGGLE_AUDIO_SESSION:
-                                        //       // TODO: only iOS
-                                        //       break;
-                                        //     case Event
-                                        //         .ACTION_DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP:
-                                        //       // TODO: only iOS
-                                        //       break;
-                                        //   }
-                                        // });
+                                            .showCallkitIncoming(Callparam(
+                                                '${element.groupId}',
+                                                '${element.groupName}'));
+                                      }else{
+                                          // Fluttertoast.showToast(
+                                          // msg: "Tat may roi",
+                                          // toastLength: Toast.LENGTH_SHORT,
+                                          // gravity: ToastGravity.BOTTOM,
+                                          // timeInSecForIosWeb: 1,
+                                          // textColor: Colors.white,
+                                          // backgroundColor: Colors.pink,
+                                          // fontSize: 16.0);
                                       }
                                     });
                                   }
@@ -553,6 +470,110 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
       ),
     );
   }
+
+  Future<void> listenerEvent(context) async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      FlutterCallkitIncoming.onEvent.listen((event) {
+        if (!mounted) return;
+        switch (event!.event) {
+          case Event.ACTION_CALL_INCOMING:
+            print('ACTION_CALL_INCOMING');
+            break;
+          case Event.ACTION_CALL_START:
+            // TODO: started an outgoing call
+            // TODO: show screen calling in Flutter
+            break;
+          case Event.ACTION_CALL_ACCEPT:
+            print(
+                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id']}');
+            Future.delayed(Duration.zero, () {
+              navigatePush(
+                  context,
+                  CallVideo(
+                    groupid: (event.body as Map<String, dynamic>)['id'],
+                    grname: (event.body as Map<String, dynamic>)['nameCaller'],
+                    answere: true,
+                  ));
+            });
+
+            break;
+          case Event.ACTION_CALL_DECLINE:
+            print('ACTION_CALL_DECLINE');
+            break;
+          case Event.ACTION_CALL_ENDED:
+            // TODO: ended an incoming/outgoing call
+            break;
+          case Event.ACTION_CALL_TIMEOUT:
+            // TODO: missed an incoming call
+            break;
+          case Event.ACTION_CALL_CALLBACK:
+            // TODO: only Android - click action `Call back` from missed call notification
+            break;
+          case Event.ACTION_CALL_TOGGLE_HOLD:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_MUTE:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_DMTF:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_GROUP:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+            // TODO: only iOS
+            break;
+        }
+      });
+    } on Exception {}
+  }
+
+  Callparam(String grid, String grname) {
+    return CallKitParams(
+      id: grid,
+      nameCaller: 'Nhóm $grname',
+      appName: 'Cùng Phượt',
+      avatar: 'assets/images/Cùng Phượt.png',
+      handle: 'đang gọi video',
+      type: 0,
+      duration: 30000,
+      textAccept: 'Trả lời',
+      textDecline: 'Từ chối',
+      textMissedCall: 'Missed call',
+      textCallback: 'Gọi lại',
+      extra: <String, dynamic>{'userId': '${Userinfo.userSingleton.uid}'},
+      headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+      android: AndroidParams(
+        isCustomNotification: true,
+        // isShowLogo: true,
+        isShowCallback: true,
+        isShowMissedCallNotification: true,
+        ringtonePath: 'system_ringtone_default',
+        backgroundColor: '#0955fa',
+        backgroundUrl: 'assets/test.png',
+        actionColor: '#4CAF50',
+      ),
+      ios: IOSParams(
+        iconName: 'Cùng Phượt',
+        handleType: '',
+        supportsVideo: true,
+        maximumCallGroups: 2,
+        maximumCallsPerCallGroup: 1,
+        audioSessionMode: 'default',
+        audioSessionActive: true,
+        audioSessionPreferredSampleRate: 44100.0,
+        audioSessionPreferredIOBufferDuration: 0.005,
+        supportsDTMF: true,
+        supportsHolding: true,
+        supportsGrouping: false,
+        supportsUngrouping: false,
+        ringtonePath: 'system_ringtone_default',
+      ),
+    );
+  }
 }
 
 class buttonicon extends StatelessWidget {
@@ -592,14 +613,16 @@ class groupitem extends StatelessWidget {
       onTap: group.status == 'deleted'
           ? null
           : () {
-              navigateReplacement(
-                  context,
-                  chatDetail(
-                    groupId: group.groupId.toString(),
-                    groupName: group.groupName.toString(),
-                    members: group.members!,
-                    admininfo: group.admin!,
-                  ));
+              Future.delayed(Duration.zero, () {
+                navigateReplacement(
+                    context,
+                    chatDetail(
+                      groupId: group.groupId.toString(),
+                      groupName: group.groupName.toString(),
+                      members: group.members!,
+                      admininfo: group.admin!,
+                    ));
+              });
             },
       onLongPress: () {},
       child: Stack(

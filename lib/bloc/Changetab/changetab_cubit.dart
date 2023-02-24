@@ -5,7 +5,7 @@ part 'changetab_state.dart';
 
 class ChangetabCubit extends Cubit<ChangetabState> {
   ChangetabCubit() : super(ChangetabState(index: 0));
-  void change(int pos){
+   change(int pos){
     emit(ChangetabState(index: pos));
   }
 }

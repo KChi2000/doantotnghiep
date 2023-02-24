@@ -21,16 +21,16 @@ import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import '../../components/navigate.dart';
 import '../DisplayPage.dart';
 
-class CallVideo extends StatefulWidget {
-  CallVideo({required this.groupid, required this.grname, this.answere});
+class CallAudio extends StatefulWidget {
+  CallAudio({required this.groupid, required this.grname, this.answere});
   String groupid;
   String grname;
   bool? answere;
   @override
-  State<CallVideo> createState() => _CallVideoState();
+  State<CallAudio> createState() => _CallAudioState();
 }
 
-class _CallVideoState extends State<CallVideo> {
+class _CallAudioState extends State<CallAudio> {
   Signaling signaling = Signaling();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
@@ -49,7 +49,7 @@ class _CallVideoState extends State<CallVideo> {
     initValue();
     signaling.onAddRemoteStream = ((stream) {
       _remoteRenderer.srcObject = stream;
-      context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
+      // context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       setState(() {});
     });
 
@@ -66,23 +66,19 @@ class _CallVideoState extends State<CallVideo> {
   }
 
   createRoom() {
-    signaling.createRoom(_remoteRenderer, widget.groupid,'video');
+    signaling.createRoom(_remoteRenderer, widget.groupid,'audio');
     // setState(() {});
   }
 
   initValue() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    await signaling.openUserMedia(
-        _localRenderer,
-        _remoteRenderer,
-        context.read<ToggleCmCubit>().state.openCamera,
-        context.read<ToggleCmCubit>().state.enableMic,
-        isFrontCameraSelected);
+    await signaling.openUserMedia(_localRenderer, _remoteRenderer, false,
+        context.read<ToggleCmCubit>().state.enableMic, isFrontCameraSelected);
     setState(() {});
     if (widget.answere! == true) {
-      // await context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
-      signaling.joinRoom(widget.groupid, _remoteRenderer,'video');
+      await context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
+      signaling.joinRoom(widget.groupid, _remoteRenderer,'audio');
       setState(() {});
     }
   }
@@ -143,16 +139,16 @@ class _CallVideoState extends State<CallVideo> {
                             }
                             return state.addRemote
                                 ? Container(
-                                  // color: Colors.amber,
-                                  width: screenwidth,
-                                  height: screenheight / 2 - 10,
-                                  child: RTCVideoView(
-                                    _remoteRenderer,
-                                    mirror: true,
-                                    objectFit: RTCVideoViewObjectFit
-                                        .RTCVideoViewObjectFitCover,
-                                  ),
-                                )
+                                    // color: Colors.amber,
+                                    width: screenwidth,
+                                    height: screenheight / 2 - 10,
+                                    child: RTCVideoView(
+                                      _remoteRenderer,
+                                      mirror: true,
+                                      objectFit: RTCVideoViewObjectFit
+                                          .RTCVideoViewObjectFitCover,
+                                    ),
+                                  )
                                 : SizedBox();
                           },
                         ),
@@ -182,21 +178,6 @@ class _CallVideoState extends State<CallVideo> {
                           children: [
                             itemcall(
                                 Icon(
-                                  state.openCamera
-                                      ? Icons.videocam
-                                      : Icons.videocam_off,
-                                  color: Colors.black,
-                                ), () async {
-                              await context
-                                  .read<ToggleCmCubit>()
-                                  .toggleCamera();
-                              signaling.toggleCamera(state.openCamera);
-                            }, Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            itemcall(
-                                Icon(
                                   state.enableMic ? Icons.mic : Icons.mic_off,
                                   color: Colors.black,
                                 ), () async {
@@ -204,18 +185,7 @@ class _CallVideoState extends State<CallVideo> {
                               signaling.toggleMic(state.enableMic);
                             }, Colors.white),
                             SizedBox(
-                              width: 30,
-                            ),
-                            itemcall(
-                                SvgPicture.asset(
-                                    'assets/icons/camera-flip.svg'), () async {
-                              await context
-                                  .read<ToggleCmCubit>()
-                                  .switchCamera();
-                              signaling.switchCamera(state.useFrontCamera);
-                            }, Colors.white),
-                            SizedBox(
-                              width: 30,
+                              width: 60,
                             ),
                             itemcall(
                                 SvgPicture.asset(
@@ -223,7 +193,7 @@ class _CallVideoState extends State<CallVideo> {
                                   color: Colors.white,
                                 ), () async {
                               await signaling.hangUp(
-                                  _localRenderer, widget.groupid,'video');
+                                  _localRenderer, widget.groupid,'audio');
                               await FlutterCallkitIncoming.endCall(
                                   widget.groupid);
                               Navigator.pop(context);
@@ -240,8 +210,7 @@ class _CallVideoState extends State<CallVideo> {
                     listener: (context, state) {
                       if (state is GroupInfoCubitLoaded) {
                         state.groupinfo!.forEach((element) async {
-                          if (element.groupId.toString() ==
-                              widget.groupid) {
+                          if (element.groupId.toString() == widget.groupid) {
                             if (element.callStatus == 'call end') {
                               Navigator.pop(ct);
                               // ct.read<ChangetabCubit>().change(1);
@@ -258,9 +227,8 @@ class _CallVideoState extends State<CallVideo> {
                           }
                         });
                       }
-                     
                     },
-                     child: SizedBox(),
+                    child: SizedBox(),
                   )
                 ],
               ))),

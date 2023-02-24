@@ -71,7 +71,7 @@ class IncomingCall extends StatelessWidget {
                           color: Colors.white,
                         ),
                         () async {
-                    navigatePush(context, CallVideo(groupid: group.groupId.toString(),answere: true,));
+                    // navigatePush(context, CallVideo(groupid: group.groupId.toString(),answere: true,));
                   
                         },
                         Colors.green),

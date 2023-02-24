@@ -7,6 +7,7 @@ import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
+import 'package:doantotnghiep/screens/Chat/CallAudio.dart';
 
 import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
@@ -55,7 +56,6 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     context.read<GetChatMessageCubit>().fetchData(widget.groupId);
     context.read<SendMessageCubit>().initialStatusSendMessage();
-    
   }
 
   @override
@@ -87,34 +87,31 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(
-                  onPressed: () async {
-                  
-                  },
-                  icon: Icon(Icons.call)),
+              child: IconButton(onPressed: () async {
+                 Future.delayed(Duration.zero, () {
+                      navigatePush(
+                          context,
+                          CallAudio(
+                            groupid: widget.groupId,
+                            grname: widget.groupName,
+                            answere: false,
+                          ));
+                    });
+              }, icon: Icon(Icons.call)),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(
                   onPressed: () async {
-                    // CallKitParams params = CallKitParams(
-                    //     id: '1',
-                    //     nameCaller: 'aaaa',
-                    //     handle: '12345',
-                    //     type: 1,
-                    //     textMissedCall: 'Call back',
-                    //     extra: {'userId': '1234'});
-                    // await FlutterCallkitIncoming.showMissCallNotification(
-                    //     params);
-                    // context
-                    //     .read<MakeAVideoCallCubit>()
-                    //     .getusermedia(widget.groupId);
-                    //  print('ccccccc : ${(context.read<MakeAVideoCallCubit>().state as MakeAVideoCallLoaded).calling}');
-                    navigatePush(
-                        context,
-                        CallVideo(
-                          groupid: widget.groupId,
-                        ));
+                    Future.delayed(Duration.zero, () {
+                      navigatePush(
+                          context,
+                          CallVideo(
+                            groupid: widget.groupId,
+                            grname: widget.groupName,
+                            answere: false,
+                          ));
+                    });
                   },
                   icon: Icon(Icons.videocam)),
             ),

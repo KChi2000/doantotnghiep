@@ -11,6 +11,7 @@ import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/Message.dart';
+import 'package:doantotnghiep/screens/Chat/CallAudio.dart';
 import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 import 'package:doantotnghiep/screens/Chat/IncomingCall.dart';
 
@@ -342,29 +343,23 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                           .toString()
                                                           .length) !=
                                               Userinfo.userSingleton.uid) {
-
-                                      Fluttertoast.showToast(
-                                          msg: "Đang co ai do goi",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          textColor: Colors.white,
-                                          backgroundColor: Colors.pink,
-                                          fontSize: 16.0);
                                         listenerEvent(ct);
                                         await FlutterCallkitIncoming
                                             .showCallkitIncoming(Callparam(
                                                 '${element.groupId}',
-                                                '${element.groupName}'));
-                                      }else{
-                                          // Fluttertoast.showToast(
-                                          // msg: "Tat may roi",
-                                          // toastLength: Toast.LENGTH_SHORT,
-                                          // gravity: ToastGravity.BOTTOM,
-                                          // timeInSecForIosWeb: 1,
-                                          // textColor: Colors.white,
-                                          // backgroundColor: Colors.pink,
-                                          // fontSize: 16.0);
+                                                '${element.groupName}',
+                                                element.type == Type.callvideo
+                                                    ? 'video'
+                                                    : 'audio'));
+                                      } else {
+                                        // Fluttertoast.showToast(
+                                        // msg: "Tat may roi",
+                                        // toastLength: Toast.LENGTH_SHORT,
+                                        // gravity: ToastGravity.BOTTOM,
+                                        // timeInSecForIosWeb: 1,
+                                        // textColor: Colors.white,
+                                        // backgroundColor: Colors.pink,
+                                        // fontSize: 16.0);
                                       }
                                     });
                                   }
@@ -487,16 +482,35 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
             break;
           case Event.ACTION_CALL_ACCEPT:
             print(
-                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id']}');
-            Future.delayed(Duration.zero, () {
-              navigatePush(
-                  context,
-                  CallVideo(
-                    groupid: (event.body as Map<String, dynamic>)['id'],
-                    grname: (event.body as Map<String, dynamic>)['nameCaller'],
-                    answere: true,
-                  ));
-            });
+                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id'].toString().substring(0, 5)}');
+            (event.body as Map<String, dynamic>)['id']
+                        .toString()
+                        .substring(0, 5) ==
+                    'video'
+                ? Future.delayed(Duration.zero, () {
+                    navigatePush(
+                        context,
+                        CallVideo(
+                          groupid: (event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5),
+                          grname: (event.body
+                              as Map<String, dynamic>)['nameCaller'],
+                          answere: true,
+                        ));
+                  })
+                : Future.delayed(Duration.zero, () {
+                    navigatePush(
+                        context,
+                        CallAudio(
+                          groupid: (event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5),
+                          grname: (event.body
+                              as Map<String, dynamic>)['nameCaller'],
+                          answere: true,
+                        ));
+                  });
 
             break;
           case Event.ACTION_CALL_DECLINE:
@@ -531,18 +545,18 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
     } on Exception {}
   }
 
-  Callparam(String grid, String grname) {
+  Callparam(String grid, String grname, String typeOfcall) {
     return CallKitParams(
-      id: grid,
+      id: '$typeOfcall $grid',
       nameCaller: 'Nhóm $grname',
       appName: 'Cùng Phượt',
       avatar: 'assets/images/Cùng Phượt.png',
-      handle: 'đang gọi video',
+      handle: 'đang gọi $typeOfcall',
       type: 0,
       duration: 30000,
       textAccept: 'Trả lời',
       textDecline: 'Từ chối',
-      textMissedCall: 'Missed call',
+      textMissedCall: 'Cuộc gọi nhỡ',
       textCallback: 'Gọi lại',
       extra: <String, dynamic>{'userId': '${Userinfo.userSingleton.uid}'},
       headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
@@ -803,37 +817,99 @@ class groupitem extends StatelessWidget {
                                   onTap: () async {
                                     if (Userinfo.userSingleton.uid !=
                                         group.admin!.adminId.toString()) {
-                                      ct.loaderOverlay.show();
-                                      await context
-                                          .read<JoindStatusCubit>()
-                                          .leaveGroup(group.groupId.toString(),
-                                              group.groupName.toString());
-                                      ct.loaderOverlay.hide();
-
-                                      Fluttertoast.showToast(
-                                          msg: "Đã rời nhóm thành công",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          textColor: Colors.white,
-                                          backgroundColor: Colors.pink,
-                                          fontSize: 16.0);
+                                      Future.delayed(
+                                        const Duration(seconds: 0),
+                                        () => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            surfaceTintColor: Colors.white,
+                                            title: Text(
+                                                'Bạn có chắc muốn rời nhóm?'),
+                                            actions: [
+                                              ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Hủy')),
+                                              ElevatedButton(
+                                                  onPressed: () async {
+                                                    ct.loaderOverlay.show();
+                                                    await context
+                                                        .read<
+                                                            JoindStatusCubit>()
+                                                        .leaveGroup(
+                                                            group.groupId
+                                                                .toString(),
+                                                            group.groupName
+                                                                .toString());
+                                                    ct.loaderOverlay.hide();
+                                                    Navigator.pop(context);
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Đã rời nhóm thành công",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.BOTTOM,
+                                                        timeInSecForIosWeb: 1,
+                                                        textColor: Colors.white,
+                                                        backgroundColor:
+                                                            Colors.pink,
+                                                        fontSize: 16.0);
+                                                  },
+                                                  child: Text('Xác nhận'))
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     } else {
-                                      ct.loaderOverlay.show();
-                                      await context
-                                          .read<JoindStatusCubit>()
-                                          .deleteGroup(group.groupId.toString(),
-                                              group.groupName.toString());
-                                      ct.loaderOverlay.hide();
-
-                                      Fluttertoast.showToast(
-                                          msg: "Đã xóa nhóm thành công",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          textColor: Colors.white,
-                                          backgroundColor: Colors.pink,
-                                          fontSize: 16.0);
+                                      Future.delayed(
+                                        const Duration(seconds: 0),
+                                        () => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            surfaceTintColor: Colors.white,
+                                            title: Text(
+                                                'Bạn có chắc muốn xóa nhóm?'),
+                                            actions: [
+                                              ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Hủy')),
+                                              ElevatedButton(
+                                                  onPressed: () async {
+                                                    ct.loaderOverlay.show();
+                                                    await context
+                                                        .read<
+                                                            JoindStatusCubit>()
+                                                        .deleteGroup(
+                                                            group.groupId
+                                                                .toString(),
+                                                            group.groupName
+                                                                .toString());
+                                                    ct.loaderOverlay.hide();
+                                                    Navigator.pop(context);
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Đã rời xóa thành công",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.BOTTOM,
+                                                        timeInSecForIosWeb: 1,
+                                                        textColor: Colors.white,
+                                                        backgroundColor:
+                                                            Colors.pink,
+                                                        fontSize: 16.0);
+                                                  },
+                                                  child: Text('Xác nhận'))
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                   child: Text(

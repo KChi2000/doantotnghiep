@@ -58,15 +58,8 @@ class _CallAudioState extends State<CallAudio> {
     // setState(() {});
   }
 
-  setTime() {
-    Timer.periodic(Duration(seconds: 30), (timer) {
-      print(
-          'VS Local Render: ${_localRenderer}  Remote Render: ${_remoteRenderer}');
-    });
-  }
-
   createRoom() {
-    signaling.createRoom(_remoteRenderer, widget.groupid,'audio');
+    signaling.createRoom(_remoteRenderer, widget.groupid, 'audio');
     // setState(() {});
   }
 
@@ -78,7 +71,7 @@ class _CallAudioState extends State<CallAudio> {
     setState(() {});
     if (widget.answere! == true) {
       await context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
-      signaling.joinRoom(widget.groupid, _remoteRenderer,'audio');
+      signaling.joinRoom(widget.groupid, _remoteRenderer, 'audio');
       setState(() {});
     }
   }
@@ -193,7 +186,7 @@ class _CallAudioState extends State<CallAudio> {
                                   color: Colors.white,
                                 ), () async {
                               await signaling.hangUp(
-                                  _localRenderer, widget.groupid,'audio');
+                                  _localRenderer, widget.groupid, 'audio');
                               await FlutterCallkitIncoming.endCall(
                                   widget.groupid);
                               Navigator.pop(context);

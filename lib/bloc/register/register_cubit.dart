@@ -12,7 +12,7 @@ part 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit() : super(RegisterInitial());
-  void register(context, String name, String email, String pass) async {
+  register(context, String name, String email, String pass) async {
     AuthService authService = AuthService(context: context);
     emit(registerLoading());
     var result = await authService.registerWithEmail(name, email, pass);
@@ -23,8 +23,7 @@ class RegisterCubit extends Cubit<RegisterState> {
       emit(registerLoaded());
       Userinfo.userSingleton.name = name;
       navigateReplacement(context, MyApp());
-    } 
-    else {
+    } else {
       print('errorrrrrr');
       print(result);
       emit(registerError());

@@ -33,7 +33,8 @@ class DatabaseService {
       'email': email,
       'groups': [],
       'profilePic': '',
-      'uid': uid
+      'uid': uid,
+      'location': {'latitude': '21.5752668', 'longitude': '105.8281605'}
     });
     return result;
   }

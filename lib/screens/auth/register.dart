@@ -16,6 +16,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
+import '../../bloc/FetchLocation/fetch_location_cubit.dart';
 import '../../helper/helper_function.dart';
 
 class Register extends StatefulWidget {
@@ -146,11 +147,14 @@ class _RegisterState extends State<Register> {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (formKey.currentState!.validate()) {
-                                context.read<RegisterCubit>().register(
+                                await context.read<RegisterCubit>().register(
                                     context,
                                     fullnameCon.text,
                                     emailCon.text,
                                     passwordCon.text);
+                                await context
+                                    .read<FetchLocationCubit>()
+                                    .requestLocation();
                               }
                             },
                             child: BlocBuilder<RegisterCubit, RegisterState>(

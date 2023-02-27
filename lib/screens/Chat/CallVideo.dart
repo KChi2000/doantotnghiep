@@ -34,28 +34,24 @@ class _CallVideoState extends State<CallVideo> {
   Signaling signaling = Signaling();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  String? roomId;
+
   TextEditingController textEditingController = TextEditingController(text: '');
-  // bool isAudioOn = true, isVideoOn = true,
+
   bool isFrontCameraSelected = true;
   @override
   void initState() {
-    if (widget.answere! == true) {
-      context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
-    } else {
-      context.read<OnHaveRemoteRenderCubit>().haveRemote(false);
-    }
+    context.read<OnHaveRemoteRenderCubit>().haveRemote(widget.answere!);
+
     createRoom();
     initValue();
     signaling.onAddRemoteStream = ((stream) {
-      _remoteRenderer.srcObject = stream;
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
+      _remoteRenderer.srcObject = stream;
+
       setState(() {});
     });
 
     super.initState();
-
-    // setState(() {});
   }
 
   setTime() {
@@ -66,7 +62,7 @@ class _CallVideoState extends State<CallVideo> {
   }
 
   createRoom() {
-    signaling.createRoom(_remoteRenderer, widget.groupid,'video');
+    signaling.createRoom(_remoteRenderer, widget.groupid, 'video');
     // setState(() {});
   }
 
@@ -80,9 +76,10 @@ class _CallVideoState extends State<CallVideo> {
         context.read<ToggleCmCubit>().state.enableMic,
         isFrontCameraSelected);
     setState(() {});
-    if (widget.answere! == true) {
-      // await context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
-      signaling.joinRoom(widget.groupid, _remoteRenderer,'video');
+    if (widget.answere!) {
+      print(
+          'VS Local Render: ${_localRenderer}  Remote Render: ${_remoteRenderer}');
+      signaling.joinRoom(widget.groupid, _remoteRenderer, 'video');
       setState(() {});
     }
   }
@@ -141,18 +138,19 @@ class _CallVideoState extends State<CallVideo> {
                             } else {
                               context.loaderOverlay.hide();
                             }
+                            print('STATE IN ADDREMOTE ${state.addRemote}');
                             return state.addRemote
                                 ? Container(
-                                  // color: Colors.amber,
-                                  width: screenwidth,
-                                  height: screenheight / 2 - 10,
-                                  child: RTCVideoView(
-                                    _remoteRenderer,
-                                    mirror: true,
-                                    objectFit: RTCVideoViewObjectFit
-                                        .RTCVideoViewObjectFitCover,
-                                  ),
-                                )
+                                    // color: Colors.amber,
+                                    width: screenwidth,
+                                    height: screenheight / 2 - 10,
+                                    child: RTCVideoView(
+                                      _remoteRenderer,
+                                      mirror: true,
+                                      objectFit: RTCVideoViewObjectFit
+                                          .RTCVideoViewObjectFitCover,
+                                    ),
+                                  )
                                 : SizedBox();
                           },
                         ),
@@ -223,7 +221,7 @@ class _CallVideoState extends State<CallVideo> {
                                   color: Colors.white,
                                 ), () async {
                               await signaling.hangUp(
-                                  _localRenderer, widget.groupid,'video');
+                                  _localRenderer, widget.groupid, 'video');
                               await FlutterCallkitIncoming.endCall(
                                   widget.groupid);
                               Navigator.pop(context);
@@ -240,8 +238,7 @@ class _CallVideoState extends State<CallVideo> {
                     listener: (context, state) {
                       if (state is GroupInfoCubitLoaded) {
                         state.groupinfo!.forEach((element) async {
-                          if (element.groupId.toString() ==
-                              widget.groupid) {
+                          if (element.groupId.toString() == widget.groupid) {
                             if (element.callStatus == 'call end') {
                               Navigator.pop(ct);
                               // ct.read<ChangetabCubit>().change(1);
@@ -258,9 +255,8 @@ class _CallVideoState extends State<CallVideo> {
                           }
                         });
                       }
-                     
                     },
-                     child: SizedBox(),
+                    child: SizedBox(),
                   )
                 ],
               ))),

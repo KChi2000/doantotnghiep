@@ -159,6 +159,62 @@ class _ProfileState extends State<Profile> {
                         SizedBox(
                           height: 20,
                         ),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 15),
+                          padding: EdgeInsets.only(
+                              left: 20, right: 10, top: 10, bottom: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(bottom: 10),
+                                width: screenwidth,
+                                child: Text(
+                                  'Name       ${Userinfo.userSingleton.name}',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(bottom: 10),
+                                width: screenwidth,
+                                child: Text(
+                                  'Email       ${(context.read<FetchImageCubit>().state as FetchImageComplete).image.email}',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              // Container(
+                              //   padding: EdgeInsets.only(bottom: 10),
+                              //   width: screenwidth,
+                              //   child: Text(
+                              //     'Địa chỉ     Thanh Hóa',
+                              //     style: TextStyle(
+                              //         fontSize: 16,
+                              //         color: Colors.black,
+                              //         fontWeight: FontWeight.w600),
+                              //   ),
+                              // ),
+                              // Container(
+                              //   padding: EdgeInsets.only(bottom: 10),
+                              //   width: screenwidth,
+                              //   child: Text(
+                              //     'Sở thích   Đi phượt bằng xe máy',
+                              //     style: TextStyle(
+                              //         fontSize: 16,
+                              //         color: Colors.black,
+                              //         fontWeight: FontWeight.w600),
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ),
                         InkWell(
                           onTap: () async {
                             showDialog(
@@ -308,3 +364,5 @@ class _ProfileState extends State<Profile> {
     );
   }
 }
+
+List<String> info = ['Thanh Hóa', 'Thái Nguyên', 'Hà Nội'];

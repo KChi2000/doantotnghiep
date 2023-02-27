@@ -31,7 +31,7 @@ class Signaling {
   StreamStateCallback? onAddRemoteStream;
   FirebaseFirestore db = FirebaseFirestore.instance;
   Future<String> createRoom(
-      RTCVideoRenderer remoteRenderer, String grid,String typeOfcall) async {
+      RTCVideoRenderer remoteRenderer, String grid, String typeOfcall) async {
     DocumentReference roomRef = db.collection('groups').doc(grid);
     roomRef.get().then(
       (value) async {
@@ -67,17 +67,19 @@ class Signaling {
             'callStatus': 'calling',
             'recentMessageSender':
                 '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
-            'recentMessage':' đang thực hiện cuôc gọi $typeOfcall',
+            'recentMessage':
+                '${Userinfo.userSingleton.name} đang thực hiện cuôc gọi $typeOfcall',
             'time': '${DateTime.now().microsecondsSinceEpoch.toString()}',
-            'type':typeOfcall=='video'? 'callvideo':'callaudio'
+            'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           };
 
           await roomRef.update(roomWithOffer);
           await roomRef.collection('Messages').add({
-             'contentMessage':'${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-      'sender':'',
-      'time':'${DateTime.now().microsecondsSinceEpoch}',
-      'type': typeOfcall=='video'? 'callvideo':'callaudio'
+            'contentMessage':
+                '${Userinfo.userSingleton.name} đang thực hiện cuôc gọi $typeOfcall',
+            'sender': '',
+            'time': '${DateTime.now().microsecondsSinceEpoch}',
+            'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           });
           print('New room created with SDK offer. Room ID: $roomId');
 
@@ -135,7 +137,8 @@ class Signaling {
     return 'someone is calling';
   }
 
-  Future<void> joinRoom(String grid, RTCVideoRenderer remoteVideo, String typeOfcall) async {
+  Future<void> joinRoom(
+      String grid, RTCVideoRenderer remoteVideo, String typeOfcall) async {
     DocumentReference roomRef = db.collection('groups').doc('$grid');
     var roomSnapshot = await roomRef.get();
     print('Got room ${roomSnapshot.exists}');
@@ -149,17 +152,16 @@ class Signaling {
       localStream?.getTracks().forEach((track) {
         peerConnection?.addTrack(track, localStream!);
       });
-       await roomRef.collection('Messages').add({
-      'contentMessage':'${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-      'sender':'',
-      'time':'${DateTime.now().microsecondsSinceEpoch}',
-      'type': typeOfcall=='video'? 'callvideo':'callaudio'
-    });
-      await roomRef.update({
-      'recentMessage':'${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-      'recentMessageSender':'',
-       'type': 'announce'
-    });
+      await roomRef.collection('Messages').add({
+        'contentMessage':
+            '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
+        'sender': '',
+        'time': '${DateTime.now().microsecondsSinceEpoch}',
+        'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
+      });
+      // await roomRef.update({
+
+      // });
       // Code for collecting ICE candidates below
       var calleeCandidatesCollection = roomRef.collection('calleeCandidates');
       peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
@@ -195,7 +197,11 @@ class Signaling {
 
       Map<String, dynamic> roomWithAnswer = {
         'answer': {'type': answer.type, 'sdp': answer.sdp},
-        'callStatus': 'happening'
+        'callStatus': 'happening',
+        'recentMessage':
+            '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
+        'recentMessageSender': '',
+        'type': 'announce'
       };
 
       await roomRef.update(roomWithAnswer);
@@ -268,7 +274,8 @@ class Signaling {
     });
   }
 
-  Future<void> hangUp(RTCVideoRenderer localVideo, String grid,String typeOfcall) async {
+  Future<void> hangUp(
+      RTCVideoRenderer localVideo, String grid, String typeOfcall) async {
     final batch = db.batch();
     List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
     tracks.forEach((track) {
@@ -283,10 +290,10 @@ class Signaling {
     // var db = FirebaseFirestore.instance;
     var roomRef = db.collection('groups').doc(grid);
     await roomRef.collection('Messages').add({
-      'contentMessage':'Cuộc gọi $typeOfcall đã kết thúc',
-      'sender':'',
-      'time':'${DateTime.now().microsecondsSinceEpoch}',
-      'type': typeOfcall=='video'?'callvideo':'callaudio'
+      'contentMessage': 'Cuộc gọi $typeOfcall đã kết thúc',
+      'sender': '',
+      'time': '${DateTime.now().microsecondsSinceEpoch}',
+      'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
     });
     await roomRef.collection('calleeCandidates');
     var calleeCandidates = await roomRef.collection('calleeCandidates').get();
@@ -301,7 +308,7 @@ class Signaling {
       'answer': FieldValue.delete(),
       'offer': FieldValue.delete(),
       'callStatus': 'call end',
-      'recentMessage':'Kết thúc cuộc gọi video'
+      'recentMessage': 'Kết thúc cuộc gọi video'
     });
     // await roomRef.delete();
 

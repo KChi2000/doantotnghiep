@@ -29,7 +29,7 @@ class _TrackingState extends State<Tracking> {
   final GlobalKey globalKey = GlobalKey();
   @override
   void initState() {
-    // context.read<FetchLocationCubit>().requestLocation();
+    context.read<FetchLocationCubit>().requestLocation();
     context.read<GetProfileCubit>().getStreamProfile();
     context.read<GetUserGroupCubit>().getUerGroup();
     // context.read<FetchLocationCubit>().UpdateLocation();
@@ -130,6 +130,7 @@ class _TrackingState extends State<Tracking> {
                                                     borderSide:
                                                         BorderSide.none)),
                                             onChanged: (value) {
+                                              print('MAP GROUP CHANGE');
                                               if (value!.groupId.toString() !=
                                                   (context
                                                               .read<
@@ -137,7 +138,12 @@ class _TrackingState extends State<Tracking> {
                                                               .state
                                                           as FetchLocationToShowLoaded)
                                                       .selectedGroup
-                                                      .groupId) {}
+                                                      .groupId) {
+                                                context
+                                                    .read<
+                                                        FetchLocationToShowCubit>()
+                                                    .fetchFromDb(value!);
+                                              }
                                             }),
                                       );
                                     }
@@ -221,13 +227,35 @@ class _TrackingState extends State<Tracking> {
                                 context
                                     .read<FetchImageCubit>()
                                     .getFromStream(snapshot.data.data());
-                              }
-                              return BlocBuilder<FetchImageCubit,
-                                  FetchImageState>(
-                                builder: (context, state) {
-                                  context.loaderOverlay.show();
-                                  if (state is FetchImageComplete) {
-                                    context.loaderOverlay.hide();
+                                return BlocBuilder<FetchImageCubit,
+                                    FetchImageState>(
+                                  builder: (context, state) {
+                                    context.loaderOverlay.show();
+                                    if (state is FetchImageComplete) {
+                                      context.loaderOverlay.hide();
+                                      return GoogleMap(
+                                        mapType: MapType.normal,
+                                        initialCameraPosition: CameraPosition(
+                                            target:
+                                                LatLng(21.5752612, 105.8281156),
+                                            zoom: 5),
+                                        markers: {
+                                          Marker(
+                                              infoWindow:
+                                                  InfoWindow(title: 'bạn'),
+                                              markerId: MarkerId('you'),
+                                              position: LatLng(
+                                                  state.image.location!
+                                                      .latitude!,
+                                                  state.image.location!
+                                                      .longitude!),
+                                              icon: BitmapDescriptor
+                                                  .defaultMarkerWithHue(
+                                                      BitmapDescriptor
+                                                          .hueRose)),
+                                        },
+                                      );
+                                    }
                                     return GoogleMap(
                                       mapType: MapType.normal,
                                       initialCameraPosition: CameraPosition(
@@ -235,37 +263,25 @@ class _TrackingState extends State<Tracking> {
                                               LatLng(21.5752612, 105.8281156),
                                           zoom: 5),
                                       markers: {
-                                        Marker(
-                                            infoWindow:
-                                                InfoWindow(title: 'bạn'),
-                                            markerId: MarkerId('you'),
-                                            position: LatLng(
-                                                state.image.location!.latitude!,
-                                                state.image.location!
-                                                    .longitude!),
-                                            icon: BitmapDescriptor
-                                                .defaultMarkerWithHue(
-                                                    BitmapDescriptor.hueRose)),
+                                        // Marker(
+                                        //     infoWindow: InfoWindow(title: 'bạn'),
+                                        //     markerId: MarkerId('you'),
+                                        //     position:
+                                        //         LatLng(21.5752612, 105.8281156),
+                                        //     icon: BitmapDescriptor
+                                        //         .defaultMarkerWithHue(
+                                        //             BitmapDescriptor.hueRose)),
                                       },
                                     );
-                                  }
-                                  return GoogleMap(
-                                    mapType: MapType.normal,
-                                    initialCameraPosition: CameraPosition(
-                                        target: LatLng(21.5752612, 105.8281156),
-                                        zoom: 5),
-                                    markers: {
-                                      // Marker(
-                                      //     infoWindow: InfoWindow(title: 'bạn'),
-                                      //     markerId: MarkerId('you'),
-                                      //     position:
-                                      //         LatLng(21.5752612, 105.8281156),
-                                      //     icon: BitmapDescriptor
-                                      //         .defaultMarkerWithHue(
-                                      //             BitmapDescriptor.hueRose)),
-                                    },
-                                  );
-                                },
+                                  },
+                                );
+                              }
+                              return GoogleMap(
+                                mapType: MapType.normal,
+                                initialCameraPosition: CameraPosition(
+                                    target: LatLng(21.5752612, 105.8281156),
+                                    zoom: 5),
+                                markers: {},
                               );
                             });
                       },

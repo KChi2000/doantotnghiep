@@ -87,8 +87,9 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(onPressed: () async {
-                 Future.delayed(Duration.zero, () {
+              child: IconButton(
+                  onPressed: () async {
+                    Future.delayed(Duration.zero, () {
                       navigatePush(
                           context,
                           CallAudio(
@@ -97,7 +98,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                             answere: false,
                           ));
                     });
-              }, icon: Icon(Icons.call)),
+                  },
+                  icon: Icon(Icons.call)),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -285,7 +287,11 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                 '${e.Name.toString()}',
                 style: TextStyle(fontSize: 18),
               ),
-        index != widget.members.length - 1 ? Divider() : SizedBox(),
+        index != widget.members.length - 1
+            ? Divider(
+                color: Colors.grey.withOpacity(0.5),
+              )
+            : SizedBox(),
       ],
     );
   }
@@ -466,9 +472,12 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
         : Center(
             child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(list[index].sender == Userinfo.userSingleton.name
-                ? 'bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
-                : '${list[index].sender} ${list[index].contentMessage} lúc ${list[index].displaytime}'),
+            child: Text(
+              list[index].sender == Userinfo.userSingleton.name
+                  ? 'bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
+                  : '${list[index].sender} ${list[index].contentMessage} lúc ${list[index].displaytime}',
+              textAlign: TextAlign.center,
+            ),
           ));
   }
 

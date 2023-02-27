@@ -41,6 +41,7 @@ import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import '../../bloc/JoinStatus/join_status_cubit.dart';
 import '../../bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
 import '../../bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
+import '../../bloc/getProfile/get_profile_cubit.dart';
 import '../../model/User.dart';
 
 class ConnectToFriend extends StatefulWidget {
@@ -59,6 +60,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
   @override
   void initState() {
     context.read<GetUserGroupCubit>().getUerGroup();
+    
     super.initState();
   }
 
@@ -482,35 +484,35 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
             break;
           case Event.ACTION_CALL_ACCEPT:
             print(
-                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id'].toString().substring(0, 5)}');
-            (event.body as Map<String, dynamic>)['id']
-                        .toString()
-                        .substring(0, 5) ==
-                    'video'
-                ? Future.delayed(Duration.zero, () {
+                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id'].toString().substring(5)}');
+            // (event.body as Map<String, dynamic>)['id']
+            //             .toString()
+            //             .substring(0, 5) ==
+            //         'video'
+            //     ? 
+            Future.delayed(Duration.zero, () {
                     navigatePush(
                         context,
                         CallVideo(
-                          groupid: (event.body as Map<String, dynamic>)['id']
-                              .toString()
-                              .substring(5),
-                          grname: (event.body
-                              as Map<String, dynamic>)['nameCaller'],
-                          answere: true,
-                        ));
-                  })
-                : Future.delayed(Duration.zero, () {
-                    navigatePush(
-                        context,
-                        CallAudio(
-                          groupid: (event.body as Map<String, dynamic>)['id']
-                              .toString()
-                              .substring(5),
+                          groupid: (event.body as Map<String, dynamic>)['id'].toString().substring(5)
+                             ,
                           grname: (event.body
                               as Map<String, dynamic>)['nameCaller'],
                           answere: true,
                         ));
                   });
+            //     : Future.delayed(Duration.zero, () {
+            //         navigatePush(
+            //             context,
+            //             CallAudio(
+            //               groupid: (event.body as Map<String, dynamic>)['id']
+            //                   .toString()
+            //                   .substring(5),
+            //               grname: (event.body
+            //                   as Map<String, dynamic>)['nameCaller'],
+            //               answere: true,
+            //             ));
+            //       });
 
             break;
           case Event.ACTION_CALL_DECLINE:
@@ -547,7 +549,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
 
   Callparam(String grid, String grname, String typeOfcall) {
     return CallKitParams(
-      id: '$typeOfcall $grid',
+      id: '$typeOfcall$grid',
       nameCaller: 'Nhóm $grname',
       appName: 'Cùng Phượt',
       avatar: 'assets/images/Cùng Phượt.png',

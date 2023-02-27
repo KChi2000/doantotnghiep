@@ -62,7 +62,9 @@ class _CallVideoState extends State<CallVideo> {
   }
 
   createRoom() {
-    signaling.createRoom(_remoteRenderer, widget.groupid, 'video');
+   if(widget.answere == false){
+     signaling.createRoom(_remoteRenderer, widget.groupid, 'video');
+   }
     // setState(() {});
   }
 

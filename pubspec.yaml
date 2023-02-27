@@ -105,9 +105,15 @@ flutter:
     - assets/animations/
     - assets/icons/
   fonts:
-    - family: beautiFont
+    - family: roboto
       fonts:
-        - asset: assets/fonts/DancingScript-VariableFont_wght.ttf
+        - asset: assets/fonts/Roboto/Roboto-Regular.ttf
+    - family: robotoitalic
+      fonts:
+        - asset: assets/fonts/Roboto/Roboto-Italic.ttf
+    - family: robotobold
+      fonts:
+        - asset: assets/fonts/Roboto/Roboto-Bold.ttf
   
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

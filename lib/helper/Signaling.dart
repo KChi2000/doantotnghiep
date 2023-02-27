@@ -35,6 +35,7 @@ class Signaling {
     DocumentReference roomRef = db.collection('groups').doc(grid);
     roomRef.get().then(
       (value) async {
+         print('TRY CALLING create ${value.exists} ${grid} ${value.data()}');
         var rs = value.data() as Map<String, dynamic>;
         print(
             ' Create PeerConnection with configuration: $configuration :${rs['offer']}');
@@ -67,8 +68,7 @@ class Signaling {
             'callStatus': 'calling',
             'recentMessageSender':
                 '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
-            'recentMessage':
-                '${Userinfo.userSingleton.name} đang thực hiện cuôc gọi $typeOfcall',
+            'recentMessage': ' đã bắt đầu cuôc gọi $typeOfcall',
             'time': '${DateTime.now().microsecondsSinceEpoch.toString()}',
             'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           };
@@ -76,8 +76,8 @@ class Signaling {
           await roomRef.update(roomWithOffer);
           await roomRef.collection('Messages').add({
             'contentMessage':
-                '${Userinfo.userSingleton.name} đang thực hiện cuôc gọi $typeOfcall',
-            'sender': '',
+                ' đã bắt đầu cuộc gọi $typeOfcall',
+            'sender': '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
             'time': '${DateTime.now().microsecondsSinceEpoch}',
             'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           });
@@ -139,9 +139,9 @@ class Signaling {
 
   Future<void> joinRoom(
       String grid, RTCVideoRenderer remoteVideo, String typeOfcall) async {
-    DocumentReference roomRef = db.collection('groups').doc('$grid');
-    var roomSnapshot = await roomRef.get();
-    print('Got room ${roomSnapshot.exists}');
+     DocumentReference roomRef = db.collection('groups').doc(grid);
+   roomRef.get().then((roomSnapshot) async {
+        print('TRY CALLING join ${roomSnapshot.exists} ${grid} ${roomSnapshot.data()}');
 
     if (roomSnapshot.exists) {
       print('Create PeerConnection with configuration: $configuration');
@@ -155,13 +155,16 @@ class Signaling {
       await roomRef.collection('Messages').add({
         'contentMessage':
             '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-        'sender': '',
+        'sender': '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
         'time': '${DateTime.now().microsecondsSinceEpoch}',
-        'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
+        'type': 'announce'
       });
-      // await roomRef.update({
-
-      // });
+      await roomRef.update({
+        'recentMessage':
+            '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
+        'recentMessageSender': '',
+        'type': 'announce'
+      });
       // Code for collecting ICE candidates below
       var calleeCandidatesCollection = roomRef.collection('calleeCandidates');
       peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
@@ -197,11 +200,7 @@ class Signaling {
 
       Map<String, dynamic> roomWithAnswer = {
         'answer': {'type': answer.type, 'sdp': answer.sdp},
-        'callStatus': 'happening',
-        'recentMessage':
-            '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-        'recentMessageSender': '',
-        'type': 'announce'
+        'callStatus': 'happening'
       };
 
       await roomRef.update(roomWithAnswer);
@@ -211,7 +210,7 @@ class Signaling {
       roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
         snapshot.docChanges.forEach((document) {
           var data = document.doc.data() as Map<String, dynamic>;
-          print(data);
+
           print('Got new remote ICE candidate: $data');
           peerConnection!.addCandidate(
             RTCIceCandidate(
@@ -223,6 +222,8 @@ class Signaling {
         });
       });
     }
+    });
+  
   }
 
   Future<void> openUserMedia(
@@ -291,7 +292,7 @@ class Signaling {
     var roomRef = db.collection('groups').doc(grid);
     await roomRef.collection('Messages').add({
       'contentMessage': 'Cuộc gọi $typeOfcall đã kết thúc',
-      'sender': '',
+      'sender': '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
       'time': '${DateTime.now().microsecondsSinceEpoch}',
       'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
     });

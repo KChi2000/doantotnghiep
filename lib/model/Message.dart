@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-enum Type { text, announce,  callvideo,callaudio}
+enum Type { text, announce,  callvideo,callaudio,callend}
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class Message {

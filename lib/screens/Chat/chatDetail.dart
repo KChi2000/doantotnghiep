@@ -27,6 +27,9 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import '../../bloc/getUserGroup/get_user_group_cubit.dart';
+import '../../components/ItemMessage.dart';
+import '../../components/ItemThanhVien.dart';
+import '../../components/callItem.dart';
 import '../../model/Group.dart';
 import '../../model/User.dart';
 
@@ -138,7 +141,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                   itemCount: widget.members.length,
                                   itemBuilder: (context, index) {
                                     return ItemThanhVien(
-                                        widget.members[index], index);
+                                        widget.members[index], index,widget.admininfo.adminId!,widget.members.length);
                                   },
                                 ),
                               ),
@@ -269,217 +272,10 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
         ));
   }
 
-  Widget ItemThanhVien(Members e, int index) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        widget.admininfo.adminId == e.Id
-            ? Userinfo.userSingleton.uid == e.Id
-                ? Text(
-                    '${e.Name.toString()}(Bạn-Admin)',
-                    style: TextStyle(fontSize: 18),
-                  )
-                : Text(
-                    '${e.Name.toString()}(Admin)',
-                    style: TextStyle(fontSize: 18),
-                  )
-            : Text(
-                '${e.Name.toString()}',
-                style: TextStyle(fontSize: 18),
-              ),
-        index != widget.members.length - 1
-            ? Divider(
-                color: Colors.grey.withOpacity(0.5),
-              )
-            : SizedBox(),
-      ],
-    );
-  }
 
-  Widget ItemMessage(List<Message> list, int index, int length) {
-    return list[index].type == Type.text
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: Userinfo.userSingleton.uid ==
-                    list[index].sender.substring(list[index].sender.length - 28)
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: [
-              list[index].ontap
-                  ? SizedBox(
-                      height: 5,
-                    )
-                  : SizedBox(),
-              list[index].ontap
-                  ? Center(
-                      child: Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 7),
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Text(
-                            'Lúc ${list[index].displaytime}',
-                            style: TextStyle(fontSize: 12, color: Colors.white),
-                          )))
-                  : Userinfo.userSingleton.uid ==
-                              list[index]
-                                  .sender
-                                  .substring(list[index].sender.length - 28) &&
-                          index > 0 &&
-                          index <= length - 1 &&
-                          list[index].timesent - list[index - 1].timesent >= 3
-                      ? Center(
-                          child: Text(
-                          '${list[index].timelocal}',
-                          style: TextStyle(fontSize: 12, color: Colors.black45),
-                        ))
-                      : SizedBox(),
 
-              list[index].ontap
-                  ? SizedBox(
-                      height: 5,
-                    )
-                  : SizedBox(),
-              index >= length - 1 && index != 0
-                  ? index == length - 1 &&
-                          Userinfo.userSingleton.uid !=
-                              list[index]
-                                  .sender
-                                  .substring(list[index].sender.length - 28) &&
-                          list[index].sender != list[index - 1].sender
-                      ? messageText(list[index].sender, list[index].sender)
-                      : list[index].timesent - list[index - 1].timesent >= 4 &&
-                              Userinfo.userSingleton.uid !=
-                                  list[index]
-                                      .sender
-                                      .substring(list[index].sender.length - 28)
-                          ? messageText(list[index].sender, list[index].sender)
-                          : SizedBox()
-                  : Userinfo.userSingleton.uid !=
-                          list[index]
-                              .sender
-                              .substring(list[index].sender.length - 28)
-                      ? index == 0
-                          ? messageText(list[index].sender, list[index].sender)
-                          : list[index].sender != list[index - 1].sender
-                              ? messageText(
-                                  list[index].sender, list[index].sender)
-                              : list[index].timesent -
-                                          list[index - 1].timesent >=
-                                      4
-                                  ? messageText(
-                                      list[index].sender, list[index].sender)
-                                  : SizedBox()
-                      : SizedBox(),
-              GestureDetector(
-                onTap: () {
-                  context.read<MessageCubitCubit>().onTapMsg(index);
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 5,
-                    ),
-                    index < length - 1 &&
-                            Userinfo.userSingleton.uid !=
-                                list[index]
-                                    .sender
-                                    .substring(list[index].sender.length - 28)
-                        ? list[index].sender != list[index + 1].sender
-                            ? itemImage(list[index].sender)
-                            : list[index + 1].timesent - list[index].timesent >=
-                                    4
-                                ? itemImage(list[index].sender)
-                                : SizedBox(
-                                    width: 30,
-                                  )
-                        : index == length - 1 &&
-                                Userinfo.userSingleton.uid !=
-                                    list[index].sender.substring(
-                                        list[index].sender.length - 28)
-                            ? itemImage(list[index].sender)
-                            : SizedBox(
-                                width: 30,
-                              ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth: screenwidth - 150,
-                        // minWidth: 50
-                      ),
-                      // width: screenwidth - 150,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Userinfo.userSingleton.uid ==
-                                list[index]
-                                    .sender
-                                    .substring(list[index].sender.length - 28)
-                            ? Colors.pink
-                            : Colors.grey,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      margin: EdgeInsets.only(bottom: 3),
-                      child: Text(
-                        list[index].contentMessage,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                    Userinfo.userSingleton.uid ==
-                            list[index]
-                                .sender
-                                .substring(list[index].sender.length - 28)
-                        ? SizedBox(
-                            width: 10,
-                          )
-                        : SizedBox()
-                  ],
-                ),
-              ),
-              // BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-              //   builder: (context, state) {
-              //     return StreamBuilder(
-              //         stream: state.stream,
-              //         builder: (context, snapshot) {
-              //           state.stream!.listen((event) {
-              //             if (snapshot.hasData) {
-              //               context
-              //                   .read<ChangeMessageStatusCubit>()
-              //                   .update(snapshot.data, widget.groupId);
-              //             }
-              //           });
-
-              //           return BlocBuilder<ChangeMessageStatusCubit,
-              //               ChangeMessageStatusState>(
-              //             builder: (context, state) {
-              //               print('list of string ${state.viewer.length}');
-              //               if (state.viewer.length == 0) {
-              //                 return messagestatus('đã gửi', index, length);
-              //               }
-              //               return messagestatus('đã xem', index, length);
-              //             },
-              //           );
-              //         });
-              //   },
-              // )
-            ],
-          )
-        : Center(
-            child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              list[index].sender == Userinfo.userSingleton.name
-                  ? 'bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
-                  : '${list[index].sender} ${list[index].contentMessage} lúc ${list[index].displaytime}',
-              textAlign: TextAlign.center,
-            ),
-          ));
-  }
+ 
+  
 
   Widget messagestatus(String status, int index, int length) {
     if (index == length - 1) {
@@ -489,42 +285,6 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     return SizedBox();
   }
 
-  Widget itemImage(String name) {
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Theme.of(context).primaryColor),
-      child: Center(
-          child: Text(
-        '${name.substring(0, 1)}',
-        style: TextStyle(color: Colors.white),
-      )),
-    );
-  }
+  
 
-  Widget messageText(String message, String sender) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        sender.substring(sender.length - 28) != Userinfo.userSingleton.uid
-            ? SizedBox(
-                width: 45,
-              )
-            : SizedBox(
-                width: 10,
-              ),
-        Text(
-          message.substring(0, message.length - 29),
-          style: TextStyle(fontSize: 13, color: Colors.black54),
-        ),
-        sender.substring(sender.length - 28) == Userinfo.userSingleton.uid
-            ? SizedBox(
-                width: 10,
-              )
-            : SizedBox(),
-      ],
-    );
-  }
 }

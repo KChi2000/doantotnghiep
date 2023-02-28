@@ -35,7 +35,7 @@ class Signaling {
     DocumentReference roomRef = db.collection('groups').doc(grid);
     roomRef.get().then(
       (value) async {
-         print('TRY CALLING create ${value.exists} ${grid} ${value.data()}');
+        print('TRY CALLING create ${value.exists} ${grid} ${value.data()}');
         var rs = value.data() as Map<String, dynamic>;
         print(
             ' Create PeerConnection with configuration: $configuration :${rs['offer']}');
@@ -75,9 +75,9 @@ class Signaling {
 
           await roomRef.update(roomWithOffer);
           await roomRef.collection('Messages').add({
-            'contentMessage':
-                ' đã bắt đầu cuộc gọi $typeOfcall',
-            'sender': '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
+            'contentMessage': ' đã bắt đầu cuộc gọi $typeOfcall',
+            'sender':
+                '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
             'time': '${DateTime.now().microsecondsSinceEpoch}',
             'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           });
@@ -139,91 +139,91 @@ class Signaling {
 
   Future<void> joinRoom(
       String grid, RTCVideoRenderer remoteVideo, String typeOfcall) async {
-     DocumentReference roomRef = db.collection('groups').doc(grid);
-   roomRef.get().then((roomSnapshot) async {
-        print('TRY CALLING join ${roomSnapshot.exists} ${grid} ${roomSnapshot.data()}');
+    DocumentReference roomRef = db.collection('groups').doc(grid);
+    roomRef.get().then((roomSnapshot) async {
+      print(
+          'TRY CALLING join ${roomSnapshot.exists} ${grid} ${roomSnapshot.data()}');
 
-    if (roomSnapshot.exists) {
-      print('Create PeerConnection with configuration: $configuration');
-      peerConnection = await createPeerConnection(configuration);
+      if (roomSnapshot.exists) {
+        print('Create PeerConnection with configuration: $configuration');
+        peerConnection = await createPeerConnection(configuration);
 
-      registerPeerConnectionListeners();
+        registerPeerConnectionListeners();
 
-      localStream?.getTracks().forEach((track) {
-        peerConnection?.addTrack(track, localStream!);
-      });
-      await roomRef.collection('Messages').add({
-        'contentMessage':
-            '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-        'sender': '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
-        'time': '${DateTime.now().microsecondsSinceEpoch}',
-        'type': 'announce'
-      });
-      await roomRef.update({
-        'recentMessage':
-            '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
-        'recentMessageSender': '',
-        'type': 'announce'
-      });
-      // Code for collecting ICE candidates below
-      var calleeCandidatesCollection = roomRef.collection('calleeCandidates');
-      peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
-        if (candidate == null) {
-          print('onIceCandidate: complete!');
-          return;
-        }
-        print('onIceCandidate: ${candidate.toMap()}');
-        calleeCandidatesCollection.add(candidate.toMap());
-      };
-      // Code for collecting ICE candidate above
-
-      peerConnection?.onTrack = (RTCTrackEvent event) {
-        print('[MyRTC] Got remote track: ${event.streams[0]}');
-        event.streams[0].getTracks().forEach((track) {
-          print(
-              '[MyRTC] Add a track to the remoteStream: $track $remoteStream ${remoteStream.hashCode}');
-          remoteStream?.addTrack(track);
+        localStream?.getTracks().forEach((track) {
+          peerConnection?.addTrack(track, localStream!);
         });
-      };
-
-      // Code for creating SDP answer below
-      var data = roomSnapshot.data() as Map<String, dynamic>;
-      print('Got offer $data');
-      var offer = data['offer'];
-      await peerConnection?.setRemoteDescription(
-        RTCSessionDescription(offer['sdp'], offer['type']),
-      );
-      var answer = await peerConnection!.createAnswer();
-      print('Created Answer $answer');
-
-      await peerConnection!.setLocalDescription(answer);
-
-      Map<String, dynamic> roomWithAnswer = {
-        'answer': {'type': answer.type, 'sdp': answer.sdp},
-        'callStatus': 'happening'
-      };
-
-      await roomRef.update(roomWithAnswer);
-      // Finished creating SDP answer
-
-      // Listening for remote ICE candidates below
-      roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
-        snapshot.docChanges.forEach((document) {
-          var data = document.doc.data() as Map<String, dynamic>;
-
-          print('Got new remote ICE candidate: $data');
-          peerConnection!.addCandidate(
-            RTCIceCandidate(
-              data['candidate'],
-              data['sdpMid'],
-              data['sdpMLineIndex'],
-            ),
-          );
+        await roomRef.collection('Messages').add({
+          'contentMessage': 'đã tham gia cuộc gọi $typeOfcall',
+          'sender':
+              '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
+          'time': '${DateTime.now().microsecondsSinceEpoch}',
+          'type': 'announce'
         });
-      });
-    }
+        await roomRef.update({
+          'recentMessage':
+              '${Userinfo.userSingleton.name} đã tham gia cuộc gọi $typeOfcall',
+          'recentMessageSender': '',
+          'type': 'announce'
+        });
+        // Code for collecting ICE candidates below
+        var calleeCandidatesCollection = roomRef.collection('calleeCandidates');
+        peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
+          if (candidate == null) {
+            print('onIceCandidate: complete!');
+            return;
+          }
+          print('onIceCandidate: ${candidate.toMap()}');
+          calleeCandidatesCollection.add(candidate.toMap());
+        };
+        // Code for collecting ICE candidate above
+
+        peerConnection?.onTrack = (RTCTrackEvent event) {
+          print('[MyRTC] Got remote track: ${event.streams[0]}');
+          event.streams[0].getTracks().forEach((track) {
+            print(
+                '[MyRTC] Add a track to the remoteStream: $track $remoteStream ${remoteStream.hashCode}');
+            remoteStream?.addTrack(track);
+          });
+        };
+
+        // Code for creating SDP answer below
+        var data = roomSnapshot.data() as Map<String, dynamic>;
+        print('Got offer $data');
+        var offer = data['offer'];
+        await peerConnection?.setRemoteDescription(
+          RTCSessionDescription(offer['sdp'], offer['type']),
+        );
+        var answer = await peerConnection!.createAnswer();
+        print('Created Answer $answer');
+
+        await peerConnection!.setLocalDescription(answer);
+
+        Map<String, dynamic> roomWithAnswer = {
+          'answer': {'type': answer.type, 'sdp': answer.sdp},
+          'callStatus': 'happening'
+        };
+
+        await roomRef.update(roomWithAnswer);
+        // Finished creating SDP answer
+
+        // Listening for remote ICE candidates below
+        roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
+          snapshot.docChanges.forEach((document) {
+            var data = document.doc.data() as Map<String, dynamic>;
+
+            print('Got new remote ICE candidate: $data');
+            peerConnection!.addCandidate(
+              RTCIceCandidate(
+                data['candidate'],
+                data['sdpMid'],
+                data['sdpMLineIndex'],
+              ),
+            );
+          });
+        });
+      }
     });
-  
   }
 
   Future<void> openUserMedia(
@@ -336,6 +336,11 @@ class Signaling {
 
     peerConnection?.onAddStream = (MediaStream stream) {
       print("[MyRTC] Add remote stream");
+      onAddRemoteStream?.call(stream);
+      remoteStream = stream;
+    };
+    peerConnection?.onRemoveStream=(stream) {
+      print('[MyRTC] SOMEONE HAVE LEFT OUT');
       onAddRemoteStream?.call(stream);
       remoteStream = stream;
     };

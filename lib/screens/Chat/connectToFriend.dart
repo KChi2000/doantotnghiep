@@ -633,10 +633,7 @@ class groupitem extends StatelessWidget {
                 navigateReplacement(
                     context,
                     chatDetail(
-                      groupId: group.groupId.toString(),
-                      groupName: group.groupName.toString(),
-                      members: group.members!,
-                      admininfo: group.admin!,
+                      group: group,
                     ));
               });
             },

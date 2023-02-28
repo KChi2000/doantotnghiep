@@ -62,9 +62,9 @@ class _CallVideoState extends State<CallVideo> {
   }
 
   createRoom() {
-   if(widget.answere == false){
-     signaling.createRoom(_remoteRenderer, widget.groupid, 'video');
-   }
+    if (widget.answere == false) {
+      signaling.createRoom(_remoteRenderer, widget.groupid, 'video');
+    }
     // setState(() {});
   }
 
@@ -87,7 +87,7 @@ class _CallVideoState extends State<CallVideo> {
   }
 
   @override
-  Widget build(BuildContext ct) {
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
           body: Container(
@@ -173,7 +173,7 @@ class _CallVideoState extends State<CallVideo> {
                     right: 0,
                     child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
                       listener: (context, state) {
-                        print('CAMERA TOGGLE: ${state.openCamera}');
+                      
                       },
                       builder: (context, state) {
                         return Row(
@@ -242,9 +242,7 @@ class _CallVideoState extends State<CallVideo> {
                         state.groupinfo!.forEach((element) async {
                           if (element.groupId.toString() == widget.groupid) {
                             if (element.callStatus == 'call end') {
-                              Navigator.pop(ct);
-                              // ct.read<ChangetabCubit>().change(1);
-                              // navigateReplacement(ct, DisplayPage());
+                              Navigator.pop(context);
                               Fluttertoast.showToast(
                                   msg: "Kết thúc cuộc gọi",
                                   toastLength: Toast.LENGTH_SHORT,

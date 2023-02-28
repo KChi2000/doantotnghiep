@@ -26,6 +26,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 
 import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
+import '../../bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import '../../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../../components/ItemMessage.dart';
 import '../../components/ItemThanhVien.dart';
@@ -34,16 +35,13 @@ import '../../model/Group.dart';
 import '../../model/User.dart';
 
 class chatDetail extends StatefulWidget {
-  chatDetail(
-      {super.key,
-      required this.groupId,
-      required this.groupName,
-      required this.members,
-      required this.admininfo});
-  String groupName;
-  List<Members> members;
-  Admin admininfo;
-  String groupId;
+  chatDetail({
+    super.key,
+    required this.group,
+  });
+
+  //List<Members> members;
+  GroupInfo group;
 
   @override
   State<chatDetail> createState() => _chatDetailState();
@@ -57,7 +55,10 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    context.read<GetChatMessageCubit>().fetchData(widget.groupId);
+    context
+        .read<GetChatMessageCubit>()
+        .fetchData(widget.group.groupId.toString());
+    context.read<FetchLocationToShowCubit>().fetchFromDb(widget.group);
     context.read<SendMessageCubit>().initialStatusSendMessage();
   }
 
@@ -77,7 +78,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           title: Text(
-            widget.groupName,
+            widget.group.groupName.toString(),
           ),
           centerTitle: false,
           leading: IconButton(
@@ -96,8 +97,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                       navigatePush(
                           context,
                           CallAudio(
-                            groupid: widget.groupId,
-                            grname: widget.groupName,
+                            groupid: widget.group.groupId.toString(),
+                            grname: widget.group.groupName.toString(),
                             answere: false,
                           ));
                     });
@@ -112,8 +113,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                       navigatePush(
                           context,
                           CallVideo(
-                            groupid: widget.groupId,
-                            grname: widget.groupName,
+                            groupid: widget.group.groupId.toString(),
+                            grname: widget.group.groupName.toString(),
                             answere: false,
                           ));
                     });
@@ -129,8 +130,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                         builder: (context) => AlertDialog(
                               backgroundColor: Colors.white,
                               surfaceTintColor: Colors.white,
-                              title:
-                                  Text('Thành viên(${widget.members.length})'),
+                              title: Text(
+                                  'Thành viên(${widget.group.members!.length})'),
                               content: Container(
                                 constraints: BoxConstraints(
                                     minHeight: 80, maxHeight: 200),
@@ -138,10 +139,13 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                 color: Colors.white,
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: widget.members.length,
+                                  itemCount: widget.group.members!.length,
                                   itemBuilder: (context, index) {
                                     return ItemThanhVien(
-                                        widget.members[index], index,widget.admininfo.adminId!,widget.members.length);
+                                        widget.group.members![index],
+                                        index,
+                                        widget.group.admin!.adminId.toString(),
+                                        widget.group.members!.length);
                                   },
                                 ),
                               ),
@@ -188,8 +192,8 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                         'Hãy nhắn gì đó cho các bạn của bạn nào ((:')));
                           }
                           if (snapshot.data!.docChanges.length != 0) {
-                            DatabaseService()
-                                .updateisReadMessage(widget.groupId);
+                            DatabaseService().updateisReadMessage(
+                                widget.group.groupId!.toString());
                           }
                           context
                               .read<MessageCubitCubit>()
@@ -204,8 +208,26 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                   shrinkWrap: true,
                                   itemCount: state.list!.length,
                                   itemBuilder: (context, index) {
-                                    return ItemMessage(
-                                        state.list!, index, state.list!.length);
+                                    return BlocBuilder<FetchLocationToShowCubit,
+                                        FetchLocationToShowState>(
+                                      builder: (context, stateUser) {
+                                        if (stateUser
+                                            is FetchLocationToShowLoaded) {
+                                          print(
+                                              'LIST OF USER LENHTH : ${stateUser.list.length} ');
+                                          return ItemMessage(
+                                              list: state.list!,
+                                              listUser: stateUser.list,
+                                              index: index,
+                                              length: state.list!.length);
+                                        }
+                                        return ItemMessage(
+                                            list: state.list!,
+                                            listUser: [],
+                                            index: index,
+                                            length: state.list!.length);
+                                      },
+                                    );
                                   },
                                 ),
                               );
@@ -231,7 +253,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                             hintStyle: TextStyle(color: Colors.grey)),
                         onFieldSubmitted: (value) async {
                           await context.read<SendMessageCubit>().sendmessage(
-                              widget.groupId,
+                              widget.group.groupId!.toString(),
                               Message(
                                   sender:
                                       '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
@@ -247,7 +269,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                       IconButton(
                           onPressed: () async {
                             await context.read<SendMessageCubit>().sendmessage(
-                                widget.groupId,
+                                widget.group.groupId!.toString(),
                                 Message(
                                     sender:
                                         '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
@@ -272,11 +294,6 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
         ));
   }
 
-
-
- 
-  
-
   Widget messagestatus(String status, int index, int length) {
     if (index == length - 1) {
       return Text(status,
@@ -284,7 +301,4 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     }
     return SizedBox();
   }
-
-  
-
 }

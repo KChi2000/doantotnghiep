@@ -130,7 +130,6 @@ class _TrackingState extends State<Tracking> {
                                                     borderSide:
                                                         BorderSide.none)),
                                             onChanged: (value) {
-                                              print('MAP GROUP CHANGE');
                                               if (value!.groupId.toString() !=
                                                   (context
                                                               .read<
@@ -142,7 +141,7 @@ class _TrackingState extends State<Tracking> {
                                                 context
                                                     .read<
                                                         FetchLocationToShowCubit>()
-                                                    .fetchFromDb(value!);
+                                                    .fetchFromDb(value);
                                               }
                                             }),
                                       );

@@ -11,8 +11,9 @@ import 'itemImage.dart';
 import 'messageText.dart';
 
 class ItemMessage extends StatelessWidget {
-  ItemMessage(this.list, this.index, this.length);
+  ItemMessage({required this.list, this.listUser,required this.index,required  this.length});
   List<Message> list;
+  List<Userinfo>? listUser;
   int index;
   int length;
   @override
@@ -107,9 +108,9 @@ class ItemMessage extends StatelessWidget {
                                   .sender
                                   .substring(list[index].sender.length - 28)
                       ? list[index].sender != list[index + 1].sender
-                          ? itemImage(list[index].sender, context)
+                          ? itemImage(list[index].sender,listUser!, context)
                           : list[index + 1].timesent - list[index].timesent >= 4
-                              ? itemImage(list[index].sender, context)
+                              ? itemImage(list[index].sender,listUser!, context)
                               : SizedBox(
                                   width: 30,
                                 )
@@ -118,7 +119,7 @@ class ItemMessage extends StatelessWidget {
                                   list[index]
                                       .sender
                                       .substring(list[index].sender.length - 28)
-                          ? itemImage(list[index].sender, context)
+                          ? itemImage(list[index].sender, listUser!,context)
                           : SizedBox(
                               width: 30,
                             ),
@@ -167,16 +168,24 @@ class ItemMessage extends StatelessWidget {
             child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            list[index].sender == Userinfo.userSingleton.name
-                ? 'bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
-                : '${list[index].contentMessage} lúc ${list[index].displaytime}',
+            Userinfo.userSingleton.uid ==
+                    list[index].sender.toString().substring(
+                          list[index].sender.toString().length - 28,
+                        )
+                ? 'Bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
+                : '${list[index].sender.toString().substring(0,
+                          list[index].sender.toString().length - 29,
+                        )} ${list[index].contentMessage} lúc ${list[index].displaytime}',
             textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12),
           ),
         ));
 
       case Type.callvideo:
-        return callItem(list, index);
-      
+        return callItem(list, listUser!,index, Icons.videocam, context);
+      case Type.callaudio:
+        return callItem(list,listUser!, index, Icons.call, context);
+
       default:
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -267,9 +276,9 @@ class ItemMessage extends StatelessWidget {
                                   .sender
                                   .substring(list[index].sender.length - 28)
                       ? list[index].sender != list[index + 1].sender
-                          ? itemImage(list[index].sender, context)
+                          ? itemImage(list[index].sender, listUser!,context)
                           : list[index + 1].timesent - list[index].timesent >= 4
-                              ? itemImage(list[index].sender, context)
+                              ? itemImage(list[index].sender,listUser!, context)
                               : SizedBox(
                                   width: 30,
                                 )
@@ -278,7 +287,7 @@ class ItemMessage extends StatelessWidget {
                                   list[index]
                                       .sender
                                       .substring(list[index].sender.length - 28)
-                          ? itemImage(list[index].sender, context)
+                          ? itemImage(list[index].sender, listUser!,context)
                           : SizedBox(
                               width: 30,
                             ),
@@ -319,34 +328,10 @@ class ItemMessage extends StatelessWidget {
                 ],
               ),
             ),
-            // BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-            //   builder: (context, state) {
-            //     return StreamBuilder(
-            //         stream: state.stream,
-            //         builder: (context, snapshot) {
-            //           state.stream!.listen((event) {
-            //             if (snapshot.hasData) {
-            //               context
-            //                   .read<ChangeMessageStatusCubit>()
-            //                   .update(snapshot.data, widget.groupId);
-            //             }
-            //           });
-
-            //           return BlocBuilder<ChangeMessageStatusCubit,
-            //               ChangeMessageStatusState>(
-            //             builder: (context, state) {
-            //               print('list of string ${state.viewer.length}');
-            //               if (state.viewer.length == 0) {
-            //                 return messagestatus('đã gửi', index, length);
-            //               }
-            //               return messagestatus('đã xem', index, length);
-            //             },
-            //           );
-            //         });
-            //   },
-            // )
+            
           ],
         );
     }
   }
+ 
 }

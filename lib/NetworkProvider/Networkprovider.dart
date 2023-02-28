@@ -293,10 +293,9 @@ class DatabaseService {
         Userinfo userinfo =
             Userinfo.fromJson(location.data() as Map<String, dynamic>);
         list.add(userinfo);
-        // print('get from firebase ${userinfo.toJson()}');
       },
     );
-    // print('complete!!!!!!!!!!!!!!');
+  
     return list;
   }
 

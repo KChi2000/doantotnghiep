@@ -163,10 +163,7 @@ class _SearchGroupState extends State<SearchGroup> {
         navigatePush(
             context,
             chatDetail(
-              groupId: group.groupId.toString(),
-              groupName: group.groupName.toString(),
-              members: group.members!,
-              admininfo: group.admin!,
+             group: group,
             ));
       },
       onLongPress: () {
@@ -226,10 +223,7 @@ Widget groupitems(
       navigateReplacement(
           ct,
           chatDetail(
-            groupId: group.groupId.toString(),
-            groupName: group.groupName.toString(),
-            members: group.members!,
-            admininfo: group.admin!,
+          group: group,
           ));
     },
     onLongPress: () {},

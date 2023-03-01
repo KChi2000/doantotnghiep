@@ -353,7 +353,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                 element.type == Type.callvideo
                                                     ? 'video'
                                                     : 'audio'));
-                                      } else {
+                                      } else if(element.callStatus == 'call end'){
+                                         await FlutterCallkitIncoming.endCall(element.groupId.toString());
                                         // Fluttertoast.showToast(
                                         // msg: "Tat may roi",
                                         // toastLength: Toast.LENGTH_SHORT,

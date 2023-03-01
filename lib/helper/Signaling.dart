@@ -35,7 +35,7 @@ class Signaling {
     DocumentReference roomRef = db.collection('groups').doc(grid);
     roomRef.get().then(
       (value) async {
-        print('TRY CALLING create ${value.exists} ${grid} ${value.data()}');
+     
         var rs = value.data() as Map<String, dynamic>;
         print(
             ' Create PeerConnection with configuration: $configuration :${rs['offer']}');
@@ -141,15 +141,9 @@ class Signaling {
       String grid, RTCVideoRenderer remoteVideo, String typeOfcall) async {
     DocumentReference roomRef = db.collection('groups').doc(grid);
     roomRef.get().then((roomSnapshot) async {
-      print(
-          'TRY CALLING join ${roomSnapshot.exists} ${grid} ${roomSnapshot.data()}');
-
       if (roomSnapshot.exists) {
-        print('Create PeerConnection with configuration: $configuration');
         peerConnection = await createPeerConnection(configuration);
-
         registerPeerConnectionListeners();
-
         localStream?.getTracks().forEach((track) {
           peerConnection?.addTrack(track, localStream!);
         });
@@ -316,7 +310,9 @@ class Signaling {
     localStream!.dispose();
     remoteStream?.dispose();
   }
+void removeRemoteStream(){
 
+}
   void registerPeerConnectionListeners() {
     peerConnection?.onIceGatheringState = (RTCIceGatheringState state) {
       print('ICE gathering state changed: $state');

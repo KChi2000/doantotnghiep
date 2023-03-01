@@ -47,7 +47,8 @@ class _CallVideoState extends State<CallVideo> {
     signaling.onAddRemoteStream = ((stream) {
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
-
+       print(
+          'VS Local Render: ${_localRenderer}  Remote Render: ${_remoteRenderer}');
       setState(() {});
     });
 
@@ -172,9 +173,7 @@ class _CallVideoState extends State<CallVideo> {
                     left: 0,
                     right: 0,
                     child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
-                      listener: (context, state) {
-                      
-                      },
+                      listener: (context, state) {},
                       builder: (context, state) {
                         return Row(
                           mainAxisSize: MainAxisSize.max,
@@ -224,8 +223,7 @@ class _CallVideoState extends State<CallVideo> {
                                 ), () async {
                               await signaling.hangUp(
                                   _localRenderer, widget.groupid, 'video');
-                              await FlutterCallkitIncoming.endCall(
-                                  widget.groupid);
+
                               Navigator.pop(context);
                             }, Colors.red[900]!),
                             SizedBox(

@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/foundation.dart';
+
 import 'package:doantotnghiep/model/Message.dart';
 
 class GroupInfo {
@@ -82,6 +85,47 @@ class GroupInfo {
     data['status'] = this.status;
     return data;
   }
+
+  @override
+  bool operator ==(covariant GroupInfo other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.recentMessageSender == recentMessageSender &&
+      other.inviteId == inviteId &&
+      listEquals(other.isReadAr, isReadAr) &&
+      listEquals(other.members, members) &&
+      other.admin == admin &&
+      other.groupId == groupId &&
+      other.groupPic == groupPic &&
+      other.recentMessage == recentMessage &&
+      other.groupName == groupName &&
+      other.time == time &&
+      other.checked == checked &&
+      other.checkIsRead == checkIsRead &&
+      other.type == type &&
+      other.callStatus == callStatus &&
+      other.status == status;
+  }
+
+  @override
+  int get hashCode {
+    return recentMessageSender.hashCode ^
+      inviteId.hashCode ^
+      isReadAr.hashCode ^
+      members.hashCode ^
+      admin.hashCode ^
+      groupId.hashCode ^
+      groupPic.hashCode ^
+      recentMessage.hashCode ^
+      groupName.hashCode ^
+      time.hashCode ^
+      checked.hashCode ^
+      checkIsRead.hashCode ^
+      type.hashCode ^
+      callStatus.hashCode ^
+      status.hashCode;
+  }
 }
 
 class Members {
@@ -120,6 +164,18 @@ class Admin {
     data['adminName'] = this.adminName;
     return data;
   }
+
+  @override
+  bool operator ==(covariant Admin other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.adminId == adminId &&
+      other.adminName == adminName;
+  }
+
+  @override
+  int get hashCode => adminId.hashCode ^ adminName.hashCode;
 }
 
 class Read {

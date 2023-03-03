@@ -12,10 +12,10 @@ part 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit() : super(RegisterInitial());
-  register(context, String name, String email, String pass) async {
+  register(context, String name, String email, String pass,String sothich) async {
     AuthService authService = AuthService(context: context);
     emit(registerLoading());
-    var result = await authService.registerWithEmail(name, email, pass);
+    var result = await authService.registerWithEmail(name, email, pass,sothich);
     print('result: $result');
     if (result == true) {
       await HelperFunctions.saveLoggedUserEmail(email);

@@ -17,13 +17,13 @@ class AuthService {
   AuthService({this.context});
   Userinfo userinfo = Userinfo();
 
-  Future registerWithEmail(String fullName, String email, String pass) async {
+  Future registerWithEmail(String fullName, String email, String pass,String sothich) async {
     try {
       var user = await firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: pass);
 
       if (user != null) {
-        await DatabaseService(uid: user.user!.uid).addUserData(fullName, email);
+        await DatabaseService(uid: user.user!.uid).addUserData(fullName, email,sothich);
         await HelperFunctions.saveLoggedUserUid(user.user!.uid);
         Userinfo.userSingleton.uid = user.user!.uid;
         return true;

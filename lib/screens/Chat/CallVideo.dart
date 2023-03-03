@@ -34,21 +34,20 @@ class _CallVideoState extends State<CallVideo> {
   Signaling signaling = Signaling();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-
+  int time = 0;
   TextEditingController textEditingController = TextEditingController(text: '');
-
+  Timer? timer;
   bool isFrontCameraSelected = true;
   @override
   void initState() {
     context.read<OnHaveRemoteRenderCubit>().haveRemote(widget.answere!);
-
+    setTime();
     createRoom();
     initValue();
     signaling.onAddRemoteStream = ((stream) {
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
-       print(
-          'VS Local Render: ${_localRenderer}  Remote Render: ${_remoteRenderer}');
+      timer!.cancel();
       setState(() {});
     });
 
@@ -56,10 +55,20 @@ class _CallVideoState extends State<CallVideo> {
   }
 
   setTime() {
-    Timer.periodic(Duration(seconds: 30), (timer) {
-      print(
-          'VS Local Render: ${_localRenderer}  Remote Render: ${_remoteRenderer}');
+    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      time += 1;
+      print('TIMER RUN: $time');
+      if (time == 30 &&
+          context.read<OnHaveRemoteRenderCubit>().state.addRemote == false) {
+             timer.cancel();
+        await signaling.hangUp(_localRenderer, widget.groupid, 'video');
+       
+      }
     });
+  }
+
+  stopTime() {
+    timer!.cancel();
   }
 
   createRoom() {
@@ -221,10 +230,11 @@ class _CallVideoState extends State<CallVideo> {
                                   'assets/icons/phone-hangup.svg',
                                   color: Colors.white,
                                 ), () async {
+                                   stopTime();
                               await signaling.hangUp(
                                   _localRenderer, widget.groupid, 'video');
-
-                              Navigator.pop(context);
+                             
+                              // Navigator.pop(context);
                             }, Colors.red[900]!),
                             SizedBox(
                               width: 15,
@@ -236,6 +246,7 @@ class _CallVideoState extends State<CallVideo> {
                   ),
                   BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
                     listener: (context, state) {
+                      print('LISTEN STREAM FROM CALL VIDEO');
                       if (state is GroupInfoCubitLoaded) {
                         state.groupinfo!.forEach((element) async {
                           if (element.groupId.toString() == widget.groupid) {

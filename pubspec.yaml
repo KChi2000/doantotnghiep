@@ -105,6 +105,9 @@ flutter:
     - assets/animations/
     - assets/icons/
   fonts:
+    - family: beautiFont
+      fonts:
+        - asset: assets/fonts/DancingScript-VariableFont_wght.ttf
     - family: roboto
       fonts:
         - asset: assets/fonts/Roboto/Roboto-Regular.ttf

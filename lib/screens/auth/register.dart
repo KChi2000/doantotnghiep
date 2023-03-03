@@ -32,6 +32,7 @@ class _RegisterState extends State<Register> {
   var passwordCon = TextEditingController();
 
   var fullnameCon = TextEditingController();
+ var sothichCon = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
   @override
@@ -42,26 +43,26 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: LoaderOverlay(
-        useDefaultLoading: false,
-        overlayOpacity: 0.6,
-        overlayWidget: Center(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Đang đăng ký...',
-              style: TextStyle(color: Colors.white),
-            )
-          ],
-        )),
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: SingleChildScrollView(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: LoaderOverlay(
+            useDefaultLoading: false,
+      overlayOpacity: 0.6,
+      overlayWidget: Center(
+          child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'Đang đăng ký...',
+            style: TextStyle(color: Colors.black),
+          )
+        ],
+      )),
+          child: SingleChildScrollView(
             child: Container(
               width: screenwidth,
               height: screenheight,
@@ -98,7 +99,7 @@ class _RegisterState extends State<Register> {
                           ],
                         ),
                         SizedBox(
-                          height: 100,
+                          height: 70,
                         ),
                         SizedBox(
                           width: screenwidth - 100,
@@ -128,6 +129,20 @@ class _RegisterState extends State<Register> {
                         SizedBox(
                           height: 20,
                         ),
+                         SizedBox(
+                          width: screenwidth - 100,
+                          child: textfieldWithSpace(
+                            hint: 'du lịch, ...',
+                            label: 'Sở thích',
+                            icon: Icons.hiking_outlined,
+                            iconcolor: Colors.pink,
+                            emailCon: sothichCon,
+                            error: 'Sở thích của bạn là gì',
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
                         SizedBox(
                           width: screenwidth - 100,
                           child: textfield(
@@ -151,25 +166,19 @@ class _RegisterState extends State<Register> {
                                     context,
                                     fullnameCon.text,
                                     emailCon.text,
-                                    passwordCon.text);
-                                await context
-                                    .read<FetchLocationCubit>()
-                                    .requestLocation();
+                                    passwordCon.text,sothichCon.text.trim());
+                                // await context
+                                //     .read<FetchLocationCubit>()
+                                //     .requestLocation();
                               }
                             },
                             child: BlocBuilder<RegisterCubit, RegisterState>(
                               builder: (context, state) {
                                 if (state is registerLoading) {
                                   context.loaderOverlay.show();
-                                  // return SizedBox(
-                                  //   width: 25,
-                                  //   height: 25,
-                                  //   child: CircularProgressIndicator(),
-                                  // );
+                                 
                                 }
-                                // if (state is registerLoaded) {
-                                //   navigateRempve(context, MyApp());
-                                // }
+                               
                                 context.loaderOverlay.hide();
                                 return Text('Đăng kí');
                               },

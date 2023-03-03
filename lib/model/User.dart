@@ -2,10 +2,11 @@
 
 import 'dart:convert';
 
-import 'package:doantotnghiep/constant.dart';
-import 'package:doantotnghiep/model/Location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:doantotnghiep/constant.dart';
+import 'package:doantotnghiep/model/Location.dart';
 
 //fuutu
 
@@ -16,6 +17,16 @@ class Userinfo {
   String? name;
   Location? location;
   String? email;
+  String? sothich;
+  Userinfo({
+    this.uid,
+    this.profilePic,
+    this.groups,
+    this.name,
+    this.location,
+    this.email,
+    this.sothich,
+  });
   void saveUserInfo(String uid, String name) {
     this.uid = uid;
     this.name = name;
@@ -29,13 +40,7 @@ class Userinfo {
     this.name = name;
   }
 
-  Userinfo(
-      {this.uid,
-      this.profilePic,
-      this.groups,
-      this.name,
-      this.location,
-      this.email});
+
   static Userinfo userSingleton = Userinfo();
   Userinfo.fromJson(Map<String, dynamic> json) {
     uid = json['uid'];
@@ -51,6 +56,7 @@ class Userinfo {
         ? new Location.fromJson(json['location'])
         : null;
     email = json['email'];
+    sothich= json['sothich'];
   }
 
   Map<String, dynamic> toJson() {
@@ -65,6 +71,7 @@ class Userinfo {
       data['location'] = this.location!.toJson();
     }
     data['email'] = this.email;
+     data['sothich']=this.sothich;
     return data;
   }
 }

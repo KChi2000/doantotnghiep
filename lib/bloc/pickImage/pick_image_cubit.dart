@@ -16,12 +16,15 @@ class PickImageCubit extends Cubit<PickImageState> {
   PickImageCubit() : super(PickImageInitial());
   void pick(ImageSource typePick) async {
     try {
-      emit(PickImageLoading());
+     
       XFile? image = await ImagePicker().pickImage(source: typePick);
-      String url = await DatabaseService().uploadImage(File(image!.path));
+     if(image != null){
+       emit(PickImageLoading());
+       String url = await DatabaseService().uploadImage(File(image!.path));
       if (url != null && url.isNotEmpty) {
         emit(PickImageLoaded());
       }
+     }
     } on FirebaseException catch (e) {
       print('ERROR: $e');
     }

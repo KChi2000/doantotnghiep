@@ -27,14 +27,15 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('groups');
   final storageRef =
       FirebaseStorage.instance.ref('${Userinfo.userSingleton.uid}');
-  Future addUserData(String fullname, String email) async {
+  Future addUserData(String fullname, String email,String sothich) async {
     var result = await userCollection.doc(uid).set({
       'fullName': fullname,
       'email': email,
+      'sothich': sothich,
       'groups': [],
       'profilePic': '',
       'uid': uid,
-      'location': {'latitude': '21.5752668', 'longitude': '105.8281605'}
+      'location': {'latitude': '0', 'longitude': '0'}
     });
     return result;
   }

@@ -135,12 +135,7 @@ class _CallAudioState extends State<CallAudio> {
                                     // color: Colors.amber,
                                     width: screenwidth,
                                     height: screenheight / 2 - 10,
-                                    child: RTCVideoView(
-                                      _remoteRenderer,
-                                      mirror: true,
-                                      objectFit: RTCVideoViewObjectFit
-                                          .RTCVideoViewObjectFitCover,
-                                    ),
+                                    child:Text('Remote')
                                   )
                                 : SizedBox();
                           },

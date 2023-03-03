@@ -262,14 +262,7 @@ class _TrackingState extends State<Tracking> {
                                               LatLng(21.5752612, 105.8281156),
                                           zoom: 5),
                                       markers: {
-                                        // Marker(
-                                        //     infoWindow: InfoWindow(title: 'bạn'),
-                                        //     markerId: MarkerId('you'),
-                                        //     position:
-                                        //         LatLng(21.5752612, 105.8281156),
-                                        //     icon: BitmapDescriptor
-                                        //         .defaultMarkerWithHue(
-                                        //             BitmapDescriptor.hueRose)),
+                                     
                                       },
                                     );
                                   },

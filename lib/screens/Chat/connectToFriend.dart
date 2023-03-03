@@ -313,6 +313,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                           stream: state.stream,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
+                          
                               context
                                   .read<GroupInfoCubitCubit>()
                                   .updateGroup(snapshot.data);
@@ -330,6 +331,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
+                                    print('LISTEN STREAM FROM BLOC');
                                   if (state is GroupInfoCubitLoaded) {
                                     state.groupinfo!.forEach((element) async {
                                       if (element.callStatus == 'calling' &&
@@ -355,14 +357,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                     : 'audio'));
                                       } else if(element.callStatus == 'call end'){
                                          await FlutterCallkitIncoming.endCall(element.groupId.toString());
-                                        // Fluttertoast.showToast(
-                                        // msg: "Tat may roi",
-                                        // toastLength: Toast.LENGTH_SHORT,
-                                        // gravity: ToastGravity.BOTTOM,
-                                        // timeInSecForIosWeb: 1,
-                                        // textColor: Colors.white,
-                                        // backgroundColor: Colors.pink,
-                                        // fontSize: 16.0);
+                                       
                                       }
                                     });
                                   }
@@ -391,8 +386,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                 bottom: 10,
                                                 left: 15,
                                                 right: 15),
-                                            // padding:
-                                            //     EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                                          
                                             decoration: BoxDecoration(
                                                 color: Colors.grey
                                                     .withOpacity(0.35),
@@ -438,9 +432,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 },
                               );
                             }
-                            // return Center(
-                            //   child: CircularProgressIndicator(),
-                            // );
+                          
                             return Center(
                               child: Text('oops, bạn chưa có nhóm nào ((:'),
                             );
@@ -486,11 +478,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
           case Event.ACTION_CALL_ACCEPT:
             print(
                 'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id'].toString().substring(5)}');
-            // (event.body as Map<String, dynamic>)['id']
-            //             .toString()
-            //             .substring(0, 5) ==
-            //         'video'
-            //     ? 
+            (event.body as Map<String, dynamic>)['id']
+                        .toString()
+                        .substring(0, 5) ==
+                    'video'
+                ? 
             Future.delayed(Duration.zero, () {
                     navigatePush(
                         context,
@@ -501,19 +493,19 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               as Map<String, dynamic>)['nameCaller'],
                           answere: true,
                         ));
+                  })
+                : Future.delayed(Duration.zero, () {
+                    navigatePush(
+                        context,
+                        CallAudio(
+                          groupid: (event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5),
+                          grname: (event.body
+                              as Map<String, dynamic>)['nameCaller'],
+                          answere: true,
+                        ));
                   });
-            //     : Future.delayed(Duration.zero, () {
-            //         navigatePush(
-            //             context,
-            //             CallAudio(
-            //               groupid: (event.body as Map<String, dynamic>)['id']
-            //                   .toString()
-            //                   .substring(5),
-            //               grname: (event.body
-            //                   as Map<String, dynamic>)['nameCaller'],
-            //               answere: true,
-            //             ));
-            //       });
 
             break;
           case Event.ACTION_CALL_DECLINE:

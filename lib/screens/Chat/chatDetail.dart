@@ -3,8 +3,10 @@ import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cub
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
 import 'package:doantotnghiep/bloc/SendMessage/send_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
+import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
+import 'package:doantotnghiep/helper/location_notofications.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
 import 'package:doantotnghiep/screens/Chat/CallAudio.dart';
@@ -14,6 +16,7 @@ import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:doantotnghiep/screens/Chat/connectToFriend.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -23,6 +26,7 @@ import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
@@ -54,12 +58,13 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+   LocalNotificationService.initialize();
     context
         .read<GetChatMessageCubit>()
         .fetchData(widget.group.groupId.toString());
     context.read<FetchLocationToShowCubit>().fetchFromDb(widget.group);
     context.read<SendMessageCubit>().initialStatusSendMessage();
+    messageFireBase();
   }
 
   @override
@@ -71,7 +76,18 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
       print('not in th chat detail');
     }
   }
-
+  messageFireBase(){
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      print('FB message when app terminated:\n${value!.notification!.title} ${value!.notification!.body}');
+    });
+    FirebaseMessaging.onMessage.listen((value) {
+      print('FB message in foreground:\n${value!.notification!.title} ${value!.notification!.body}');
+      LocalNotificationService.showNotificationOnForeground(value);
+    });
+     FirebaseMessaging.onMessageOpenedApp.listen((value) {
+      print('FB message in background:\n${value!.notification!.title} ${value!.notification!.body}');
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,15 +125,20 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(
                   onPressed: () async {
-                    Future.delayed(Duration.zero, () {
-                      navigatePush(
-                          context,
-                          CallVideo(
-                            groupid: widget.group.groupId.toString(),
-                            grname: widget.group.groupName.toString(),
-                            answere: false,
-                          ));
-                    });
+                     FlutterRingtonePlayer.playRingtone();
+                    context
+                        .read<NoticeCallingCubit>()
+                        .notificationCalling(true);
+                   
+                    // Future.delayed(Duration.zero, () {
+                    //   navigatePush(
+                    //       context,
+                    //       CallVideo(
+                    //         groupid: widget.group.groupId.toString(),
+                    //         grname: widget.group.groupName.toString(),
+                    //         answere: false,
+                    //       ));
+                    // });
                   },
                   icon: Icon(Icons.videocam)),
             ),
@@ -213,8 +234,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                       builder: (context, stateUser) {
                                         if (stateUser
                                             is FetchLocationToShowLoaded) {
-                                          print(
-                                              'LIST OF USER LENHTH : ${stateUser.list.length} ');
+                                     
                                           return ItemMessage(
                                               list: state.list!,
                                               listUser: stateUser.list,
@@ -236,6 +256,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                         });
                   },
                 ),
+                SizedBox(height: 10,),
                 Container(
                   width: screenwidth,
                   // height: 100,
@@ -262,7 +283,9 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                       .microsecondsSinceEpoch
                                       .toString(),
                                   type: Type.text));
-
+                          // await FirebaseMessaging.instance.sendMessage({
+                            
+                          // });
                           messageController.clear();
                         },
                       )),

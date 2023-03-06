@@ -81,7 +81,7 @@ class Signaling {
             'time': '${DateTime.now().microsecondsSinceEpoch}',
             'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           });
-          print('New room created with SDK offer. Room ID: $roomId');
+         
 
           peerConnection?.onTrack = (RTCTrackEvent event) {
             print('[MyRTC] Got remote track: ${event.streams[0]}');

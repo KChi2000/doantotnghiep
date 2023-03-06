@@ -60,7 +60,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
   @override
   void initState() {
     context.read<GetUserGroupCubit>().getUerGroup();
-    
+
     super.initState();
   }
 
@@ -313,7 +313,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                           stream: state.stream,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                          
                               context
                                   .read<GroupInfoCubitCubit>()
                                   .updateGroup(snapshot.data);
@@ -327,11 +326,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                   ],
                                 );
                               }
-
+                            
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
-                                    print('LISTEN STREAM FROM BLOC');
+                                  print('LISTEN STREAM FROM BLOC');
                                   if (state is GroupInfoCubitLoaded) {
                                     state.groupinfo!.forEach((element) async {
                                       if (element.callStatus == 'calling' &&
@@ -355,10 +354,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                 element.type == Type.callvideo
                                                     ? 'video'
                                                     : 'audio'));
-                                      } else if(element.callStatus == 'call end'){
-                                         await FlutterCallkitIncoming.endCall(element.groupId.toString());
-                                       
                                       }
+                                 
                                     });
                                   }
                                 },
@@ -386,7 +383,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                                 bottom: 10,
                                                 left: 15,
                                                 right: 15),
-                                          
                                             decoration: BoxDecoration(
                                                 color: Colors.grey
                                                     .withOpacity(0.35),
@@ -432,7 +428,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                                 },
                               );
                             }
-                          
+
                             return Center(
                               child: Text('oops, bạn chưa có nhóm nào ((:'),
                             );
@@ -482,13 +478,13 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                         .toString()
                         .substring(0, 5) ==
                     'video'
-                ? 
-            Future.delayed(Duration.zero, () {
+                ? Future.delayed(Duration.zero, () {
                     navigatePush(
                         context,
                         CallVideo(
-                          groupid: (event.body as Map<String, dynamic>)['id'].toString().substring(5)
-                             ,
+                          groupid: (event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5),
                           grname: (event.body
                               as Map<String, dynamic>)['nameCaller'],
                           answere: true,

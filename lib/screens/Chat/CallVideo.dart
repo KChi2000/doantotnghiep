@@ -44,13 +44,7 @@ class _CallVideoState extends State<CallVideo> {
     setTime();
     createRoom();
     initValue();
-    signaling.onAddRemoteStream = ((stream) {
-      context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
-      _remoteRenderer.srcObject = stream;
-      timer!.cancel();
-      setState(() {});
-    });
-
+    onAddRemote();
     super.initState();
   }
 
@@ -60,9 +54,8 @@ class _CallVideoState extends State<CallVideo> {
       print('TIMER RUN: $time');
       if (time == 30 &&
           context.read<OnHaveRemoteRenderCubit>().state.addRemote == false) {
-             timer.cancel();
+        timer.cancel();
         await signaling.hangUp(_localRenderer, widget.groupid, 'video');
-       
       }
     });
   }
@@ -71,11 +64,19 @@ class _CallVideoState extends State<CallVideo> {
     timer!.cancel();
   }
 
+  onAddRemote() {
+    signaling.onAddRemoteStream = ((stream) {
+      context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
+      _remoteRenderer.srcObject = stream;
+      timer!.cancel();
+      setState(() {});
+    });
+  }
+
   createRoom() {
     if (widget.answere == false) {
       signaling.createRoom(_remoteRenderer, widget.groupid, 'video');
     }
-    // setState(() {});
   }
 
   initValue() async {
@@ -230,10 +231,10 @@ class _CallVideoState extends State<CallVideo> {
                                   'assets/icons/phone-hangup.svg',
                                   color: Colors.white,
                                 ), () async {
-                                   stopTime();
+                              stopTime();
                               await signaling.hangUp(
                                   _localRenderer, widget.groupid, 'video');
-                             
+
                               // Navigator.pop(context);
                             }, Colors.red[900]!),
                             SizedBox(
@@ -254,6 +255,16 @@ class _CallVideoState extends State<CallVideo> {
                               Navigator.pop(context);
                               Fluttertoast.showToast(
                                   msg: "Kết thúc cuộc gọi",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  textColor: Colors.white,
+                                  backgroundColor: Colors.pink,
+                                  fontSize: 16.0);
+                            }
+                            if (element.callStatus == 'happening') {
+                              Fluttertoast.showToast(
+                                  msg: "${element.recentMessage}",
                                   toastLength: Toast.LENGTH_SHORT,
                                   gravity: ToastGravity.BOTTOM,
                                   timeInSecForIosWeb: 1,

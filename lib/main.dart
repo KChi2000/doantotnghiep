@@ -20,6 +20,7 @@ import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'dart:async';
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
+import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/bloc/onHaveRemoteRender/on_have_remote_render_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/resetEmail/reset_email_cubit.dart';
@@ -43,15 +44,24 @@ import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:uuid/uuid.dart';
 
 import 'bloc/pickImage/pick_image_cubit.dart';
 import 'components/navigate.dart';
 import 'model/User.dart';
-
+Future<void> backgroundHandler(RemoteMessage message)async{
+  print('FB message from background ${message!.notification!.title} ${message!.notification!.body}');
+  
+}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        
   runApp(
     BlocProvider(
       create: (context) => CheckLoggedCubit(),
@@ -68,10 +78,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  late final Uuid _uuid;
-  String? _currentUuid;
 
-  late final FirebaseMessaging _firebaseMessaging;
   @override
   void initState() {
     // TODO: implement initState
@@ -80,14 +87,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
-    
   }
 
   void checkUserLoggedIn() async {
     context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -168,8 +172,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider(
           create: (context) => CanCreateGroupCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => OnHaveRemoteRenderCubit(),
+        ),
+        BlocProvider(
+          create: (context) => NoticeCallingCubit(),
         ),
       ],
       child: MaterialApp(
@@ -183,18 +190,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         locale: Locale('vi', 'VN'),
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        // onGenerateRoute: (settings) {
-        //   final arguments = settings.arguments;
-        //   switch(settings.name){
-        //      case '/callScreen':
-        //     if (arguments is String) {
-        //       // the details page for one specific user
-        //       return CallVideo(arguments);
-        //     }
-        //   }
-        // },
         theme: ThemeData(
-            // appBarTheme: AppBarTheme(color: Colors.pink),
             useMaterial3: true,
             colorScheme: ColorScheme(
                 brightness: Brightness.light,
@@ -216,7 +212,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             print('store model name ${Userinfo.userSingleton.name}');
             print('store model name ${Userinfo.userSingleton.uid}');
             if (state.uid.isNotEmpty) {
-              return DisplayPage();
+              return BlocBuilder<NoticeCallingCubit, bool>(
+                builder: (context, state) {
+                  return Stack(
+                    children: [
+                      DisplayPage(),
+                      state ? noticeIfCalling() : SizedBox.shrink()
+                    ],
+                  );
+                },
+              );
             }
             return Login();
           },

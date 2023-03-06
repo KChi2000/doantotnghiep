@@ -12,9 +12,9 @@ import '../../bloc/toggleCM/toggle_cm_cubit.dart';
 import 'CallVideo.dart';
 
 class IncomingCall extends StatelessWidget {
-  GroupInfo group;
-  IncomingCall({required this.group});
-
+  // GroupInfo group;
+  // IncomingCall({required this.group});
+IncomingCall();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,13 +30,14 @@ class IncomingCall extends StatelessWidget {
               radius: 80,
               backgroundColor: Colors.pink,
               child: Text(
-                '${group.groupName.toString().substring(0, 1)}',
+                // '${group.groupName.toString().substring(0, 1)}',
+                '',
                 style: TextStyle(color: Colors.white, fontSize: 50),
               ),
             ),
             SizedBox(height: 10),
             Text(
-              'Nhóm ${group.groupName} đang gọi...',
+              'Nhóm  đang gọi...',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.pink, fontSize: 20),
             ),

@@ -15,6 +15,7 @@ import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getInviteId/get_invite_id_cubit.dart';
+import 'package:doantotnghiep/bloc/getNumberInformation/get_number_information_cubit.dart';
 import 'package:doantotnghiep/bloc/getProfile/get_profile_cubit.dart';
 import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'dart:async';
@@ -22,6 +23,7 @@ import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
 import 'package:doantotnghiep/bloc/login/login_cubit.dart';
 import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/bloc/onHaveRemoteRender/on_have_remote_render_cubit.dart';
+import 'package:doantotnghiep/bloc/pushNotification/push_notification_cubit.dart';
 import 'package:doantotnghiep/bloc/register/register_cubit.dart';
 import 'package:doantotnghiep/bloc/resetEmail/reset_email_cubit.dart';
 import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart';
@@ -61,7 +63,7 @@ void main() async {
           badge: true,
           sound: true,
         );
-        
+       
   runApp(
     BlocProvider(
       create: (context) => CheckLoggedCubit(),
@@ -177,6 +179,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => NoticeCallingCubit(),
+        ),
+         BlocProvider(
+          create: (context) => GetNumberInformationCubit(),
+        ),
+         BlocProvider(
+          create: (context) => PushNotificationCubit(),
         ),
       ],
       child: MaterialApp(

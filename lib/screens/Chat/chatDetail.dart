@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cubit.dart';
 import 'package:doantotnghiep/bloc/MessageCubit/message_cubit_cubit.dart';
@@ -10,7 +12,7 @@ import 'package:doantotnghiep/helper/location_notofications.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
 import 'package:doantotnghiep/screens/Chat/CallAudio.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:doantotnghiep/screens/DisplayPage.dart';
@@ -58,7 +60,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
   void initState() {
     // TODO: implement initState
     super.initState();
-   LocalNotificationService.initialize();
+    LocalNotificationService.initialize();
     context
         .read<GetChatMessageCubit>()
         .fetchData(widget.group.groupId.toString());
@@ -76,18 +78,23 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
       print('not in th chat detail');
     }
   }
-  messageFireBase(){
+
+  messageFireBase() {
     FirebaseMessaging.instance.getInitialMessage().then((value) {
-      print('FB message when app terminated:\n${value!.notification!.title} ${value!.notification!.body}');
+      print(
+          'FB message when app terminated:\n${value!.notification!.title} ${value!.notification!.body}');
     });
     FirebaseMessaging.onMessage.listen((value) {
-      print('FB message in foreground:\n${value!.notification!.title} ${value!.notification!.body}');
+      print(
+          'FB message in foreground:\n${value!.notification!.title} ${value!.notification!.body}');
       LocalNotificationService.showNotificationOnForeground(value);
     });
-     FirebaseMessaging.onMessageOpenedApp.listen((value) {
-      print('FB message in background:\n${value!.notification!.title} ${value!.notification!.body}');
+    FirebaseMessaging.onMessageOpenedApp.listen((value) {
+      print(
+          'FB message in background:\n${value!.notification!.title} ${value!.notification!.body}');
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,11 +132,11 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(
                   onPressed: () async {
-                     FlutterRingtonePlayer.playRingtone();
+                    FlutterRingtonePlayer.playRingtone();
                     context
                         .read<NoticeCallingCubit>()
                         .notificationCalling(true);
-                   
+
                     // Future.delayed(Duration.zero, () {
                     //   navigatePush(
                     //       context,
@@ -219,6 +226,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                           context
                               .read<MessageCubitCubit>()
                               .DisplayMessage(snapshot);
+
                           return BlocConsumer<MessageCubitCubit,
                               MessageCubitState>(
                             listener: (context, state) {},
@@ -234,7 +242,6 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                       builder: (context, stateUser) {
                                         if (stateUser
                                             is FetchLocationToShowLoaded) {
-                                     
                                           return ItemMessage(
                                               list: state.list!,
                                               listUser: stateUser.list,
@@ -256,7 +263,9 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                         });
                   },
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
                   width: screenwidth,
                   // height: 100,
@@ -282,15 +291,16 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                   time: DateTime.now()
                                       .microsecondsSinceEpoch
                                       .toString(),
-                                  type: Type.text));
-                          // await FirebaseMessaging.instance.sendMessage({
-                            
-                          // });
+                                  type: Type.text),widget.group.groupName.toString());
+
                           messageController.clear();
                         },
                       )),
                       IconButton(
                           onPressed: () async {
+                            var token =
+                                await FirebaseMessaging.instance.getToken();
+                            print('TOKEN FROM FB MESSAGING: $token');
                             await context.read<SendMessageCubit>().sendmessage(
                                 widget.group.groupId!.toString(),
                                 Message(
@@ -301,8 +311,10 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                     time: DateTime.now()
                                         .microsecondsSinceEpoch
                                         .toString(),
-                                    type: Type.text));
+                                    type: Type.text),widget.group.groupName.toString());
+                      
                             messageController.clear();
+                             
                           },
                           icon: Icon(
                             Icons.send,
@@ -323,5 +335,31 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
           style: TextStyle(fontSize: 11, color: Colors.black54));
     }
     return SizedBox();
+  }
+
+  Future<void> pushNotification(String sender,String message) async {
+    try {
+      http.Response response =
+          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+              headers: {
+                'Authorization':
+                    'key=AAAAUU2PhnA:APA91bGHF5XySlMdvuH_D8vzi0WbRxtA7bFUk-xp2Wu2MKiDEtQ7tu7gUCZS9CIAcEjJdhhTezgUPg4q6QzoABH-yDDqQfizZ5dWJVvOVQhUkV98I9afP6FPMOxa1m3fNUa7XRzS6CpZ',
+                'Content-Type': 'application/json'
+              },
+              body: jsonEncode(<String, dynamic>{
+                "to": "c703z063S36jDx-OsYfh6H:APA91bFU0j1v9phGcmHe6zn05Q-9bsG8qK2HVO72JPnsNNJttZuRvQJeVVfmGBYBPA7ACi8C2NvLetpQqexe1WXkHOoKgXsOIkFDv2myr6PoDGqU1fEyraKN1gkmGCoZ0Qr7BgBqxXCf",
+                "notification": {
+                  "body": "$sender: $message",
+                  "title": "Tin nhắn từ nhóm..."
+                },
+                'priority':'high',
+                "data": {
+                  "body": "Notification Body",
+                  "title": "Notification Title",
+                  "key_1": "Value for key_1",
+                  "key_2": "Value for key_2"
+                }
+              }));
+    } catch (e) {}
   }
 }

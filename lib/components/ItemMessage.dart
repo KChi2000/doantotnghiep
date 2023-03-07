@@ -11,7 +11,11 @@ import 'itemImage.dart';
 import 'messageText.dart';
 
 class ItemMessage extends StatelessWidget {
-  ItemMessage({required this.list, this.listUser,required this.index,required  this.length});
+  ItemMessage(
+      {required this.list,
+      this.listUser,
+      required this.index,
+      required this.length});
   List<Message> list;
   List<Userinfo>? listUser;
   int index;
@@ -108,9 +112,10 @@ class ItemMessage extends StatelessWidget {
                                   .sender
                                   .substring(list[index].sender.length - 28)
                       ? list[index].sender != list[index + 1].sender
-                          ? itemImage(list[index].sender,listUser!, context)
+                          ? itemImage(list[index].sender, listUser!, context)
                           : list[index + 1].timesent - list[index].timesent >= 4
-                              ? itemImage(list[index].sender,listUser!, context)
+                              ? itemImage(
+                                  list[index].sender, listUser!, context)
                               : SizedBox(
                                   width: 30,
                                 )
@@ -119,7 +124,7 @@ class ItemMessage extends StatelessWidget {
                                   list[index]
                                       .sender
                                       .substring(list[index].sender.length - 28)
-                          ? itemImage(list[index].sender, listUser!,context)
+                          ? itemImage(list[index].sender, listUser!, context)
                           : SizedBox(
                               width: 30,
                             ),
@@ -168,12 +173,15 @@ class ItemMessage extends StatelessWidget {
             child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            Userinfo.userSingleton.uid ==
-                    list[index].sender.toString().substring(
-                          list[index].sender.toString().length - 28,
-                        )
-                ? 'Bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
-                : '${list[index].sender.toString().substring(0,
+            list[index].sender.toString().length < 28
+                ? '${list[index].sender.toString()} ${list[index].contentMessage} lúc ${list[index].displaytime}'
+                : Userinfo.userSingleton.uid ==
+                        list[index].sender.toString().substring(
+                              list[index].sender.toString().length - 28,
+                            )
+                    ? 'Bạn ${list[index].contentMessage} lúc ${list[index].displaytime}'
+                    : '${list[index].sender.toString().substring(
+                          0,
                           list[index].sender.toString().length - 29,
                         )} ${list[index].contentMessage} lúc ${list[index].displaytime}',
             textAlign: TextAlign.center,
@@ -182,9 +190,9 @@ class ItemMessage extends StatelessWidget {
         ));
 
       case Type.callvideo:
-        return callItem(list, listUser!,index, Icons.videocam, context);
+        return callItem(list, listUser!, index, Icons.videocam, context);
       case Type.callaudio:
-        return callItem(list,listUser!, index, Icons.call, context);
+        return callItem(list, listUser!, index, Icons.call, context);
 
       default:
         return Column(
@@ -224,7 +232,6 @@ class ItemMessage extends StatelessWidget {
                         style: TextStyle(fontSize: 12, color: Colors.black45),
                       ))
                     : SizedBox(),
-
             list[index].ontap
                 ? SizedBox(
                     height: 5,
@@ -276,9 +283,10 @@ class ItemMessage extends StatelessWidget {
                                   .sender
                                   .substring(list[index].sender.length - 28)
                       ? list[index].sender != list[index + 1].sender
-                          ? itemImage(list[index].sender, listUser!,context)
+                          ? itemImage(list[index].sender, listUser!, context)
                           : list[index + 1].timesent - list[index].timesent >= 4
-                              ? itemImage(list[index].sender,listUser!, context)
+                              ? itemImage(
+                                  list[index].sender, listUser!, context)
                               : SizedBox(
                                   width: 30,
                                 )
@@ -287,7 +295,7 @@ class ItemMessage extends StatelessWidget {
                                   list[index]
                                       .sender
                                       .substring(list[index].sender.length - 28)
-                          ? itemImage(list[index].sender, listUser!,context)
+                          ? itemImage(list[index].sender, listUser!, context)
                           : SizedBox(
                               width: 30,
                             ),
@@ -328,10 +336,8 @@ class ItemMessage extends StatelessWidget {
                 ],
               ),
             ),
-            
           ],
         );
     }
   }
- 
 }

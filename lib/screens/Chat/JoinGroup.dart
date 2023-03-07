@@ -3,6 +3,7 @@ import 'package:doantotnghiep/bloc/JoinStatus/join_status_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 
 import 'package:doantotnghiep/bloc/joinToGroup.dart/join_to_group_cubit.dart';
+import 'package:doantotnghiep/bloc/pushNotification/push_notification_cubit.dart';
 
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
@@ -202,6 +203,7 @@ class _JoinGroupState extends State<JoinGroup> {
                           .read<JoinToGroupCubit>()
                           .updateData(codeCon.text);
                       if (state.joined) {
+                       
                         Fluttertoast.showToast(
                             msg: "Đã rời nhóm thành công",
                             toastLength: Toast.LENGTH_SHORT,
@@ -211,6 +213,7 @@ class _JoinGroupState extends State<JoinGroup> {
                             backgroundColor: Colors.pink,
                             fontSize: 16.0);
                       } else {
+                        await context.read<PushNotificationCubit>().pushNoti(group.groupName.toString(), '${Userinfo.userSingleton.name} đã tham gia nhóm');
                         Fluttertoast.showToast(
                             msg: "Đã tham gia thành công",
                             toastLength: Toast.LENGTH_SHORT,

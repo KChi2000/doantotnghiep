@@ -101,6 +101,7 @@ class _LoginState extends State<Login> {
                       Form(
                           key: formKey,
                           child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               SizedBox(
                                 width: screenwidth - 100,

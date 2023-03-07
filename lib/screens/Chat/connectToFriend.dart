@@ -694,7 +694,7 @@ class groupitem extends StatelessWidget {
                                                               .length -
                                                           28)
                                               ? 'Bạn: '
-                                              : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
+                                              : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}: '
                                           : 'Chưa có tin nhắn nào',
                                       style: TextStyle(
                                           color: Colors.black87,

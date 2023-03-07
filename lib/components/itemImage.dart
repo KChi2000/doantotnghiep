@@ -27,9 +27,9 @@ Widget itemImage(String name, List<Userinfo> lisUser, context) {
 String filterProfileImage(List<Userinfo> list, String value) {
   String profileImage = '';
   for (Userinfo element in list) {
-    print('IMAGE URL HAS FOUND : ${value.substring(value.length - 28)}');
+   
     if (element.uid == value.substring(value.length - 28)) {
-      print('IMAGE URL HAS FOUND : ${element.profilePic}');
+    
       return element.profilePic.toString();
     }
   }

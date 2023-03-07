@@ -1,3 +1,4 @@
+import 'package:doantotnghiep/bloc/getNumberInformation/get_number_information_cubit.dart';
 import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
@@ -9,11 +10,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../bloc/Changetab/changetab_cubit.dart';
+import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 
 class DisplayPage extends StatefulWidget {
   DisplayPage({super.key});
@@ -76,7 +79,32 @@ class _DisplayPageState extends State<DisplayPage> {
                             backgroundColor: Colors.red,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(Icons.chat),
+                            icon: Badge(
+                              child: Icon(Icons.chat),
+                              backgroundColor: Color.fromARGB(255, 244, 25, 9),
+                              label: BlocBuilder<GroupInfoCubitCubit,
+                                  GroupInfoCubitState>(
+                                builder: (context, state) {
+                                  if (state is GroupInfoCubitLoaded) {
+                                    context.read<GetNumberInformationCubit>().getNumberOfNotification(state.groupinfo!);
+                                    return BlocBuilder<GetNumberInformationCubit,
+                                        GetNumberInformationState>(
+                                      builder: (context, state) {
+                                        FlutterAppBadger.updateBadgeCount(state.number);
+                                        return Text(
+                                          '${state.number}',
+                                          style: TextStyle(color: Colors.white),
+                                        );
+                                      },
+                                    );
+                                  }
+                                  return Text(
+                                    '0',
+                                    style: TextStyle(color: Colors.white),
+                                  );
+                                },
+                              ),
+                            ),
                             label: 'Chat',
                             backgroundColor: Colors.green,
                           ),
@@ -95,7 +123,7 @@ class _DisplayPageState extends State<DisplayPage> {
                     ));
               },
             ),
-          // notice?  noticeIfCalling():SizedBox()
+            // notice?  noticeIfCalling():SizedBox()
           ],
         );
       },
@@ -125,8 +153,7 @@ class noticeIfCalling extends StatelessWidget {
             width: screenwidth - 20,
             // height: 100,
             decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(15)),
+                color: Colors.grey, borderRadius: BorderRadius.circular(15)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -175,17 +202,39 @@ class noticeIfCalling extends StatelessWidget {
                     Row(
                       // mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(width: 60,),
+                        SizedBox(
+                          width: 60,
+                        ),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red,padding: EdgeInsets.symmetric(horizontal: 10)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding: EdgeInsets.symmetric(horizontal: 10)),
                             onPressed: () {
                               FlutterRingtonePlayer.stop();
-                               context.read<NoticeCallingCubit>().notificationCalling(false);
-                            }, child: Text('TỪ CHỐI',style: TextStyle( fontFamily: 'robotomedium',color: Colors.white),)),
-                            SizedBox(width: 15,),
-                            ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green,padding: EdgeInsets.symmetric(horizontal: 10)),
-                            onPressed: () {}, child: Text('TRẢ LỜI',style: TextStyle( fontFamily: 'robotomedium',color: Colors.white),))
+                              context
+                                  .read<NoticeCallingCubit>()
+                                  .notificationCalling(false);
+                            },
+                            child: Text(
+                              'TỪ CHỐI',
+                              style: TextStyle(
+                                  fontFamily: 'robotomedium',
+                                  color: Colors.white),
+                            )),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                padding: EdgeInsets.symmetric(horizontal: 10)),
+                            onPressed: () {},
+                            child: Text(
+                              'TRẢ LỜI',
+                              style: TextStyle(
+                                  fontFamily: 'robotomedium',
+                                  color: Colors.white),
+                            ))
                       ],
                     )
                   ],

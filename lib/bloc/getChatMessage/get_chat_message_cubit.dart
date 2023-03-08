@@ -14,7 +14,7 @@ class GetChatMessageCubit extends Cubit<GetChatMessageState> {
       emit(GetChatMessageState(data: result));
       await DatabaseService().updateisReadMessage(grId);
     } on FirebaseException catch (e) {
-      print('exception da xay ra $e');
+     
     }
   }
 }

@@ -12,6 +12,6 @@ class GetInviteIdCubit extends Cubit<GetInviteIdState> {
     GroupInfo group =
           GroupInfo.fromJson(data.docs[0].data() as Map<String, dynamic>);
     emit(GetInviteIdState(group));
-   print('data invite id: ${group.groupName}');
+  
   }
 }

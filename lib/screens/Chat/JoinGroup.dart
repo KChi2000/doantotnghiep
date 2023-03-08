@@ -146,9 +146,7 @@ class _JoinGroupState extends State<JoinGroup> {
              group: group,
             ));
       },
-      onLongPress: () {
-        print('nhả ra mau');
-      },
+     
       child: Container(
         // margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
         color: Colors.transparent,
@@ -213,7 +211,7 @@ class _JoinGroupState extends State<JoinGroup> {
                             backgroundColor: Colors.pink,
                             fontSize: 16.0);
                       } else {
-                        await context.read<PushNotificationCubit>().pushNoti(group.groupName.toString(), '${Userinfo.userSingleton.name} đã tham gia nhóm');
+                        await context.read<PushNotificationCubit>().pushNoti(group, '${Userinfo.userSingleton.name} đã tham gia nhóm');
                         Fluttertoast.showToast(
                             msg: "Đã tham gia thành công",
                             toastLength: Toast.LENGTH_SHORT,

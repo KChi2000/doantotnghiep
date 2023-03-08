@@ -16,7 +16,7 @@ class RegisterCubit extends Cubit<RegisterState> {
     AuthService authService = AuthService(context: context);
     emit(registerLoading());
     var result = await authService.registerWithEmail(name, email, pass,sothich);
-    print('result: $result');
+
     if (result == true) {
       await HelperFunctions.saveLoggedUserEmail(email);
       await HelperFunctions.saveLoggedUserName(name);
@@ -24,8 +24,7 @@ class RegisterCubit extends Cubit<RegisterState> {
       Userinfo.userSingleton.name = name;
       navigateReplacement(context, MyApp());
     } else {
-      print('errorrrrrr');
-      print(result);
+     
       emit(registerError());
     }
   }

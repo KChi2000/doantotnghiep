@@ -157,7 +157,7 @@ class _CallAudioState extends State<CallAudio> {
                     right: 0,
                     child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
                       listener: (context, state) {
-                        print('CAMERA TOGGLE: ${state.openCamera}');
+                  
                       },
                       builder: (context, state) {
                         return Row(

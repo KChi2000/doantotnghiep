@@ -16,7 +16,7 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
   void updateGroup(QuerySnapshot snapshot) {
     emit(GroupInfoCubitLoading());
     var rs = snapshot.docs.map((e) {
-      // print('DATA FROM FIREBASE: ${e.data()}');
+    
       return GroupInfo.fromJson(e.data() as Map<String, dynamic>);
     }).toList();
 
@@ -25,7 +25,7 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
         if (element.status == 'deleted') {
           var timeDeleted = DateTime.fromMicrosecondsSinceEpoch(
               int.parse(element.time.toString()));
-            print('Time deleted: $timeDeleted  time now ${DateTime.now} compare: ${timeDeleted.compareTo(DateTime.now())}');
+          
             if(timeDeleted.compareTo(DateTime.now())<=0){
              
                 await DatabaseService().deleteDataInFB(element.groupId.toString(), element.groupName.toString());

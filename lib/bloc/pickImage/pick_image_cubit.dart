@@ -26,7 +26,7 @@ class PickImageCubit extends Cubit<PickImageState> {
       }
      }
     } on FirebaseException catch (e) {
-      print('ERROR: $e');
+    
     }
   }
 }

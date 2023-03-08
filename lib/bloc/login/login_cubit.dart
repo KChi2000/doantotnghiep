@@ -27,7 +27,7 @@ class LoginCubit extends Cubit<LoginState> {
         await HelperFunctions.saveLoggedUserEmail(snapshot.docs[0]['email']);
         await HelperFunctions.saveLoggedUserName(snapshot.docs[0]['fullName']);
       //  Userinfo.userSingleton.email = snapshot.docs[0]['email'];
-       Userinfo.userSingleton.saveUserInfo(snapshot.docs[0]['uid'],snapshot.docs[0]['fullName']);
+       Userinfo.userSingleton.saveUserInfo(snapshot.docs[0]['uid'],snapshot.docs[0]['fullName'],snapshot.docs[0]['registration_id']);
        navigateReplacement(context, MyApp());
     emit(LoginLoaded());
    } else{

@@ -1,7 +1,9 @@
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:doantotnghiep/bloc/getNumberInformation/get_number_information_cubit.dart';
 import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
+import 'package:doantotnghiep/model/User.dart';
 import 'package:doantotnghiep/screens/Chat/IncomingCall.dart';
 import 'package:doantotnghiep/screens/Profile.dart';
 import 'package:doantotnghiep/screens/Map.dart';
@@ -17,6 +19,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../bloc/Changetab/changetab_cubit.dart';
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../helper/location_notofications.dart';
 
 class DisplayPage extends StatefulWidget {
   DisplayPage({super.key});
@@ -31,9 +34,19 @@ class _DisplayPageState extends State<DisplayPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+  
     super.initState();
     inittial();
+  
+    FirebaseMessaging.instance.getToken().then(
+      (token) {
+        if (token != Userinfo.userSingleton.registrationId) {
+          DatabaseService(uid: Userinfo.userSingleton.uid)
+              .updateRegistrationId(token!);
+        }
+      },
+    );
+    
   }
 
   void inittial() async {
@@ -86,11 +99,16 @@ class _DisplayPageState extends State<DisplayPage> {
                                   GroupInfoCubitState>(
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
-                                    context.read<GetNumberInformationCubit>().getNumberOfNotification(state.groupinfo!);
-                                    return BlocBuilder<GetNumberInformationCubit,
+                                    context
+                                        .read<GetNumberInformationCubit>()
+                                        .getNumberOfNotification(
+                                            state.groupinfo!);
+                                    return BlocBuilder<
+                                        GetNumberInformationCubit,
                                         GetNumberInformationState>(
                                       builder: (context, state) {
-                                        FlutterAppBadger.updateBadgeCount(state.number);
+                                        FlutterAppBadger.updateBadgeCount(
+                                            state.number);
                                         return Text(
                                           '${state.number}',
                                           style: TextStyle(color: Colors.white),

@@ -1,22 +1,25 @@
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
+import 'package:doantotnghiep/model/Group.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
+import '../../NetworkProvider/Networkprovider.dart';
 import '../../model/User.dart';
 part 'push_notification_state.dart';
 
 class PushNotificationCubit extends Cubit<PushNotificationState> {
   PushNotificationCubit() : super(PushNotificationInitial());
-  pushNoti(String grname,String content)async{
-    List<String> listOfRegistration_ids = [
-                    "c703z063S36jDx-OsYfh6H:APA91bFU0j1v9phGcmHe6zn05Q-9bsG8qK2HVO72JPnsNNJttZuRvQJeVVfmGBYBPA7ACi8C2NvLetpQqexe1WXkHOoKgXsOIkFDv2myr6PoDGqU1fEyraKN1gkmGCoZ0Qr7BgBqxXCf",
-                    "cWOiHtD1RIS9STK1pgISto:APA91bFSORzkRpBxJlijPVme5GnakAdZXQOOeVrZWzBaY-vI_S8lsWPPjXv1cVB5hXjGsLgFYvbVEigGls7DsvbpJ2TVk7WrjTZ_52ctX6zYVWPs9c8yLQiwYP6rqEvH4FxCBc9lRvmw"
-                  ];
+  pushNoti(GroupInfo group,String content)async{
+     List<Userinfo> listlocation =
+        await DatabaseService().fetchGrouplocation(group);
+    List<String?> listOfRegistration_ids =
+        listlocation.map((e) => e.registrationId).toList();
     try{
-     var token= await FirebaseMessaging.instance.getToken();
+     var token = await FirebaseMessaging.instance.getToken();
+      listOfRegistration_ids.remove(token);
        http.Response response =
             await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
                 headers: {
@@ -25,11 +28,11 @@ class PushNotificationCubit extends Cubit<PushNotificationState> {
                   'Content-Type': 'application/json'
                 },
                 body: jsonEncode(<String, dynamic>{
-                  "registration_ids": listOfRegistration_ids.remove(token),
+                  "registration_ids": listOfRegistration_ids,
                   "notification": {
                     "body":
                         "${content}",
-                    "title": "${grname}"
+                    "title": "${group.groupName.toString()}"
                   },
                   'priority': 'high',
                   "data": {

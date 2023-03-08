@@ -110,7 +110,7 @@ class _TrackingState extends State<Tracking> {
                                             BoxConstraints(maxWidth: 200),
                                         child: DropdownButtonFormField(
                                             isExpanded: true,
-                                            value: filterlist.last,
+                                            value: state.selectedGroup,
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                             items: filterlist

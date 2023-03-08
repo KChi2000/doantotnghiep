@@ -280,7 +280,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                             .read<CreateGroupCubit>()
                             .creategroup(groupNameCon.text.trim());
 
-                        print('create group thanh cong');
+                     
                         context.loaderOverlay.hide();
                         Fluttertoast.showToast(
                             msg: "Tạo nhóm thành công",
@@ -330,7 +330,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
-                                  print('LISTEN STREAM FROM BLOC');
+                              
                                   if (state is GroupInfoCubitLoaded) {
                                     state.groupinfo!.forEach((element) async {
                                       if (element.callStatus == 'calling' &&

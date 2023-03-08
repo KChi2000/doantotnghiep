@@ -47,23 +47,34 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+import 'NetworkProvider/Networkprovider.dart';
 import 'bloc/pickImage/pick_image_cubit.dart';
 import 'components/navigate.dart';
+import 'helper/location_notofications.dart';
 import 'model/User.dart';
-Future<void> backgroundHandler(RemoteMessage message)async{
-  print('FB message from background ${message!.notification!.title} ${message!.notification!.body}');
-  
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+Future<void> backgroundHandler(RemoteMessage message) async {
+  print(
+      'FB message from background ${message!.notification!.title} ${message!.notification!.body} ${message.data['id']}');
+      
 }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
-   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-       
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  messageFireBase();
+  Stream<String> fcmStream = FirebaseMessaging.instance.onTokenRefresh;
+  fcmStream.listen((token) {
+    print('FBM token was changed and applied to the db');
+    DatabaseService(uid: Userinfo.userSingleton.uid)
+        .updateRegistrationId(token);
+  });
   runApp(
     BlocProvider(
       create: (context) => CheckLoggedCubit(),
@@ -71,7 +82,23 @@ void main() async {
     ),
   );
 }
-
+ messageFireBase() {
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      print(
+          'FB message when app terminated:\n${value!.notification!.title} ${value.notification!.body}');
+    });
+    FirebaseMessaging.onMessage.listen((value) {
+      print(
+          'FB message in foreground:\n${value.notification!.title} ${value.notification!.body}');
+      LocalNotificationService.showNotificationOnForeground(value);
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((value) {
+     if(value != null){
+       print(
+          'FB message in background: ${value.notification!.title} ${value.notification!.body}');
+     }
+    });
+  }
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -80,7 +107,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-
   @override
   void initState() {
     // TODO: implement initState
@@ -180,14 +206,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider(
           create: (context) => NoticeCallingCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => GetNumberInformationCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => PushNotificationCubit(),
         ),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -216,9 +243,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             primaryColor: Colors.pink),
         home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
           builder: (context, state) {
-            print('store id: ${state.uid}');
-            print('store model name ${Userinfo.userSingleton.name}');
-            print('store model name ${Userinfo.userSingleton.uid}');
             if (state.uid.isNotEmpty) {
               return BlocBuilder<NoticeCallingCubit, bool>(
                 builder: (context, state) {

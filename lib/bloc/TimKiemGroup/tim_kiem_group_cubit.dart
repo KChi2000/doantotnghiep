@@ -32,7 +32,7 @@ void afterchange(List<GroupInfo> list) {
               .contains(state.text.toLowerCase()))
           .toList() ?? [];
 
-    print('in filter list : ${filter.length} ${filter.first.groupName}');
+   
     emit(TimKiemGroupState(list: list, filterlist: filter,text: ''));
   }
 

@@ -56,7 +56,7 @@ class MessageCubitCubit extends Cubit<MessageCubitState> {
           element.displaytime =
               '${tri.hour}:${tri.minute} ${tri.day}-${tri.month}-${tri.year}';
         }
-        // print('time sent: ${element.time}');
+    
       },
     );
     emit(MessageCubitState(list: rs));
@@ -64,9 +64,7 @@ class MessageCubitCubit extends Cubit<MessageCubitState> {
 
   void onTapMsg(int index) {
     var listtemp = state.list;
-    // listtemp!.forEach((element) {
-    //   element.ontap = false;
-    // });
+    
     listtemp![index].ontap = !listtemp[index].ontap;
     emit(MessageCubitState().copyWith(list: listtemp));
   }

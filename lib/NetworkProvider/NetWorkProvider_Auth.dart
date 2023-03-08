@@ -3,6 +3,7 @@ import 'package:doantotnghiep/helper/helper_function.dart';
 
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../components/showSnackbar.dart';
@@ -21,9 +22,9 @@ class AuthService {
     try {
       var user = await firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: pass);
-
+      String? token =await FirebaseMessaging.instance.getToken();
       if (user != null) {
-        await DatabaseService(uid: user.user!.uid).addUserData(fullName, email,sothich);
+        await DatabaseService(uid: user.user!.uid).addUserData(fullName, email,sothich,token!);
         await HelperFunctions.saveLoggedUserUid(user.user!.uid);
         Userinfo.userSingleton.uid = user.user!.uid;
         return true;
@@ -50,7 +51,7 @@ class AuthService {
         default:
           showSnackbar(context, e.toString(), Colors.pink);
       }
-      print(' sevice: ${e.code}');
+     
       return e;
     }
   }
@@ -90,7 +91,7 @@ class AuthService {
           showSnackbar(context, e.toString(), Colors.pink);
       }
 
-      print(e.code);
+   
       return e;
     }
   }

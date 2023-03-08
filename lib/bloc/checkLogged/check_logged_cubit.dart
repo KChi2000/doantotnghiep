@@ -21,7 +21,7 @@ class CheckLoggedCubit extends Cubit<CheckLoggedState> {
       emit(CheckLoggedState(''));
      }
     else{
-      Userinfo.userSingleton.saveUserInfo(id,username!);
+      Userinfo.userSingleton.saveUserNameId(id, username);
       emit(CheckLoggedState(id));
     }
    } catch(e){

@@ -41,8 +41,11 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: LoaderOverlay(
-        useDefaultLoading: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        // appBar: AppBar(title: Text('Login'),),
+        body: LoaderOverlay(
+             useDefaultLoading: false,
         overlayOpacity: 0.6,
         overlayWidget: Center(
             child: Column(
@@ -58,10 +61,7 @@ class _LoginState extends State<Login> {
             )
           ],
         )),
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          // appBar: AppBar(title: Text('Login'),),
-          body: SingleChildScrollView(
+          child: SingleChildScrollView(
             child: Container(
               // color: Colors.amber,
               width: screenwidth,
@@ -166,11 +166,6 @@ class _LoginState extends State<Login> {
                           builder: (context, state) {
                             if (state is LoginLoading) {
                               context.loaderOverlay.show();
-                              // return SizedBox(
-                              //   width: 25,
-                              //   height: 25,
-                              //   child: CircularProgressIndicator(),
-                              // );
                             }
                             context.loaderOverlay.hide();
                             return Text('Đăng nhập');

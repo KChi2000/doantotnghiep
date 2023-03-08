@@ -66,34 +66,20 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
         .fetchData(widget.group.groupId.toString());
     context.read<FetchLocationToShowCubit>().fetchFromDb(widget.group);
     context.read<SendMessageCubit>().initialStatusSendMessage();
-    messageFireBase();
+   
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
-    if (state == AppLifecycleState.resumed) {
-      print('in the chat detail');
-    } else {
-      print('not in th chat detail');
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   // TODO: implement didChangeAppLifecycleState
+  //   if (state == AppLifecycleState.resumed) {
+  //     print('in the chat detail');
+  //   } else {
+  //     print('not in th chat detail');
+  //   }
+  // }
 
-  messageFireBase() {
-    FirebaseMessaging.instance.getInitialMessage().then((value) {
-      print(
-          'FB message when app terminated:\n${value!.notification!.title} ${value!.notification!.body}');
-    });
-    FirebaseMessaging.onMessage.listen((value) {
-      print(
-          'FB message in foreground:\n${value!.notification!.title} ${value!.notification!.body}');
-      LocalNotificationService.showNotificationOnForeground(value);
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((value) {
-      print(
-          'FB message in background:\n${value!.notification!.title} ${value!.notification!.body}');
-    });
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -232,30 +218,36 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                             listener: (context, state) {},
                             builder: (context, state) {
                               return Expanded(
-                                child: ListView.builder(
-                                  controller: listController,
-                                  shrinkWrap: true,
-                                  itemCount: state.list!.length,
-                                  itemBuilder: (context, index) {
-                                    return BlocBuilder<FetchLocationToShowCubit,
-                                        FetchLocationToShowState>(
-                                      builder: (context, stateUser) {
-                                        if (stateUser
-                                            is FetchLocationToShowLoaded) {
+                                child: SingleChildScrollView(
+                                  reverse: true,
+                                  child: ListView.builder(
+                                    controller: listController,
+                                    shrinkWrap: true,
+                                    itemCount: state.list!.length,
+                                    itemBuilder: (context, index) {
+                                      return BlocBuilder<
+                                          FetchLocationToShowCubit,
+                                          FetchLocationToShowState>(
+                                        builder: (context, stateUser) {
+                                          if (stateUser
+                                              is FetchLocationToShowLoaded) {
+                                            listController.jumpTo(listController
+                                                .position.maxScrollExtent);
+                                            return ItemMessage(
+                                                list: state.list!,
+                                                listUser: stateUser.list,
+                                                index: index,
+                                                length: state.list!.length);
+                                          }
                                           return ItemMessage(
                                               list: state.list!,
-                                              listUser: stateUser.list,
+                                              listUser: [],
                                               index: index,
                                               length: state.list!.length);
-                                        }
-                                        return ItemMessage(
-                                            list: state.list!,
-                                            listUser: [],
-                                            index: index,
-                                            length: state.list!.length);
-                                      },
-                                    );
-                                  },
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ),
                               );
                             },
@@ -283,7 +275,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                             hintStyle: TextStyle(color: Colors.grey)),
                         onFieldSubmitted: (value) async {
                           await context.read<SendMessageCubit>().sendmessage(
-                              widget.group.groupId!.toString(),
+                              widget.group,
                               Message(
                                   sender:
                                       '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
@@ -291,18 +283,17 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                   time: DateTime.now()
                                       .microsecondsSinceEpoch
                                       .toString(),
-                                  type: Type.text),widget.group.groupName.toString());
+                                  type: Type.text),
+                             );
 
                           messageController.clear();
                         },
                       )),
                       IconButton(
                           onPressed: () async {
-                            var token =
-                                await FirebaseMessaging.instance.getToken();
-                            print('TOKEN FROM FB MESSAGING: $token');
+                           
                             await context.read<SendMessageCubit>().sendmessage(
-                                widget.group.groupId!.toString(),
+                                widget.group,
                                 Message(
                                     sender:
                                         '${Userinfo.userSingleton.name.toString()}_${Userinfo.userSingleton.uid.toString()}',
@@ -311,10 +302,10 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                                     time: DateTime.now()
                                         .microsecondsSinceEpoch
                                         .toString(),
-                                    type: Type.text),widget.group.groupName.toString());
-                      
+                                    type: Type.text),
+                               );
+
                             messageController.clear();
-                             
                           },
                           icon: Icon(
                             Icons.send,
@@ -337,7 +328,7 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
     return SizedBox();
   }
 
-  Future<void> pushNotification(String sender,String message) async {
+  Future<void> pushNotification(String sender, String message) async {
     try {
       http.Response response =
           await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
@@ -347,12 +338,13 @@ class _chatDetailState extends State<chatDetail> with WidgetsBindingObserver {
                 'Content-Type': 'application/json'
               },
               body: jsonEncode(<String, dynamic>{
-                "to": "c703z063S36jDx-OsYfh6H:APA91bFU0j1v9phGcmHe6zn05Q-9bsG8qK2HVO72JPnsNNJttZuRvQJeVVfmGBYBPA7ACi8C2NvLetpQqexe1WXkHOoKgXsOIkFDv2myr6PoDGqU1fEyraKN1gkmGCoZ0Qr7BgBqxXCf",
+                "to":
+                    "c703z063S36jDx-OsYfh6H:APA91bFU0j1v9phGcmHe6zn05Q-9bsG8qK2HVO72JPnsNNJttZuRvQJeVVfmGBYBPA7ACi8C2NvLetpQqexe1WXkHOoKgXsOIkFDv2myr6PoDGqU1fEyraKN1gkmGCoZ0Qr7BgBqxXCf",
                 "notification": {
                   "body": "$sender: $message",
                   "title": "Tin nhắn từ nhóm..."
                 },
-                'priority':'high',
+                'priority': 'high',
                 "data": {
                   "body": "Notification Body",
                   "title": "Notification Title",

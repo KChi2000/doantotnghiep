@@ -20,7 +20,7 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
   }
 
   joinGroup(String groupId, String groupName) async {
-    print('state join status: ${state.joined}');
+   
     String content = '';
     await DatabaseService(uid: Userinfo.userSingleton.uid)
         .JoinToGroup(state.joined, groupId, groupName.toString());

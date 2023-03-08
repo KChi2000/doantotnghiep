@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
+import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/User.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,19 +13,22 @@ part 'send_message_state.dart';
 
 class SendMessageCubit extends Cubit<SendMessageState> {
   SendMessageCubit() : super(SendMessageState(isSend: false));
-  sendmessage(String groupId, Message ms, String grname) async {
-      List<String> listOfRegistration_ids = [
-                    "foMXs52QRUWcCYDEnyogga:APA91bGJdoLGciNHC4tN5j1_Pe-dA_h4IKzZVVs5qMyLBJMsWIKgrcr_PODs0jrVp6hI9QjRCYCdHJfgjBzgWyp2zoy-M4P7RsjEjgXuWPrsJNeftiAGvPWj3LcWHLFPI4dCH-N4zhyQ",
-                    "eBxMYdTxQBSR8DG32T6Oja:APA91bEv4B6-wte61qS1AWazWLd9lL1S5IYt7Nb7Tres6vxIt4Shsgtol04ciAnhsLTBTP65wJKqx3KA35dmYKPNAO9eHiEBnf_1X54v3oar6wE44tzKH9-ZlXU_J7wn_MfYN_2lZV5R"
-                  ];
+  sendmessage(GroupInfo group, Message ms) async {
+    List<Userinfo> listlocation =
+        await DatabaseService().fetchGrouplocation(group);
+    List<String?> listOfRegistration_ids =
+        listlocation.map((e) => e.registrationId).toList();
     try {
-      var token= await FirebaseMessaging.instance.getToken();
+      var token = await FirebaseMessaging.instance.getToken();
       listOfRegistration_ids.remove(token);
+      print(
+          'AFTER REMOVE DEVICE ID: ${listOfRegistration_ids.length}\n ${listOfRegistration_ids.first}');
       emit(SendMessageState(isSend: true));
       if (ms.contentMessage.isNotEmpty &&
           ms.contentMessage.toString() != null) {
         //  DatabaseService().updateisReadMessage(groupId);
-        await DatabaseService().sendMessage(groupId, ms.toMap());
+        await DatabaseService()
+            .sendMessage(group.groupId.toString(), ms.toMap());
         http.Response response =
             await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
                 headers: {
@@ -37,24 +41,27 @@ class SendMessageCubit extends Cubit<SendMessageState> {
                   "notification": {
                     "body":
                         "${Userinfo.userSingleton.name}: ${ms.contentMessage}",
-                    "title": "${grname}"
+                    "title": "${group.groupName.toString()}",
+                  },
+                  'android': {
+                    'notification': {
+                      'imageUrl': 'https://foo.bar.pizza-monster.png'
+                    }
                   },
                   'priority': 'high',
                   "data": {
+                    "id": "${group.groupId}",
                     "body": "Notification Body",
-                    "title": "Notification Title",
-                    "key_1": "Value for key_1",
-                    "key_2": "Value for key_2"
+                    "title": "title data",
+                    "key_1": "key_1 data",
+                    "key_2": "key_2 data"
                   }
                 }));
       }
-    } catch (e) {
-      print('loi gui tin nhan');
-    }
+    } catch (e) {}
   }
 
   void initialStatusSendMessage() {
-    print('chay initial status');
     emit(SendMessageState(isSend: false));
   }
 }

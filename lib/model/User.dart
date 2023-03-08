@@ -18,6 +18,7 @@ class Userinfo {
   Location? location;
   String? email;
   String? sothich;
+  String? registrationId;
   Userinfo({
     this.uid,
     this.profilePic,
@@ -26,12 +27,18 @@ class Userinfo {
     this.location,
     this.email,
     this.sothich,
+    this.registrationId
   });
-  void saveUserInfo(String uid, String name) {
+  void saveUserInfo(String uid, String name,String registrationId) {
     this.uid = uid;
     this.name = name;
+    this.registrationId= registrationId;
   }
-
+ void saveUserNameId(String uid, String name) {
+    this.uid = uid;
+    this.name = name;
+   
+  }
   void saveUserUid(String uid) {
     this.uid = uid;
   }
@@ -40,7 +47,9 @@ class Userinfo {
     this.name = name;
   }
 
-
+ void saveRegistrationId(String registrationId) {
+    this.registrationId = registrationId;
+  }
   static Userinfo userSingleton = Userinfo();
   Userinfo.fromJson(Map<String, dynamic> json) {
     uid = json['uid'];
@@ -57,6 +66,7 @@ class Userinfo {
         : null;
     email = json['email'];
     sothich= json['sothich'];
+    registrationId = json['registration_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,6 +82,7 @@ class Userinfo {
     }
     data['email'] = this.email;
      data['sothich']=this.sothich;
+     data['registration_id']=this.registrationId;
     return data;
   }
 }

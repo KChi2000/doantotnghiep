@@ -151,7 +151,7 @@ class _CallVideoState extends State<CallVideo> {
                             } else {
                               context.loaderOverlay.hide();
                             }
-                            print('STATE IN ADDREMOTE ${state.addRemote}');
+                         
                             return state.addRemote
                                 ? Container(
                                     // color: Colors.amber,
@@ -247,7 +247,7 @@ class _CallVideoState extends State<CallVideo> {
                   ),
                   BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
                     listener: (context, state) {
-                      print('LISTEN STREAM FROM CALL VIDEO');
+                   
                       if (state is GroupInfoCubitLoaded) {
                         state.groupinfo!.forEach((element) async {
                           if (element.groupId.toString() == widget.groupid) {

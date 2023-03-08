@@ -166,9 +166,7 @@ class _SearchGroupState extends State<SearchGroup> {
              group: group,
             ));
       },
-      onLongPress: () {
-        print('nhả ra mau');
-      },
+    
       child: Container(
         // margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
         color: Colors.transparent,

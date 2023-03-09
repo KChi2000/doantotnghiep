@@ -58,7 +58,7 @@ import 'model/User.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(
-      'FB message from background ${message!.notification!.title} ${message!.notification!.body} ${message.data['group']}');
+      'FB message from background ${message!.notification!.title} ${message!.notification!.body}');
 }
 
 void main() async {

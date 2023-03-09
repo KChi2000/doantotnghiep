@@ -1,10 +1,13 @@
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
+import 'package:doantotnghiep/bloc/cubit/check_can_display_notification_cubit.dart';
 import 'package:doantotnghiep/bloc/getNumberInformation/get_number_information_cubit.dart';
 import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
+import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/User.dart';
 import 'package:doantotnghiep/screens/Chat/IncomingCall.dart';
+import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
 import 'package:doantotnghiep/screens/Profile.dart';
 import 'package:doantotnghiep/screens/Map.dart';
 import 'package:doantotnghiep/screens/Chat/connectToFriend.dart';
@@ -37,7 +40,7 @@ class _DisplayPageState extends State<DisplayPage> {
   
     super.initState();
     inittial();
-  
+  messageFireBase();
     FirebaseMessaging.instance.getToken().then(
       (token) {
         if (token != Userinfo.userSingleton.registrationId) {
@@ -48,7 +51,27 @@ class _DisplayPageState extends State<DisplayPage> {
     );
     
   }
-
+messageFireBase() {
+  FirebaseMessaging.instance.getInitialMessage().then((value) {
+    print(
+        'FB message when app terminated:\n${value?.notification?.title} ${value?.notification?.body}');
+  });
+  FirebaseMessaging.onMessage.listen((value) {
+  if(mounted){
+      print(
+        'FB message in foreground: can display notification: ${context.read<CheckCanDisplayNotificationCubit>().state}\n${value.notification!.title} ${value.notification!.body}');
+         LocalNotificationService.showNotificationOnForeground(value);
+  }
+   
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((value) {
+    if (value != null) {
+      print(
+          'FB message in background: ${value.notification!.title} ${value.notification!.body}');
+          navigatePush(context, chatDetail(group: GroupInfo.fromJson(value.data['group'] as Map<String,dynamic> ) ) );
+    }
+  });
+}
   void inittial() async {
     firebaseMessaging = FirebaseMessaging.instance;
     NotificationSettings settings = await firebaseMessaging.requestPermission();

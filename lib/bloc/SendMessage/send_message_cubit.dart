@@ -50,11 +50,11 @@ class SendMessageCubit extends Cubit<SendMessageState> {
                   },
                   'priority': 'high',
                   "data": {
-                    "id": "${group.groupId}",
-                    "body": "Notification Body",
-                    "title": "title data",
-                    "key_1": "key_1 data",
-                    "key_2": "key_2 data"
+                    "group": "${group.toJson()}",
+                    // "body": "Notification Body",
+                    // "title": "title data",
+                    // "key_1": "key_1 data",
+                    // "key_2": "key_2 data"
                   }
                 }));
       }

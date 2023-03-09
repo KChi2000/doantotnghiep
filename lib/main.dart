@@ -11,6 +11,7 @@ import 'package:doantotnghiep/bloc/canCreateGroup/can_create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
 import 'package:doantotnghiep/bloc/createGroup/create_group_cubit.dart';
+import 'package:doantotnghiep/bloc/cubit/check_can_display_notification_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
@@ -31,6 +32,7 @@ import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 
 import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
+import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
 
 import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:doantotnghiep/screens/auth/Login.dart';
@@ -52,11 +54,11 @@ import 'bloc/pickImage/pick_image_cubit.dart';
 import 'components/navigate.dart';
 import 'helper/location_notofications.dart';
 import 'model/User.dart';
-GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(
-      'FB message from background ${message!.notification!.title} ${message!.notification!.body} ${message.data['id']}');
-      
+      'FB message from background ${message!.notification!.title} ${message!.notification!.body} ${message.data['group']}');
 }
 
 void main() async {
@@ -68,7 +70,7 @@ void main() async {
     badge: true,
     sound: true,
   );
-  messageFireBase();
+
   Stream<String> fcmStream = FirebaseMessaging.instance.onTokenRefresh;
   fcmStream.listen((token) {
     print('FBM token was changed and applied to the db');
@@ -82,23 +84,9 @@ void main() async {
     ),
   );
 }
- messageFireBase() {
-    FirebaseMessaging.instance.getInitialMessage().then((value) {
-      print(
-          'FB message when app terminated:\n${value!.notification!.title} ${value.notification!.body}');
-    });
-    FirebaseMessaging.onMessage.listen((value) {
-      print(
-          'FB message in foreground:\n${value.notification!.title} ${value.notification!.body}');
-      LocalNotificationService.showNotificationOnForeground(value);
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((value) {
-     if(value != null){
-       print(
-          'FB message in background: ${value.notification!.title} ${value.notification!.body}');
-     }
-    });
-  }
+
+
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -106,21 +94,19 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   @override
   void initState() {
     // TODO: implement initState
     checkUserLoggedIn();
-
-    WidgetsBinding.instance.addObserver(this);
-
+ WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   void checkUserLoggedIn() async {
     context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -212,14 +198,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider(
           create: (context) => PushNotificationCubit(),
         ),
+        BlocProvider(
+          create: (context) => CheckCanDisplayNotificationCubit(),
+        ),
       ],
       child: MaterialApp(
-        navigatorKey: navigatorKey,
+        // navigatorKey: navigatorKey,
+       navigatorObservers: [routeObserver],
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
+      
         color: Colors.pink,
         supportedLocales: [Locale('vi', 'VN')],
         locale: Locale('vi', 'VN'),

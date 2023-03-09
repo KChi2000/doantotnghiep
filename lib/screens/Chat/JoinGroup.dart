@@ -96,7 +96,7 @@ class _JoinGroupState extends State<JoinGroup> {
                         .read<JoindStatusCubit>()
                         .setJoinStatus(state.data.groupId.toString());
 
-                    return grouprow(state.data);
+                    // return grouprow(state.data);
                   } else if (state is LoadingGroup) {
                     return Expanded(
                       child: Center(

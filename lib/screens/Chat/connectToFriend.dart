@@ -9,6 +9,7 @@ import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/main.dart';
 import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/screens/Chat/CallAudio.dart';
@@ -40,6 +41,7 @@ import 'package:rive/rive.dart';
 import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import '../../bloc/JoinStatus/join_status_cubit.dart';
 import '../../bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
+import '../../bloc/cubit/check_can_display_notification_cubit.dart';
 import '../../bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import '../../bloc/getProfile/get_profile_cubit.dart';
 import '../../model/User.dart';
@@ -51,7 +53,7 @@ class ConnectToFriend extends StatefulWidget {
   State<ConnectToFriend> createState() => _ConnectToFriendState();
 }
 
-class _ConnectToFriendState extends State<ConnectToFriend> {
+class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
   var groupNameCon = TextEditingController();
   var formkey = GlobalKey<FormState>();
   late Artboard artboard;
@@ -456,6 +458,23 @@ class _ConnectToFriendState extends State<ConnectToFriend> {
       ),
     );
   }
+@override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPush() {
+    print('ConnectToFriend Route was pushed onto navigator and is now topmost route.');
+    context.read<CheckCanDisplayNotificationCubit>().canDisplayNotification(true);
+  }
 
   Future<void> listenerEvent(context) async {
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -624,6 +643,7 @@ class groupitem extends StatelessWidget {
                     chatDetail(
                       group: group,
                     ));
+                // Navigator.pushReplacementNamed(context, '/chatdetail',arguments: group);
               });
             },
       onLongPress: () {},

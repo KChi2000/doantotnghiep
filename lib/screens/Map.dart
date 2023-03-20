@@ -29,6 +29,7 @@ class _TrackingState extends State<Tracking> {
   final GlobalKey globalKey = GlobalKey();
   @override
   void initState() {
+    context.read<GroupInfoCubitCubit>().initial();
     context.read<FetchLocationCubit>().requestLocation();
     context.read<GetProfileCubit>().getStreamProfile();
     context.read<GetUserGroupCubit>().getUerGroup();
@@ -73,17 +74,19 @@ class _TrackingState extends State<Tracking> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                  
                     builder: (context, state) {
                       return StreamBuilder(
                           stream: state.stream,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                              context
+                             context
                                   .read<GroupInfoCubitCubit>()
                                   .updateGroup(snapshot.data);
                               return BlocBuilder<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 builder: (context, state) {
+                                 
                                   if (state is GroupInfoCubitLoaded) {
                                     if (state.groupinfo!.length == 0) {
                                       context
@@ -102,6 +105,7 @@ class _TrackingState extends State<Tracking> {
                                             .backToInitial();
                                         return SizedBox();
                                       }
+                                       print('RUN AGAIN GROUP INFO CUBIT ${state.runTime}');
                                       context
                                           .read<FetchLocationToShowCubit>()
                                           .fetchFromDb(filterlist.last);
@@ -110,7 +114,7 @@ class _TrackingState extends State<Tracking> {
                                             BoxConstraints(maxWidth: 200),
                                         child: DropdownButtonFormField(
                                             isExpanded: true,
-                                            value: state.selectedGroup,
+                                            value: filterlist.last,
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                             items: filterlist
@@ -138,10 +142,7 @@ class _TrackingState extends State<Tracking> {
                                                           as FetchLocationToShowLoaded)
                                                       .selectedGroup
                                                       .groupId) {
-                                                context
-                                                    .read<
-                                                        FetchLocationToShowCubit>()
-                                                    .fetchFromDb(value);
+                                                context.read<FetchLocationToShowCubit>().fetchFromDb(value);
                                               }
                                             }),
                                       );

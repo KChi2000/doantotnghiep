@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
+import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'package:doantotnghiep/bloc/onHaveRemoteRender/on_have_remote_render_cubit.dart';
 import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
@@ -51,11 +52,11 @@ class _CallVideoState extends State<CallVideo> {
   setTime() {
     timer = Timer.periodic(Duration(seconds: 1), (timer) async {
       time += 1;
-      print('TIMER RUN: $time');
       if (time == 30 &&
           context.read<OnHaveRemoteRenderCubit>().state.addRemote == false) {
         timer.cancel();
         await signaling.hangUp(_localRenderer, widget.groupid, 'video');
+        Navigator.pop(context);
       }
     });
   }
@@ -151,17 +152,30 @@ class _CallVideoState extends State<CallVideo> {
                             } else {
                               context.loaderOverlay.hide();
                             }
-                         
+
                             return state.addRemote
                                 ? Container(
                                     // color: Colors.amber,
                                     width: screenwidth,
                                     height: screenheight / 2 - 10,
-                                    child: RTCVideoView(
-                                      _remoteRenderer,
-                                      mirror: true,
-                                      objectFit: RTCVideoViewObjectFit
-                                          .RTCVideoViewObjectFitCover,
+                                    child: Stack(
+                                      children: [
+                                        RTCVideoView(
+                                          _remoteRenderer,
+                                          mirror: true,
+                                          objectFit: RTCVideoViewObjectFit
+                                              .RTCVideoViewObjectFitCover,
+                                        ),
+                                        // Positioned(
+                                        //   top: 0,
+                                        //   left: 0,
+                                        //   child: Text(
+                                        //     '${_remoteRenderer.muted}',
+                                        //     style:
+                                        //         TextStyle(color: Colors.pink),
+                                        //   ),
+                                        // )
+                                      ],
                                     ),
                                   )
                                 : SizedBox();
@@ -226,17 +240,55 @@ class _CallVideoState extends State<CallVideo> {
                             SizedBox(
                               width: 30,
                             ),
-                            itemcall(
-                                SvgPicture.asset(
-                                  'assets/icons/phone-hangup.svg',
-                                  color: Colors.white,
-                                ), () async {
-                              stopTime();
-                              await signaling.hangUp(
-                                  _localRenderer, widget.groupid, 'video');
+                            BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                              builder: (context, state) {
+                                return StreamBuilder<dynamic>(
+                                    stream: state.stream,
+                                    builder: (context, snapshot) {
+                                      if(snapshot.hasData){
+                                         context
+                                  .read<GroupInfoCubitCubit>()
+                                  .updateGroup(snapshot.data);
+                                        return BlocBuilder<GroupInfoCubitCubit,
+                                          GroupInfoCubitState>(
+                                        builder: (context, state) {
+                                          return itemcall(
+                                              SvgPicture.asset(
+                                                'assets/icons/phone-hangup.svg',
+                                                color: Colors.white,
+                                              ), () async {
+                                            var data1 = await signaling
+                                                .peerConnection!
+                                                .getLocalDescription();
+                                            var data2 = await signaling
+                                                .peerConnection!
+                                                .getRemoteDescription();
+                                            print(
+                                                'peer connection infomation ${data1!.toMap()} and ${data2!.toMap()}');
+                                            // stopTime();
+                                            // await signaling.hangUp(
+                                            //     _localRenderer, widget.groupid, 'video');
 
-                              // Navigator.pop(context);
-                            }, Colors.red[900]!),
+                                            // Navigator.pop(context);
+                                          }, Colors.red[900]!);
+                                        },
+                                      );
+                                      }
+                                      return itemcall(
+                                              SvgPicture.asset(
+                                                'assets/icons/phone-hangup.svg',
+                                                color: Colors.white,
+                                              ), () async {
+                                           
+                                            stopTime();
+                                            await signaling.hangUp(
+                                                _localRenderer, widget.groupid, 'video');
+
+                                            Navigator.pop(context);
+                                          }, Colors.red[900]!); 
+                                    });
+                              },
+                            ),
                             SizedBox(
                               width: 15,
                             ),
@@ -245,39 +297,46 @@ class _CallVideoState extends State<CallVideo> {
                       },
                     ),
                   ),
-                  BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
-                    listener: (context, state) {
-                   
-                      if (state is GroupInfoCubitLoaded) {
-                        state.groupinfo!.forEach((element) async {
-                          if (element.groupId.toString() == widget.groupid) {
-                            if (element.callStatus == 'call end') {
-                              Navigator.pop(context);
-                              Fluttertoast.showToast(
-                                  msg: "Kết thúc cuộc gọi",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  textColor: Colors.white,
-                                  backgroundColor: Colors.pink,
-                                  fontSize: 16.0);
-                            }
-                            if (element.callStatus == 'happening') {
-                              Fluttertoast.showToast(
-                                  msg: "${element.recentMessage}",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  textColor: Colors.white,
-                                  backgroundColor: Colors.pink,
-                                  fontSize: 16.0);
-                            }
-                          }
-                        });
-                      }
-                    },
-                    child: SizedBox(),
-                  )
+                  // BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                  //   builder: (context, state) {
+                  //     return StreamBuilder<dynamic>(
+                  //       stream: state.stream,
+                  //       builder: (context, snapshot) {
+                  //        if(snapshot.hasData){
+                  //          context
+                  //                 .read<GroupInfoCubitCubit>()
+                  //                 .updateGroup(snapshot.data);
+                  //          return BlocListener<GroupInfoCubitCubit,
+                  //             GroupInfoCubitState>(
+                  //           listener: (context, state) {
+                  //             if (state is GroupInfoCubitLoaded) {
+                  //               state.groupinfo!.forEach((element) async {
+                  //                 if (element.groupId.toString() ==
+                  //                     widget.groupid) {
+                  //                   if (element.callStatus == 'call end') {
+                  //                     Navigator.pop(context);
+                  //                     Fluttertoast.showToast(
+                  //                         msg: "Kết thúc cuộc gọi",
+                  //                         toastLength: Toast.LENGTH_SHORT,
+                  //                         gravity: ToastGravity.BOTTOM,
+                  //                         timeInSecForIosWeb: 1,
+                  //                         textColor: Colors.white,
+                  //                         backgroundColor: Colors.pink,
+                  //                         fontSize: 16.0);
+                  //                   }
+
+                  //                 }
+                  //               });
+                  //             }
+                  //           },
+                  //           child: SizedBox(),
+                  //         );
+                  //        }
+                  //        return SizedBox();
+                  //       }
+                  //     );
+                  //   },
+                  // )
                 ],
               ))),
     );

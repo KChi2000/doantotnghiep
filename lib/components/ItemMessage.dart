@@ -174,7 +174,7 @@ class ItemMessage extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             list[index].sender.toString().length < 28
-                ? '${list[index].sender.toString()} ${list[index].contentMessage} lúc ${list[index].displaytime}'
+                ? list[index].sender.toString() == Userinfo.userSingleton.name?'Bạn ${list[index].contentMessage} lúc ${list[index].displaytime}' :'${list[index].sender.toString()} ${list[index].contentMessage} lúc ${list[index].displaytime}'
                 : Userinfo.userSingleton.uid ==
                         list[index].sender.toString().substring(
                               list[index].sender.toString().length - 28,

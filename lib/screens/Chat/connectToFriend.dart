@@ -41,8 +41,9 @@ import 'package:rive/rive.dart';
 import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import '../../bloc/JoinStatus/join_status_cubit.dart';
 import '../../bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
-import '../../bloc/cubit/check_can_display_notification_cubit.dart';
+
 import '../../bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
+import '../../bloc/getPicGroupMember/check_can_display_notification_cubit.dart';
 import '../../bloc/getProfile/get_profile_cubit.dart';
 import '../../model/User.dart';
 
@@ -410,11 +411,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
                                               NeverScrollableScrollPhysics(),
                                           itemCount: state.groupinfo!.length,
                                           itemBuilder: (context, index) {
-                                            context
-                                                .read<
-                                                    FetchLocationToShowCubit>()
-                                                .fetchFromDb(
-                                                    state.groupinfo![index]);
+                                            // context
+                                            //     .read<
+                                            //         FetchLocationToShowCubit>()
+                                            //     .fetchFromDb(
+                                            //         state.groupinfo![index]);
                                             return groupitem(
                                                 state.groupinfo![index],
                                                 ct,
@@ -902,7 +903,7 @@ class groupitem extends StatelessWidget {
                                                     Navigator.pop(context);
                                                     Fluttertoast.showToast(
                                                         msg:
-                                                            "Đã rời xóa thành công",
+                                                            "Đã xóa thành công",
                                                         toastLength:
                                                             Toast.LENGTH_SHORT,
                                                         gravity:

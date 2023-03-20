@@ -1,5 +1,5 @@
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
-import 'package:doantotnghiep/bloc/cubit/check_can_display_notification_cubit.dart';
+
 import 'package:doantotnghiep/bloc/getNumberInformation/get_number_information_cubit.dart';
 import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
@@ -22,6 +22,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../bloc/Changetab/changetab_cubit.dart';
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../bloc/getPicGroupMember/check_can_display_notification_cubit.dart';
 import '../helper/location_notofications.dart';
 
 class DisplayPage extends StatefulWidget {

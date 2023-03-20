@@ -14,22 +14,31 @@ part 'send_message_state.dart';
 class SendMessageCubit extends Cubit<SendMessageState> {
   SendMessageCubit() : super(SendMessageState(isSend: false));
   sendmessage(GroupInfo group, Message ms) async {
+     
+    try {
+        print('MESSAGE CONTENT : ${group.groupId}');
     List<Userinfo> listlocation =
         await DatabaseService().fetchGrouplocation(group);
-    List<String?> listOfRegistration_ids =
+   var token='';
+   List<String?> listOfRegistration_ids =[];
+      if(group.members!.length>1){
+        listOfRegistration_ids =
         listlocation.map((e) => e.registrationId).toList();
-    try {
-      var token = await FirebaseMessaging.instance.getToken();
-      listOfRegistration_ids.remove(token);
-      print(
-          'AFTER REMOVE DEVICE ID: ${listOfRegistration_ids.length}\n ${listOfRegistration_ids.first}');
+      token = (await FirebaseMessaging.instance.getToken())!;
+        listOfRegistration_ids.remove(token);
+      }
+      
+     // print(
+     //     'AFTER REMOVE DEVICE ID: ${listOfRegistration_ids.length}\n ${listOfRegistration_ids.first}');
       emit(SendMessageState(isSend: true));
       if (ms.contentMessage.isNotEmpty &&
           ms.contentMessage.toString() != null) {
-        //  DatabaseService().updateisReadMessage(groupId);
+        //  DatabaseService().updateisReadMessage(groupId)
+        print('MESSAGE FROM SEND: ${ms.toMap()}');
         await DatabaseService()
             .sendMessage(group.groupId.toString(), ms.toMap());
-        http.Response response =
+        if(group.members!.length>1){
+          http.Response response =
             await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
                 headers: {
                   'Authorization':
@@ -57,8 +66,11 @@ class SendMessageCubit extends Cubit<SendMessageState> {
                     // "key_2": "key_2 data"
                   }
                 }));
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
   void initialStatusSendMessage() {

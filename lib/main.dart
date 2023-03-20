@@ -11,12 +11,12 @@ import 'package:doantotnghiep/bloc/canCreateGroup/can_create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
 import 'package:doantotnghiep/bloc/createGroup/create_group_cubit.dart';
-import 'package:doantotnghiep/bloc/cubit/check_can_display_notification_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import 'package:doantotnghiep/bloc/getChatMessage/get_chat_message_cubit.dart';
 import 'package:doantotnghiep/bloc/getInviteId/get_invite_id_cubit.dart';
 import 'package:doantotnghiep/bloc/getNumberInformation/get_number_information_cubit.dart';
+import 'package:doantotnghiep/bloc/getPicGroupMember/get_pic_group_member_cubit.dart';
 import 'package:doantotnghiep/bloc/getProfile/get_profile_cubit.dart';
 import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'dart:async';
@@ -50,6 +50,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 import 'NetworkProvider/Networkprovider.dart';
+import 'bloc/getPicGroupMember/check_can_display_notification_cubit.dart';
 import 'bloc/pickImage/pick_image_cubit.dart';
 import 'components/navigate.dart';
 import 'helper/location_notofications.dart';
@@ -168,6 +169,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         BlocProvider(
           create: (context) => FetchLocationToShowCubit(),
         ),
+         BlocProvider(
+          create: (context) => GetPicGroupMemberCubit(),
+        ),
         BlocProvider(
           create: (context) => GetProfileCubit(),
         ),
@@ -204,7 +208,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       ],
       child: MaterialApp(
         // navigatorKey: navigatorKey,
-       navigatorObservers: [routeObserver],
+      // navigatorObservers: [routeObserver],
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

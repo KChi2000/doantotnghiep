@@ -54,7 +54,7 @@ class ConnectToFriend extends StatefulWidget {
   State<ConnectToFriend> createState() => _ConnectToFriendState();
 }
 
-class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
+class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
   var groupNameCon = TextEditingController();
   var formkey = GlobalKey<FormState>();
   late Artboard artboard;
@@ -283,7 +283,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
                             .read<CreateGroupCubit>()
                             .creategroup(groupNameCon.text.trim());
 
-                     
                         context.loaderOverlay.hide();
                         Fluttertoast.showToast(
                             msg: "Tạo nhóm thành công",
@@ -329,14 +328,16 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
                                   ],
                                 );
                               }
-                            
+
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
-                              
                                   if (state is GroupInfoCubitLoaded) {
                                     state.groupinfo!.forEach((element) async {
-                                      if (element.callStatus == 'calling' &&
+                                     if(element.recentMessageSender
+                                                  .toString().isNotEmpty && element.recentMessageSender
+                                                  .toString()!=null){
+                                       if (element.callStatus == 'calling' &&
                                           element.recentMessageSender
                                                   .toString()
                                                   .substring(
@@ -358,7 +359,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
                                                     ? 'video'
                                                     : 'audio'));
                                       }
-                                 
+                                     }
                                     });
                                   }
                                 },
@@ -459,7 +460,8 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
       ),
     );
   }
-@override
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
@@ -473,8 +475,11 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware{
 
   @override
   void didPush() {
-    print('ConnectToFriend Route was pushed onto navigator and is now topmost route.');
-    context.read<CheckCanDisplayNotificationCubit>().canDisplayNotification(true);
+    print(
+        'ConnectToFriend Route was pushed onto navigator and is now topmost route.');
+    context
+        .read<CheckCanDisplayNotificationCubit>()
+        .canDisplayNotification(true);
   }
 
   Future<void> listenerEvent(context) async {

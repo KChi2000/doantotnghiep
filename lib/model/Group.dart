@@ -10,6 +10,7 @@ class GroupInfo {
   List<Members>? members;
   Admin? admin;
   String? groupId;
+  OfferAnswer? offer;
   String? groupPic;
   String? recentMessage;
   String? groupName;
@@ -29,6 +30,7 @@ class GroupInfo {
       this.groupPic,
       this.recentMessage,
       this.groupName,
+      this.offer,
       this.time,
       this.checked,
       this.checkIsRead,
@@ -52,6 +54,7 @@ class GroupInfo {
       });
     }
     admin = json['admin'] != null ? new Admin.fromJson(json['admin']) : null;
+     offer = json['offer'] != null ? new OfferAnswer.fromJson(json['offer']) : null;
     groupId = json['groupId'];
     groupPic = json['groupPic'];
     recentMessage = json['recentMessage'];
@@ -74,6 +77,9 @@ class GroupInfo {
     }
     if (this.admin != null) {
       data['admin'] = this.admin!.toJson();
+    }
+    if (this.offer != null) {
+      data['offer'] = this.offer!.toJson();
     }
     data['groupId'] = this.groupId;
     data['groupPic'] = this.groupPic;
@@ -177,7 +183,39 @@ class Admin {
   @override
   int get hashCode => adminId.hashCode ^ adminName.hashCode;
 }
+class OfferAnswer {
+  String? id;
+  String? sdp;
+  String? type;
 
+  OfferAnswer({this.sdp, this.type});
+
+  OfferAnswer.fromJson(Map<String, dynamic> json) {
+    sdp = json['sdp'];
+    type = json['type'];
+    id= json['id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['sdp'] = this.sdp;
+    data['type'] = this.type;
+    data['id'] = this.id;
+    return data;
+  }
+
+  @override
+  bool operator ==(covariant OfferAnswer other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.sdp == sdp &&
+      other.type == type;
+  }
+
+  @override
+  int get hashCode => sdp.hashCode ^ type.hashCode;
+}
 class Read {
   String? Id;
   bool? isRead;

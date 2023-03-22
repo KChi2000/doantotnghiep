@@ -1,0 +1,4 @@
+enum typeCall{
+  offer,
+  answer
+}

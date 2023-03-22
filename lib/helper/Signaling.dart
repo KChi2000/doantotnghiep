@@ -64,7 +64,11 @@ class Signaling {
           print('Created offer: $offer');
 
           Map<String, dynamic> roomWithOffer = {
-            'offer': offer.toMap(),
+            'offer': {
+              'sdp': offer.toMap()['sdp'],
+              'type':offer.toMap()['type'],
+              'id':Userinfo.userSingleton.uid,
+            },
             'callStatus': 'calling',
             'recentMessageSender':
                 '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
@@ -194,7 +198,11 @@ class Signaling {
         await peerConnection!.setLocalDescription(answer);
 
         Map<String, dynamic> roomWithAnswer = {
-          'answer': {'type': answer.type, 'sdp': answer.sdp},
+          'answer': {'type': answer.type, 'sdp': answer.sdp,
+            
+            
+              'id':Userinfo.userSingleton.uid,
+          },
           'callStatus': 'happening'
         };
 
@@ -268,8 +276,7 @@ class Signaling {
       track.enabled = !isVideoOn;
     });
   }
-
-  Future<void> hangUp(
+ Future<void> hangUp(
       RTCVideoRenderer localVideo, String grid, String typeOfcall) async {
     final batch = db.batch();
     List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
@@ -300,8 +307,8 @@ class Signaling {
         .forEach((document) => batch.delete(document.reference));
     await batch.commit();
     await roomRef.update({
-      'answer': FieldValue.delete(),
-      'offer': FieldValue.delete(),
+      'answer': {},
+      'offer': {},
       'callStatus': 'call end',
       'recentMessage': 'Kết thúc cuộc gọi video'
     });
@@ -309,6 +316,40 @@ class Signaling {
 
     localStream!.dispose();
     remoteStream?.dispose();
+  }
+  Future<void> calleeHangup(
+       String grid, String typeOfcall) async {
+    final batch = db.batch();
+   
+//  if (peerConnection != null) peerConnection!.removeStream(remoteStream!);
+    if (remoteStream != null) {
+      remoteStream!.getTracks().forEach((track) => track.stop());
+    }
+   
+
+    // var db = FirebaseFirestore.instance;
+    var roomRef = db.collection('groups').doc(grid);
+    await roomRef.collection('Messages').add({
+      'contentMessage': ' đã rời cuộc gọi $typeOfcall',
+      'sender': '${Userinfo.userSingleton.name}_${Userinfo.userSingleton.uid}',
+      'time': '${DateTime.now().microsecondsSinceEpoch}',
+      'type': 'announce'
+    });
+    await roomRef.collection('calleeCandidates');
+    var calleeCandidates = await roomRef.collection('calleeCandidates').get();
+    calleeCandidates.docs
+        .forEach((document) => batch.delete(document.reference));
+
+    await batch.commit();
+    await roomRef.update({
+      'answer': {},
+      'callStatus': 'happening',
+      'recentMessage': 'đã rời cuộc gọi $typeOfcall'
+    });
+    // await roomRef.delete();
+
+    localStream!.dispose();
+   
   }
 void removeRemoteStream(){
 

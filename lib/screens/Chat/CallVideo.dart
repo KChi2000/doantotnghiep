@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
@@ -7,6 +8,7 @@ import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
+import 'package:doantotnghiep/model/User.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -245,47 +247,67 @@ class _CallVideoState extends State<CallVideo> {
                                 return StreamBuilder<dynamic>(
                                     stream: state.stream,
                                     builder: (context, snapshot) {
-                                      if(snapshot.hasData){
-                                         context
-                                  .read<GroupInfoCubitCubit>()
-                                  .updateGroup(snapshot.data);
+                                      if (snapshot.hasData) {
+                                        context
+                                            .read<GroupInfoCubitCubit>()
+                                            .updateGroup(snapshot.data);
                                         return BlocBuilder<GroupInfoCubitCubit,
-                                          GroupInfoCubitState>(
-                                        builder: (context, state) {
-                                          return itemcall(
-                                              SvgPicture.asset(
-                                                'assets/icons/phone-hangup.svg',
-                                                color: Colors.white,
-                                              ), () async {
-                                            var data1 = await signaling
-                                                .peerConnection!
-                                                .getLocalDescription();
-                                            var data2 = await signaling
-                                                .peerConnection!
-                                                .getRemoteDescription();
-                                            print(
-                                                'peer connection infomation ${data1!.toMap()} and ${data2!.toMap()}');
-                                            // stopTime();
-                                            // await signaling.hangUp(
-                                            //     _localRenderer, widget.groupid, 'video');
+                                            GroupInfoCubitState>(
+                                          builder: (context, state) {
+                                            return itemcall(
+                                                SvgPicture.asset(
+                                                  'assets/icons/phone-hangup.svg',
+                                                  color: Colors.white,
+                                                ), () async {
+                                              stopTime();
+                                              if (state
+                                                  is GroupInfoCubitLoaded) {
+                                                var data1 = await signaling
+                                                    .peerConnection!
+                                                    .getLocalDescription();
+                                                if (context
+                                                    .read<
+                                                        OnHaveRemoteRenderCubit>()
+                                                    .state
+                                                    .addRemote) {
+                                                  var afterFilter = state
+                                                      .groupinfo!
+                                                      .where((element) =>
+                                                          element.groupId ==
+                                                          widget.groupid)
+                                                      .first;
+                                                  if (afterFilter.offer!.id ==
+                                                      Userinfo
+                                                          .userSingleton.uid) {
+                                                    await signaling.hangUp(
+                                                        _localRenderer,
+                                                        widget.groupid,
+                                                        'video');
+                                                  } else {
+                                                    await signaling
+                                                        .calleeHangup(
+                                                            widget.groupid,
+                                                            'video');
+                                                  }
+                                                }
+                                              }
 
-                                            // Navigator.pop(context);
-                                          }, Colors.red[900]!);
-                                        },
-                                      );
+                                              Navigator.pop(context);
+                                            }, Colors.red[900]!);
+                                          },
+                                        );
                                       }
                                       return itemcall(
-                                              SvgPicture.asset(
-                                                'assets/icons/phone-hangup.svg',
-                                                color: Colors.white,
-                                              ), () async {
-                                           
-                                            stopTime();
-                                            await signaling.hangUp(
-                                                _localRenderer, widget.groupid, 'video');
+                                          SvgPicture.asset(
+                                            'assets/icons/phone-hangup.svg',
+                                            color: Colors.white,
+                                          ), () async {
+                                        stopTime();
+                                        await signaling.hangUp(_localRenderer,
+                                            widget.groupid, 'video');
 
-                                            Navigator.pop(context);
-                                          }, Colors.red[900]!); 
+                                        Navigator.pop(context);
+                                      }, Colors.red[900]!);
                                     });
                               },
                             ),
@@ -297,46 +319,32 @@ class _CallVideoState extends State<CallVideo> {
                       },
                     ),
                   ),
-                  // BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-                  //   builder: (context, state) {
-                  //     return StreamBuilder<dynamic>(
-                  //       stream: state.stream,
-                  //       builder: (context, snapshot) {
-                  //        if(snapshot.hasData){
-                  //          context
-                  //                 .read<GroupInfoCubitCubit>()
-                  //                 .updateGroup(snapshot.data);
-                  //          return BlocListener<GroupInfoCubitCubit,
-                  //             GroupInfoCubitState>(
-                  //           listener: (context, state) {
-                  //             if (state is GroupInfoCubitLoaded) {
-                  //               state.groupinfo!.forEach((element) async {
-                  //                 if (element.groupId.toString() ==
-                  //                     widget.groupid) {
-                  //                   if (element.callStatus == 'call end') {
-                  //                     Navigator.pop(context);
-                  //                     Fluttertoast.showToast(
-                  //                         msg: "Kết thúc cuộc gọi",
-                  //                         toastLength: Toast.LENGTH_SHORT,
-                  //                         gravity: ToastGravity.BOTTOM,
-                  //                         timeInSecForIosWeb: 1,
-                  //                         textColor: Colors.white,
-                  //                         backgroundColor: Colors.pink,
-                  //                         fontSize: 16.0);
-                  //                   }
-
-                  //                 }
-                  //               });
-                  //             }
-                  //           },
-                  //           child: SizedBox(),
-                  //         );
-                  //        }
-                  //        return SizedBox();
+                  // BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
+                  //   listener: (context, state) {
+                  //     if (state is GroupInfoCubitLoaded) {
+                  //       var afterFilter = state.groupinfo!
+                  //           .where(
+                  //               (element) => element.groupId == widget.groupid)
+                  //           .first;
+                  //       print('AFTER ${afterFilter.offer!.id} ${afterFilter.offer!.id != null}');
+                  //       if (afterFilter.offer!.id != null
+                  //          ) {
+                  //         if (afterFilter.callStatus == 'call end' && afterFilter.offer!.id != Userinfo.userSingleton.uid) {
+                  //           Navigator.pop(context);
+                  //           Fluttertoast.showToast(
+                  //               msg: "Kết thúc cuộc gọi",
+                  //               toastLength: Toast.LENGTH_SHORT,
+                  //               gravity: ToastGravity.BOTTOM,
+                  //               timeInSecForIosWeb: 1,
+                  //               textColor: Colors.white,
+                  //               backgroundColor: Colors.pink,
+                  //               fontSize: 16.0);
+                  //         }
                   //       }
-                  //     );
+                  //     }
                   //   },
-                  // )
+                  //   child: SizedBox(),
+                  // ),
                 ],
               ))),
     );

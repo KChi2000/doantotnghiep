@@ -358,6 +358,13 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
                                                 element.type == Type.callvideo
                                                     ? 'video'
                                                     : 'audio'));
+                                      }else if(element.callStatus == 'call end'){
+                                        print('VAO ELSE WITH ${element.type == Type.callvideo
+                                                    ? 'video'
+                                                    : 'audio'}${element.groupId}');
+                                        await FlutterCallkitIncoming.endCall('${element.type == Type.callvideo
+                                                    ? 'video'
+                                                    : 'audio'}${element.groupId}');
                                       }
                                      }
                                     });

@@ -69,6 +69,7 @@ class _CallVideoState extends State<CallVideo> {
 
   onAddRemote() {
     signaling.onAddRemoteStream = ((stream) {
+      print('Vao on add remote stream');
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
       timer!.cancel();
@@ -93,8 +94,7 @@ class _CallVideoState extends State<CallVideo> {
         isFrontCameraSelected);
     setState(() {});
     if (widget.answere!) {
-      print(
-          'VS Local Render: ${_localRenderer}  Remote Render: ${_remoteRenderer}');
+   
       signaling.joinRoom(widget.groupid, _remoteRenderer, 'video');
       setState(() {});
     }
@@ -156,39 +156,110 @@ class _CallVideoState extends State<CallVideo> {
                             }
 
                             return state.addRemote
-                                ? Container(
-                                    // color: Colors.amber,
-                                    width: screenwidth,
-                                    height: screenheight / 2 - 10,
-                                    child: Stack(
-                                      children: [
-                                        RTCVideoView(
-                                          _remoteRenderer,
-                                          mirror: true,
-                                          objectFit: RTCVideoViewObjectFit
-                                              .RTCVideoViewObjectFitCover,
-                                        ),
-                                        // Positioned(
-                                        //   top: 0,
-                                        //   left: 0,
-                                        //   child: Text(
-                                        //     '${_remoteRenderer.muted}',
-                                        //     style:
-                                        //         TextStyle(color: Colors.pink),
-                                        //   ),
-                                        // )
-                                      ],
-                                    ),
+                                ? BlocBuilder<GroupInfoCubitCubit,
+                                    GroupInfoCubitState>(
+                                    builder: (context, state) {
+                                      if (state is GroupInfoCubitLoaded) {
+                                        var afterFilter = state.groupinfo!
+                                            .where((element) =>
+                                                element.groupId ==
+                                                widget.groupid)
+                                            .first;
+                                        if (afterFilter.answer!.id == null ||
+                                            afterFilter.answer!.id
+                                                .toString()
+                                                .isEmpty) {
+                                          return SizedBox();
+                                        } else {
+                                          return Container(
+                                         
+                                            width: screenwidth,
+                                            height: screenheight / 2 - 10,
+                                            child: Stack(
+                                              children: [
+                                                RTCVideoView(
+                                                  _remoteRenderer,
+                                                  mirror: true,
+                                                  objectFit: RTCVideoViewObjectFit
+                                                      .RTCVideoViewObjectFitCover,
+                                                ),
+                                                Positioned(
+                                              right: 0,
+                                              child: Container(
+                                                  color: Colors.pink,
+                                                  padding: EdgeInsets.only(
+                                                      right: 10,
+                                                      top: 3,
+                                                      bottom: 3,
+                                                      left: 10),
+                                                  child: Text(
+                                                  afterFilter.offer!.id == Userinfo.userSingleton.uid?  '${afterFilter.answer!.name}':'${afterFilter.offer!.name}',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )))
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      }
+                                      return SizedBox();
+                                    },
                                   )
                                 : SizedBox();
                           },
                         ),
                         Flexible(
-                          child: RTCVideoView(
-                            _localRenderer,
-                            mirror: true,
-                            objectFit: RTCVideoViewObjectFit
-                                .RTCVideoViewObjectFitCover,
+                          child: Stack(
+                            children: [
+                              RTCVideoView(
+                                _localRenderer,
+                                mirror: true,
+                                objectFit: RTCVideoViewObjectFit
+                                    .RTCVideoViewObjectFitCover,
+                              ),
+                              BlocBuilder<OnHaveRemoteRenderCubit,
+                                  OnHaveRemoteRenderState>(
+                                builder: (context, state) {
+                                  if (state.addRemote) {
+                                    return BlocBuilder<GroupInfoCubitCubit,
+                                        GroupInfoCubitState>(
+                                      builder: (context, state) {
+                                        if (state is GroupInfoCubitLoaded) {
+                                          var afterFilter = state.groupinfo!
+                                              .where((element) =>
+                                                  element.groupId ==
+                                                  widget.groupid)
+                                              .first;
+                                          if (afterFilter.answer!.id == null ||
+                                              afterFilter.answer!.id
+                                                  .toString()
+                                                  .isEmpty) {
+                                            return SizedBox();
+                                          }
+                                          return Positioned(
+                                              right: 0,
+                                              child: Container(
+                                                  color: Colors.pink,
+                                                  padding: EdgeInsets.only(
+                                                      right: 10,
+                                                      top: 3,
+                                                      bottom: 3,
+                                                      left: 10),
+                                                  child: Text(
+                                                    'Bạn',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )));
+                                        }
+                                        return SizedBox();
+                                      },
+                                    );
+                                  } else {
+                                    return SizedBox();
+                                  }
+                                },
+                              )
+                            ],
                           ),
                         ),
                       ],
@@ -260,35 +331,27 @@ class _CallVideoState extends State<CallVideo> {
                                                   color: Colors.white,
                                                 ), () async {
                                               stopTime();
+
                                               if (state
                                                   is GroupInfoCubitLoaded) {
-                                                var data1 = await signaling
-                                                    .peerConnection!
-                                                    .getLocalDescription();
-                                                if (context
-                                                    .read<
-                                                        OnHaveRemoteRenderCubit>()
-                                                    .state
-                                                    .addRemote) {
-                                                  var afterFilter = state
-                                                      .groupinfo!
-                                                      .where((element) =>
-                                                          element.groupId ==
-                                                          widget.groupid)
-                                                      .first;
-                                                  if (afterFilter.offer!.id ==
-                                                      Userinfo
-                                                          .userSingleton.uid) {
-                                                    await signaling.hangUp(
-                                                        _localRenderer,
-                                                        widget.groupid,
-                                                        'video');
-                                                  } else {
-                                                    await signaling
-                                                        .calleeHangup(
-                                                            widget.groupid,
-                                                            'video');
-                                                  }
+                                                var afterFilter = state
+                                                    .groupinfo!
+                                                    .where((element) =>
+                                                        element.groupId ==
+                                                        widget.groupid)
+                                                    .first;
+                                                print(
+                                                    'filter list: ${afterFilter.offer!.toJson()}');
+                                                if (afterFilter.offer!.id ==
+                                                    Userinfo
+                                                        .userSingleton.uid) {
+                                                  await signaling.hangUp(
+                                                      _localRenderer,
+                                                      widget.groupid,
+                                                      'video');
+                                                } else {
+                                                  await signaling.calleeHangup(
+                                                      widget.groupid, 'video');
                                                 }
                                               }
 
@@ -319,32 +382,33 @@ class _CallVideoState extends State<CallVideo> {
                       },
                     ),
                   ),
-                  // BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
-                  //   listener: (context, state) {
-                  //     if (state is GroupInfoCubitLoaded) {
-                  //       var afterFilter = state.groupinfo!
-                  //           .where(
-                  //               (element) => element.groupId == widget.groupid)
-                  //           .first;
-                  //       print('AFTER ${afterFilter.offer!.id} ${afterFilter.offer!.id != null}');
-                  //       if (afterFilter.offer!.id != null
-                  //          ) {
-                  //         if (afterFilter.callStatus == 'call end' && afterFilter.offer!.id != Userinfo.userSingleton.uid) {
-                  //           Navigator.pop(context);
-                  //           Fluttertoast.showToast(
-                  //               msg: "Kết thúc cuộc gọi",
-                  //               toastLength: Toast.LENGTH_SHORT,
-                  //               gravity: ToastGravity.BOTTOM,
-                  //               timeInSecForIosWeb: 1,
-                  //               textColor: Colors.white,
-                  //               backgroundColor: Colors.pink,
-                  //               fontSize: 16.0);
-                  //         }
-                  //       }
-                  //     }
-                  //   },
-                  //   child: SizedBox(),
-                  // ),
+                  BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
+                    listener: (context, state) {
+                      if (state is GroupInfoCubitLoaded) {
+                        var afterFilter = state.groupinfo!
+                            .where(
+                                (element) => element.groupId == widget.groupid)
+                            .first;
+                        print(
+                            'AFTER ${afterFilter.offer!.id} ${afterFilter.offer!.id != null}');
+                        // if (afterFilter.offer!.id != null
+                        //    ) {
+                        // if (afterFilter.offer!.id != null) {
+                        //   Navigator.pop(context);
+                        //   Fluttertoast.showToast(
+                        //       msg: "Kết thúc cuộc gọi",
+                        //       toastLength: Toast.LENGTH_SHORT,
+                        //       gravity: ToastGravity.BOTTOM,
+                        //       timeInSecForIosWeb: 1,
+                        //       textColor: Colors.white,
+                        //       backgroundColor: Colors.pink,
+                        //       fontSize: 16.0);
+                        // }
+                        // }
+                      }
+                    },
+                    child: SizedBox(),
+                  ),
                 ],
               ))),
     );

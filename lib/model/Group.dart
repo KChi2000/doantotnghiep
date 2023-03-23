@@ -11,6 +11,7 @@ class GroupInfo {
   Admin? admin;
   String? groupId;
   OfferAnswer? offer;
+  OfferAnswer? answer;
   String? groupPic;
   String? recentMessage;
   String? groupName;
@@ -31,6 +32,7 @@ class GroupInfo {
       this.recentMessage,
       this.groupName,
       this.offer,
+      this.answer,
       this.time,
       this.checked,
       this.checkIsRead,
@@ -55,6 +57,7 @@ class GroupInfo {
     }
     admin = json['admin'] != null ? new Admin.fromJson(json['admin']) : null;
      offer = json['offer'] != null ? new OfferAnswer.fromJson(json['offer']) : null;
+      answer = json['answer'] != null ? new OfferAnswer.fromJson(json['answer']) : null;
     groupId = json['groupId'];
     groupPic = json['groupPic'];
     recentMessage = json['recentMessage'];
@@ -80,6 +83,9 @@ class GroupInfo {
     }
     if (this.offer != null) {
       data['offer'] = this.offer!.toJson();
+    }
+      if (this.answer != null) {
+      data['answer'] = this.answer!.toJson();
     }
     data['groupId'] = this.groupId;
     data['groupPic'] = this.groupPic;
@@ -187,13 +193,14 @@ class OfferAnswer {
   String? id;
   String? sdp;
   String? type;
-
-  OfferAnswer({this.sdp, this.type});
+  String? name;
+  OfferAnswer({this.sdp, this.type,this.id,this.name});
 
   OfferAnswer.fromJson(Map<String, dynamic> json) {
     sdp = json['sdp'];
     type = json['type'];
     id= json['id'];
+    name= json['name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -201,6 +208,7 @@ class OfferAnswer {
     data['sdp'] = this.sdp;
     data['type'] = this.type;
     data['id'] = this.id;
+    data['name'] = this.name;
     return data;
   }
 

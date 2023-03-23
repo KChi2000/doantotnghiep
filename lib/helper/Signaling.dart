@@ -38,8 +38,8 @@ class Signaling {
      
         var rs = value.data() as Map<String, dynamic>;
         print(
-            ' Create PeerConnection with configuration: $configuration :${rs['offer']}');
-        if (rs['offer'] == null || rs['offer'].toString().isEmpty) {
+            ' Create PeerConnection with configuration: ${rs['offer'] == null} ${rs['offer'].toString().isEmpty}');
+        if (rs['offer']['id'] == null || rs['offer']['id'].toString().isEmpty) {
           peerConnection = await createPeerConnection(configuration);
 
           registerPeerConnectionListeners();
@@ -68,6 +68,7 @@ class Signaling {
               'sdp': offer.toMap()['sdp'],
               'type':offer.toMap()['type'],
               'id':Userinfo.userSingleton.uid,
+              'name':Userinfo.userSingleton.name
             },
             'callStatus': 'calling',
             'recentMessageSender':
@@ -109,7 +110,7 @@ class Signaling {
               );
 
               print("Someone tried to connect");
-              await peerConnection?.setRemoteDescription(answer);
+              await peerConnection!.setRemoteDescription(answer);
             }
           });
           // Listening for remote session description above
@@ -202,6 +203,7 @@ class Signaling {
             
             
               'id':Userinfo.userSingleton.uid,
+              'name':Userinfo.userSingleton.name
           },
           'callStatus': 'happening'
         };
@@ -248,10 +250,8 @@ class Signaling {
   }
 
   switchCamera(bool isFrontCameraSelected) {
-    // change status
-    // isFrontCameraSelected = !isFrontCameraSelected;
 
-    // switch camera
+  
     localStream?.getVideoTracks().forEach((track) {
       // ignore: deprecated_member_use
       track.switchCamera();
@@ -259,18 +259,14 @@ class Signaling {
   }
 
   toggleMic(bool isAudioOn) {
-    // change status
-    // isAudioOn = !isAudioOn;
-    // enable or disable audio track
+  
     localStream?.getAudioTracks().forEach((track) {
       track.enabled = !isAudioOn;
     });
   }
 
   toggleCamera(bool isVideoOn) {
-    // // change status
-    // isVideoOn = !isVideoOn;
-
+   
     // enable or disable video track
     localStream?.getVideoTracks().forEach((track) {
       track.enabled = !isVideoOn;
@@ -356,19 +352,19 @@ void removeRemoteStream(){
 }
   void registerPeerConnectionListeners() {
     peerConnection?.onIceGatheringState = (RTCIceGatheringState state) {
-      print('ICE gathering state changed: $state');
+      print('[MyRTC] ICE gathering state changed: $state');
     };
 
     peerConnection?.onConnectionState = (RTCPeerConnectionState state) {
-      print('Connection state change: $state');
+      print('[MyRTC] Connection state change: $state');
     };
 
     peerConnection?.onSignalingState = (RTCSignalingState state) {
-      print('Signaling state change: $state');
+      print('[MyRTC] Signaling state change: $state');
     };
 
     peerConnection?.onIceGatheringState = (RTCIceGatheringState state) {
-      print('ICE connection state change: $state');
+      print('[MyRTC] ICE connection state change: $state');
     };
 
     peerConnection?.onAddStream = (MediaStream stream) {

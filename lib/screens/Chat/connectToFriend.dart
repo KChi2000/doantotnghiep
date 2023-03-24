@@ -334,39 +334,39 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
                                 listener: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
                                     state.groupinfo!.forEach((element) async {
-                                     if(element.recentMessageSender
-                                                  .toString().isNotEmpty && element.recentMessageSender
-                                                  .toString()!=null){
-                                       if (element.callStatus == 'calling' &&
+                                      if (element.recentMessageSender
+                                              .toString()
+                                              .isNotEmpty &&
                                           element.recentMessageSender
-                                                  .toString()
-                                                  .substring(
-                                                      element.recentMessageSender
-                                                              .toString()
-                                                              .length -
-                                                          29,
-                                                      element
-                                                          .recentMessageSender
-                                                          .toString()
-                                                          .length) !=
-                                              Userinfo.userSingleton.uid) {
-                                        listenerEvent(ct);
-                                        await FlutterCallkitIncoming
-                                            .showCallkitIncoming(Callparam(
-                                                '${element.groupId}',
-                                                '${element.groupName}',
-                                                element.type == Type.callvideo
-                                                    ? 'video'
-                                                    : 'audio'));
-                                      }else if(element.callStatus == 'call end'){
-                                        print('VAO ELSE WITH ${element.type == Type.callvideo
-                                                    ? 'video'
-                                                    : 'audio'}${element.groupId}');
-                                        await FlutterCallkitIncoming.endCall('${element.type == Type.callvideo
-                                                    ? 'video'
-                                                    : 'audio'}${element.groupId}');
+                                                  .toString() !=
+                                              null) {
+                                        if (element.callStatus == 'calling' &&
+                                            element.recentMessageSender
+                                                    .toString()
+                                                    .substring(
+                                                        element.recentMessageSender
+                                                                .toString()
+                                                                .length -
+                                                            29,
+                                                        element
+                                                            .recentMessageSender
+                                                            .toString()
+                                                            .length) !=
+                                                Userinfo.userSingleton.uid) {
+                                          listenerEvent(ct);
+                                          await FlutterCallkitIncoming
+                                              .startCall(Callparam(
+                                                  '${element.groupId}',
+                                                  '${element.groupName}',
+                                                  element.type == Type.callvideo
+                                                      ? 'video'
+                                                      : 'audio'));
+                                        } else if (element.callStatus ==
+                                            'call end') {
+                                          await FlutterCallkitIncoming.endCall(
+                                              '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
+                                        }
                                       }
-                                     }
                                     });
                                   }
                                 },
@@ -493,15 +493,33 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      FlutterCallkitIncoming.onEvent.listen((event) {
+      FlutterCallkitIncoming.onEvent.listen((event) async {
         if (!mounted) return;
         switch (event!.event) {
           case Event.ACTION_CALL_INCOMING:
             print('ACTION_CALL_INCOMING');
             break;
           case Event.ACTION_CALL_START:
-            // TODO: started an outgoing call
-            // TODO: show screen calling in Flutter
+            Map<String, dynamic> data = event.body;
+            print('ACTION_CALL_START ${data}');
+            await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
+                id: data['id'],
+                nameCaller: data['nameCaller'],
+                avatar: data['avatar'],
+                handle: data['number'],
+                duration: 30000,
+                textAccept: data['textAccept'],
+                textDecline: data['textDecline'],
+                textMissedCall: data['textMissedCall'],
+                textCallback: data['textCallback'],
+                android: AndroidParams(
+                    isCustomNotification: true,
+                    isCustomSmallExNotification: false,
+                    isShowMissedCallNotification: true,
+                    ringtonePath: 'system_ringtone_default',
+                    backgroundColor: '#0955fa',
+                    actionColor: '#4CAF50')));
+            print('ACTION_CALL_END ${data}');
             break;
           case Event.ACTION_CALL_ACCEPT:
             print(

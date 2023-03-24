@@ -56,7 +56,6 @@ import 'components/navigate.dart';
 import 'helper/location_notofications.dart';
 import 'model/User.dart';
 
-
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(
       'FB message from background ${message!.notification!.title} ${message!.notification!.body}');
@@ -79,39 +78,11 @@ void main() async {
         .updateRegistrationId(token);
   });
   runApp(
-    BlocProvider(
-      create: (context) => CheckLoggedCubit(),
-      child: MyApp(),
-    ),
-  );
-}
-
-
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
-  @override
-  void initState() {
-    // TODO: implement initState
-    checkUserLoggedIn();
- WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
-
-  void checkUserLoggedIn() async {
-    context.read<CheckLoggedCubit>().checkUserIsLogged();
-  }
- 
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => CheckLoggedCubit(),
+        ),
         BlocProvider(
           create: (context) => RegisterCubit(),
         ),
@@ -169,7 +140,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         BlocProvider(
           create: (context) => FetchLocationToShowCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => GetPicGroupMemberCubit(),
         ),
         BlocProvider(
@@ -206,53 +177,79 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           create: (context) => CheckCanDisplayNotificationCubit(),
         ),
       ],
-      child: MaterialApp(
-        // navigatorKey: navigatorKey,
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    // TODO: implement initState
+    checkUserLoggedIn();
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  void checkUserLoggedIn() async {
+    context.read<CheckLoggedCubit>().checkUserIsLogged();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // navigatorKey: navigatorKey,
       // navigatorObservers: [routeObserver],
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-      
-        color: Colors.pink,
-        supportedLocales: [Locale('vi', 'VN')],
-        locale: Locale('vi', 'VN'),
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme(
-                brightness: Brightness.light,
-                primary: Colors.pink,
-                onPrimary: Colors.pink,
-                secondary: Colors.white,
-                onSecondary: Colors.black,
-                error: Colors.pink,
-                onError: Colors.pink,
-                background: Colors.white,
-                onBackground: Colors.white,
-                surface: Colors.white,
-                onSurface: Colors.black),
-            cardColor: Colors.pink,
-            primaryColor: Colors.pink),
-        home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
-          builder: (context, state) {
-            if (state.uid.isNotEmpty) {
-              return BlocBuilder<NoticeCallingCubit, bool>(
-                builder: (context, state) {
-                  return Stack(
-                    children: [
-                      DisplayPage(),
-                      state ? noticeIfCalling() : SizedBox.shrink()
-                    ],
-                  );
-                },
-              );
-            }
-            return Login();
-          },
-        ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+
+      color: Colors.pink,
+      supportedLocales: [Locale('vi', 'VN')],
+      locale: Locale('vi', 'VN'),
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme(
+              brightness: Brightness.light,
+              primary: Colors.pink,
+              onPrimary: Colors.pink,
+              secondary: Colors.white,
+              onSecondary: Colors.black,
+              error: Colors.pink,
+              onError: Colors.pink,
+              background: Colors.white,
+              onBackground: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black),
+          cardColor: Colors.pink,
+          primaryColor: Colors.pink),
+      home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
+        builder: (context, state) {
+          if (state.uid.isNotEmpty) {
+            return BlocBuilder<NoticeCallingCubit, bool>(
+              builder: (context, state) {
+                return Stack(
+                  children: [
+                    DisplayPage(),
+                    state ? noticeIfCalling() : SizedBox.shrink()
+                  ],
+                );
+              },
+            );
+          }
+          return Login();
+        },
       ),
     );
   }

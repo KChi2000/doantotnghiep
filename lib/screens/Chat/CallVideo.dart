@@ -340,8 +340,7 @@ class _CallVideoState extends State<CallVideo> {
                                                         element.groupId ==
                                                         widget.groupid)
                                                     .first;
-                                                print(
-                                                    'filter list: ${afterFilter.offer!.toJson()}');
+                                              
                                                 if (afterFilter.offer!.id ==
                                                     Userinfo
                                                         .userSingleton.uid) {
@@ -407,6 +406,7 @@ class _CallVideoState extends State<CallVideo> {
                         // }
                       }
                     },
+                   
                     child: SizedBox(),
                   ),
                 ],

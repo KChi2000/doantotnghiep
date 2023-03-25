@@ -5,6 +5,7 @@ import 'package:doantotnghiep/bloc/noticeCalling/notice_calling_cubit.dart';
 import 'package:doantotnghiep/components/navigate.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/model/Group.dart';
+import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/model/User.dart';
 import 'package:doantotnghiep/screens/Chat/IncomingCall.dart';
 import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
@@ -17,13 +18,20 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../bloc/Changetab/changetab_cubit.dart';
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import '../bloc/getPicGroupMember/check_can_display_notification_cubit.dart';
+import '../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../helper/location_notofications.dart';
+import 'Chat/CallAudio.dart';
+import 'Chat/CallVideo.dart';
 
 class DisplayPage extends StatefulWidget {
   DisplayPage({super.key});
@@ -38,10 +46,11 @@ class _DisplayPageState extends State<DisplayPage> {
 
   @override
   void initState() {
-  
     super.initState();
+      listenerEvent(context);
     inittial();
-  messageFireBase();
+    messageFireBase();
+    context.read<GetUserGroupCubit>().getUerGroup();
     FirebaseMessaging.instance.getToken().then(
       (token) {
         if (token != Userinfo.userSingleton.registrationId) {
@@ -50,29 +59,33 @@ class _DisplayPageState extends State<DisplayPage> {
         }
       },
     );
-    
   }
-messageFireBase() {
-  FirebaseMessaging.instance.getInitialMessage().then((value) {
-    print(
-        'FB message when app terminated:\n${value?.notification?.title} ${value?.notification?.body}');
-  });
-  FirebaseMessaging.onMessage.listen((value) {
-  if(mounted){
+
+  messageFireBase() {
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
       print(
-        'FB message in foreground: can display notification: ${context.read<CheckCanDisplayNotificationCubit>().state}\n${value.notification!.title} ${value.notification!.body}');
-         LocalNotificationService.showNotificationOnForeground(value);
+          'FB message when app terminated:\n${value?.notification?.title} ${value?.notification?.body}');
+    });
+    FirebaseMessaging.onMessage.listen((value) {
+      if (mounted) {
+        print(
+            'FB message in foreground: can display notification: ${context.read<CheckCanDisplayNotificationCubit>().state}\n${value.notification!.title} ${value.notification!.body}');
+        LocalNotificationService.showNotificationOnForeground(value);
+      }
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((value) {
+      if (value != null) {
+        print(
+            'FB message in background: ${value.notification!.title} ${value.notification!.body}');
+        navigatePush(
+            context,
+            chatDetail(
+                group: GroupInfo.fromJson(
+                    value.data['group'] as Map<String, dynamic>)));
+      }
+    });
   }
-   
-  });
-  FirebaseMessaging.onMessageOpenedApp.listen((value) {
-    if (value != null) {
-      print(
-          'FB message in background: ${value.notification!.title} ${value.notification!.body}');
-          navigatePush(context, chatDetail(group: GroupInfo.fromJson(value.data['group'] as Map<String,dynamic> ) ) );
-    }
-  });
-}
+
   void inittial() async {
     firebaseMessaging = FirebaseMessaging.instance;
     NotificationSettings settings = await firebaseMessaging.requestPermission();
@@ -93,11 +106,63 @@ messageFireBase() {
       builder: (context, notice) {
         return Stack(
           children: [
-            BlocConsumer<ChangetabCubit, ChangetabState>(
-              listener: (context, state) {},
-              builder: (context, state) {
+            BlocBuilder<ChangetabCubit, ChangetabState>(
+              builder: (context, changeTab) {
                 return Scaffold(
-                    body: listPage.elementAt(state.index),
+                    body: BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                      builder: (context, state) {
+                        return StreamBuilder<dynamic>(
+                          stream: state.stream,
+                          builder: (context, snapshot) {
+                            if(snapshot.hasData){
+                                context
+                                  .read<GroupInfoCubitCubit>()
+                                  .updateGroup(snapshot.data);
+                            }
+                            return BlocListener<GroupInfoCubitCubit,
+                                GroupInfoCubitState>(
+                              listener: (context, state) {
+                                // if (state is GroupInfoCubitLoaded) {
+                                //   state.groupinfo!.forEach((element) async {
+                                //     if (element.recentMessageSender
+                                //             .toString()
+                                //             .isNotEmpty &&
+                                //         element.recentMessageSender.toString() !=
+                                //             null) {
+                                //       if (element.callStatus == 'calling' &&
+                                //           element.recentMessageSender
+                                //                   .toString()
+                                //                   .substring(
+                                //                       element.recentMessageSender
+                                //                               .toString()
+                                //                               .length -
+                                //                           29,
+                                //                       element.recentMessageSender
+                                //                           .toString()
+                                //                           .length) !=
+                                //               Userinfo.userSingleton.uid) {
+                                //         // listenerEvent(ct);
+                                //         await FlutterCallkitIncoming.startCall(
+                                //             Callparam(
+                                //                 '${element.groupId}',
+                                //                 '${element.groupName}',
+                                //                 element.type == Type.callvideo
+                                //                     ? 'video'
+                                //                     : 'audio'));
+                                //       } else if (element.callStatus == 'call end') {
+                                //         await FlutterCallkitIncoming.endCall(
+                                //             '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
+                                //       }
+                                //     }
+                                //   });
+                                // }
+                              },
+                              child: listPage.elementAt(changeTab.index),
+                            );
+                          }
+                        );
+                      },
+                    ),
                     bottomNavigationBar: Container(
                       decoration: BoxDecoration(
                         boxShadow: <BoxShadow>[
@@ -156,7 +221,7 @@ messageFireBase() {
                             backgroundColor: Colors.green,
                           ),
                         ],
-                        currentIndex: state.index,
+                        currentIndex: changeTab.index,
                         // selectedItemColor: Colors.amber[800],
                         onTap: (value) {
                           context.read<ChangetabCubit>().change(value);
@@ -171,6 +236,146 @@ messageFireBase() {
       },
     );
   }
+    Future<void> listenerEvent(context) async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      FlutterCallkitIncoming.onEvent.listen((event) async {
+        if (!mounted) return;
+        switch (event!.event) {
+          case Event.ACTION_CALL_INCOMING:
+            print('ACTION_CALL_INCOMING');
+            break;
+          case Event.ACTION_CALL_START:
+            Map<String, dynamic> data = event.body;
+            print('ACTION_CALL_START ${data}');
+            await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
+                id: data['id'],
+                nameCaller: data['nameCaller'],
+                avatar: data['avatar'],
+                handle: data['number'],
+                duration: 30000,
+                textAccept: data['textAccept'],
+                textDecline: data['textDecline'],
+                textMissedCall: data['textMissedCall'],
+                textCallback: data['textCallback'],
+                android: AndroidParams(
+                    isCustomNotification: true,
+                    isCustomSmallExNotification: false,
+                    isShowMissedCallNotification: true,
+                    ringtonePath: 'system_ringtone_default',
+                    backgroundColor: '#0955fa',
+                    actionColor: '#4CAF50')));
+            print('ACTION_CALL_END ${data}');
+            break;
+          case Event.ACTION_CALL_ACCEPT:
+            print(
+                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id'].toString().substring(5)}');
+            (event.body as Map<String, dynamic>)['id']
+                        .toString()
+                        .substring(0, 5) ==
+                    'video'
+                ? Future.delayed(Duration.zero, () {
+                    navigatePush(
+                        context,
+                        CallVideo(
+                          groupid: (event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5),
+                          grname: (event.body
+                              as Map<String, dynamic>)['nameCaller'],
+                          answere: true,
+                        ));
+                  })
+                : Future.delayed(Duration.zero, () {
+                    navigatePush(
+                        context,
+                        CallAudio(
+                          groupid: (event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5),
+                          grname: (event.body
+                              as Map<String, dynamic>)['nameCaller'],
+                          answere: true,
+                        ));
+                  });
+
+            break;
+          case Event.ACTION_CALL_DECLINE:
+            print('ACTION_CALL_DECLINE');
+            break;
+          case Event.ACTION_CALL_ENDED:
+            // TODO: ended an incoming/outgoing call
+            break;
+          case Event.ACTION_CALL_TIMEOUT:
+            // TODO: missed an incoming call
+            break;
+          case Event.ACTION_CALL_CALLBACK:
+            // TODO: only Android - click action `Call back` from missed call notification
+            break;
+          case Event.ACTION_CALL_TOGGLE_HOLD:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_MUTE:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_DMTF:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_GROUP:
+            // TODO: only iOS
+            break;
+          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
+            // TODO: only iOS
+            break;
+        }
+      });
+    } on Exception {}
+  }
+}
+
+Callparam(String grid, String grname, String typeOfcall) {
+  return CallKitParams(
+    id: '$typeOfcall$grid',
+    nameCaller: 'Nhóm $grname',
+    appName: 'Cùng Phượt',
+    avatar: 'assets/images/Cùng Phượt.png',
+    handle: 'đang gọi $typeOfcall',
+    type: 0,
+    duration: 30000,
+    textAccept: 'Trả lời',
+    textDecline: 'Từ chối',
+    textMissedCall: 'Cuộc gọi nhỡ',
+    textCallback: 'Gọi lại',
+    extra: <String, dynamic>{'userId': '${Userinfo.userSingleton.uid}'},
+    headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+    android: AndroidParams(
+      isCustomNotification: true,
+      // isShowLogo: true,
+      isShowCallback: true,
+      isShowMissedCallNotification: true,
+      ringtonePath: 'system_ringtone_default',
+      backgroundColor: '#0955fa',
+      backgroundUrl: 'assets/test.png',
+      actionColor: '#4CAF50',
+    ),
+    ios: IOSParams(
+      iconName: 'Cùng Phượt',
+      handleType: '',
+      supportsVideo: true,
+      maximumCallGroups: 2,
+      maximumCallsPerCallGroup: 1,
+      audioSessionMode: 'default',
+      audioSessionActive: true,
+      audioSessionPreferredSampleRate: 44100.0,
+      audioSessionPreferredIOBufferDuration: 0.005,
+      supportsDTMF: true,
+      supportsHolding: true,
+      supportsGrouping: false,
+      supportsUngrouping: false,
+      ringtonePath: 'system_ringtone_default',
+    ),
+  );
 }
 
 class noticeIfCalling extends StatelessWidget {

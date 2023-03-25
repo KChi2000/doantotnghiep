@@ -31,6 +31,7 @@ import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart
 import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
 
@@ -55,6 +56,7 @@ import 'bloc/pickImage/pick_image_cubit.dart';
 import 'components/navigate.dart';
 import 'helper/location_notofications.dart';
 import 'model/User.dart';
+import 'screens/Chat/CallAudio.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(
@@ -237,15 +239,62 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       home: BlocBuilder<CheckLoggedCubit, CheckLoggedState>(
         builder: (context, state) {
           if (state.uid.isNotEmpty) {
-            return BlocBuilder<NoticeCallingCubit, bool>(
-              builder: (context, state) {
-                return Stack(
-                  children: [
-                    DisplayPage(),
-                    state ? noticeIfCalling() : SizedBox.shrink()
-                  ],
-                );
-              },
+            return Stack(
+              children: [
+                BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                  builder: (context, state) {
+                    return StreamBuilder<dynamic>(
+                        stream: state.stream,
+                        builder: (context, snapshot) {
+                          if(snapshot.hasData){
+                                context
+                                  .read<GroupInfoCubitCubit>()
+                                  .updateGroup(snapshot.data);
+                            }
+                          return BlocListener<GroupInfoCubitCubit,
+                                GroupInfoCubitState>(
+                            listener: (context, state) {
+                                 if (state is GroupInfoCubitLoaded) {
+                                 state.groupinfo!.forEach((element) async {
+                                    if (element.recentMessageSender
+                                            .toString()
+                                            .isNotEmpty &&
+                                        element.recentMessageSender.toString() !=
+                                            null) {
+                                      if (element.callStatus == 'calling' &&
+                                          element.recentMessageSender
+                                                  .toString()
+                                                  .substring(
+                                                      element.recentMessageSender
+                                                              .toString()
+                                                              .length -
+                                                          29,
+                                                      element.recentMessageSender
+                                                          .toString()
+                                                          .length) !=
+                                              Userinfo.userSingleton.uid) {
+                                        // listenerEvent(ct);
+                                        await FlutterCallkitIncoming.startCall(
+                                            Callparam(
+                                                '${element.groupId}',
+                                                '${element.groupName}',
+                                                element.type == Type.callvideo
+                                                    ? 'video'
+                                                    : 'audio'));
+                                      } else if (element.callStatus == 'call end') {
+                                        await FlutterCallkitIncoming.endCall(
+                                            '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
+                                      }
+                                    }
+                                  });
+                                }
+                            },
+                            child: DisplayPage(),
+                          );
+                        });
+                  },
+                ),
+              ],
             );
           }
           return Login();

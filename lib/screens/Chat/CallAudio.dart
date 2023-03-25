@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import 'package:doantotnghiep/bloc/onHaveRemoteRender/on_have_remote_render_cubit.dart';
@@ -18,7 +19,9 @@ import 'package:loader_overlay/loader_overlay.dart';
 
 import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../../components/navigate.dart';
+import '../../model/User.dart';
 import '../DisplayPage.dart';
 
 class CallAudio extends StatefulWidget {
@@ -38,29 +41,46 @@ class _CallAudioState extends State<CallAudio> {
   TextEditingController textEditingController = TextEditingController(text: '');
   // bool isAudioOn = true, isVideoOn = true,
   bool isFrontCameraSelected = true;
+  int time = 0;
+  Timer? timer;
   @override
   void initState() {
-    if (widget.answere! == true) {
-      context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
-    } else {
-      context.read<OnHaveRemoteRenderCubit>().haveRemote(false);
-    }
+    context.read<OnHaveRemoteRenderCubit>().haveRemote(widget.answere!);
+    setTime();
     createRoom();
     initValue();
+    onAddRemote();
+    super.initState();
+  }
+
+  setTime() {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      time += 1;
+      if (time == 30 &&
+          context.read<OnHaveRemoteRenderCubit>().state.addRemote == false) {
+        timer.cancel();
+        await signaling.hangUp(_localRenderer, widget.groupid, 'video');
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  onAddRemote() {
     signaling.onAddRemoteStream = ((stream) {
+      print('Vao on add remote stream');
+      context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
-      // context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
+      timer!.cancel();
       setState(() {});
     });
+  }
 
-    super.initState();
-
-    // setState(() {});
+  stopTime() {
+    timer!.cancel();
   }
 
   createRoom() {
     signaling.createRoom(_remoteRenderer, widget.groupid, 'audio');
-    // setState(() {});
   }
 
   initValue() async {
@@ -119,8 +139,8 @@ class _CallAudioState extends State<CallAudio> {
                       ],
                     )),
                     child: Column(
-                      // shrinkWrap: true,
-                      // crossAxisCount: 1,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         BlocBuilder<OnHaveRemoteRenderCubit,
                             OnHaveRemoteRenderState>(
@@ -131,21 +151,204 @@ class _CallAudioState extends State<CallAudio> {
                               context.loaderOverlay.hide();
                             }
                             return state.addRemote
-                                ? Container(
-                                    // color: Colors.amber,
-                                    width: screenwidth,
-                                    height: screenheight / 2 - 10,
-                                    child:Text('Remote')
+                                ? BlocBuilder<GroupInfoCubitCubit,
+                                    GroupInfoCubitState>(
+                                    builder: (context, state) {
+                                      if (state is GroupInfoCubitLoaded) {
+                                        var afterFilter = state.groupinfo!
+                                            .where((element) =>
+                                                element.groupId ==
+                                                widget.groupid)
+                                            .first;
+                                        if (afterFilter.answer!.id == null ||
+                                            afterFilter.answer!.id
+                                                .toString()
+                                                .isEmpty) {
+                                          return Container(
+                                            width: screenwidth,
+                                            height: screenheight / 2 - 10,
+                                            padding: EdgeInsets.only(
+                                                bottom: 100,
+                                                right: 40,
+                                                left: 40),
+                                            color: Colors.black,
+                                            child: ClipRect(
+                                              child: BackdropFilter(
+                                                filter: new ImageFilter.blur(
+                                                    sigmaX: 10.0,
+                                                    sigmaY: 10.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Colors
+                                                          .grey.shade200
+                                                          .withOpacity(0.5),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  30))),
+                                                  child: Center(
+                                                      child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      CircleAvatar(
+                                                        radius: 50,
+                                                        child: Text(
+                                                          'Bạn',
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Bạn',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white,
+                                                            fontSize: 20),
+                                                      ),
+                                                    ],
+                                                  )),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          return Container(
+                                              width: screenwidth,
+                                              height: screenheight / 2 - 10,
+                                              color: Colors.black,
+                                              padding: EdgeInsets.only(
+                                                  top: 60,
+                                                  right: 40,
+                                                  left: 40,
+                                                  bottom: 40),
+                                              child: ClipRect(
+                                                child: BackdropFilter(
+                                                  filter: new ImageFilter.blur(
+                                                      sigmaX: 10.0,
+                                                      sigmaY: 10.0),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200
+                                                            .withOpacity(0.5),
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    30))),
+                                                    child: Center(
+                                                        child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 50,
+                                                          child: Text(
+                                                            afterFilter.offer!
+                                                                        .id ==
+                                                                    Userinfo
+                                                                        .userSingleton
+                                                                        .uid
+                                                                ? '${afterFilter.answer!.name}'
+                                                                : '${afterFilter.offer!.name}',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          afterFilter.offer!
+                                                                      .id ==
+                                                                  Userinfo
+                                                                      .userSingleton
+                                                                      .uid
+                                                              ? '${afterFilter.answer!.name}'
+                                                              : '${afterFilter.offer!.name}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 20),
+                                                        ),
+                                                      ],
+                                                    )),
+                                                  ),
+                                                ),
+                                              ));
+                                        }
+                                      }
+                                      return SizedBox();
+                                    },
                                   )
                                 : SizedBox();
                           },
                         ),
                         Flexible(
-                          child: RTCVideoView(
-                            _localRenderer,
-                            mirror: true,
-                            objectFit: RTCVideoViewObjectFit
-                                .RTCVideoViewObjectFitCover,
+                          child: BlocBuilder<OnHaveRemoteRenderCubit,
+                              OnHaveRemoteRenderState>(
+                            builder: (context, state) {
+                              if (state.addRemote) {
+                                return BlocBuilder<GroupInfoCubitCubit,
+                                    GroupInfoCubitState>(
+                                  builder: (context, state) {
+                                    if (state is GroupInfoCubitLoaded) {
+                                      var afterFilter = state.groupinfo!
+                                          .where((element) =>
+                                              element.groupId == widget.groupid)
+                                          .first;
+                                      if (afterFilter.answer!.id == null ||
+                                          afterFilter.answer!.id
+                                              .toString()
+                                              .isEmpty) {
+                                        return SizedBox();
+                                      }
+                                      return Container(
+                                        padding: EdgeInsets.only(
+                                            bottom: 100, right: 40, left: 40),
+                                        color: Colors.black,
+                                        child: ClipRect(
+                                          child: BackdropFilter(
+                                            filter: new ImageFilter.blur(
+                                                sigmaX: 10.0, sigmaY: 10.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey.shade200
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(30))),
+                                              child: Center(
+                                                  child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  CircleAvatar(
+                                                    radius: 50,
+                                                    child: Text(
+                                                      'Bạn',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'Bạn',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 20),
+                                                  ),
+                                                ],
+                                              )),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return SizedBox();
+                                  },
+                                );
+                              } else {
+                                return SizedBox();
+                              }
+                            },
                           ),
                         ),
                       ],
@@ -156,9 +359,7 @@ class _CallAudioState extends State<CallAudio> {
                     left: 0,
                     right: 0,
                     child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
-                      listener: (context, state) {
-                  
-                      },
+                      listener: (context, state) {},
                       builder: (context, state) {
                         return Row(
                           mainAxisSize: MainAxisSize.max,
@@ -175,17 +376,66 @@ class _CallAudioState extends State<CallAudio> {
                             SizedBox(
                               width: 60,
                             ),
-                            itemcall(
-                                SvgPicture.asset(
-                                  'assets/icons/phone-hangup.svg',
-                                  color: Colors.white,
-                                ), () async {
-                              await signaling.hangUp(
-                                  _localRenderer, widget.groupid, 'audio');
-                              await FlutterCallkitIncoming.endCall(
-                                  widget.groupid);
-                              Navigator.pop(context);
-                            }, Colors.red[900]!),
+                            BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                              builder: (context, state) {
+                                return StreamBuilder<dynamic>(
+                                    stream: state.stream,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        context
+                                            .read<GroupInfoCubitCubit>()
+                                            .updateGroup(snapshot.data);
+                                        return BlocBuilder<GroupInfoCubitCubit,
+                                            GroupInfoCubitState>(
+                                          builder: (context, state) {
+                                            return itemcall(
+                                                SvgPicture.asset(
+                                                  'assets/icons/phone-hangup.svg',
+                                                  color: Colors.white,
+                                                ), () async {
+                                              stopTime();
+
+                                              if (state
+                                                  is GroupInfoCubitLoaded) {
+                                                var afterFilter = state
+                                                    .groupinfo!
+                                                    .where((element) =>
+                                                        element.groupId ==
+                                                        widget.groupid)
+                                                    .first;
+
+                                                if (afterFilter.offer!.id ==
+                                                    Userinfo
+                                                        .userSingleton.uid) {
+                                                  await signaling.hangUp(
+                                                      _localRenderer,
+                                                      widget.groupid,
+                                                      'audio');
+                                                } else {
+                                                  await signaling.calleeHangup(
+                                                      widget.groupid, 'audio');
+                                                }
+                                              }
+
+                                              Navigator.pop(context);
+                                            }, Colors.red[900]!);
+                                          },
+                                        );
+                                      }
+                                      return itemcall(
+                                          SvgPicture.asset(
+                                            'assets/icons/phone-hangup.svg',
+                                            color: Colors.white,
+                                          ), () async {
+                                        stopTime();
+                                        await signaling.hangUp(_localRenderer,
+                                            widget.groupid, 'video');
+
+                                        Navigator.pop(context);
+                                      }, Colors.red[900]!);
+                                    });
+                              },
+                            ),
                             SizedBox(
                               width: 15,
                             ),
@@ -200,17 +450,17 @@ class _CallAudioState extends State<CallAudio> {
                         state.groupinfo!.forEach((element) async {
                           if (element.groupId.toString() == widget.groupid) {
                             if (element.callStatus == 'call end') {
-                              Navigator.pop(ct);
+                              // Navigator.pop(ct);
                               // ct.read<ChangetabCubit>().change(1);
                               // navigateReplacement(ct, DisplayPage());
-                              Fluttertoast.showToast(
-                                  msg: "Kết thúc cuộc gọi",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  textColor: Colors.white,
-                                  backgroundColor: Colors.pink,
-                                  fontSize: 16.0);
+                              // Fluttertoast.showToast(
+                              //     msg: "Kết thúc cuộc gọi",
+                              //     toastLength: Toast.LENGTH_SHORT,
+                              //     gravity: ToastGravity.BOTTOM,
+                              //     timeInSecForIosWeb: 1,
+                              //     textColor: Colors.white,
+                              //     backgroundColor: Colors.pink,
+                              //     fontSize: 16.0);
                             }
                           }
                         });

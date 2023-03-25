@@ -94,7 +94,7 @@ class _CallVideoState extends State<CallVideo> {
         isFrontCameraSelected);
     setState(() {});
     if (widget.answere!) {
-   
+
       signaling.joinRoom(widget.groupid, _remoteRenderer, 'video');
       setState(() {});
     }
@@ -382,14 +382,16 @@ class _CallVideoState extends State<CallVideo> {
                     ),
                   ),
                   BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
-                    listener: (context, state) {
+                    listener: (context, state)async {
                       if (state is GroupInfoCubitLoaded) {
                         var afterFilter = state.groupinfo!
                             .where(
                                 (element) => element.groupId == widget.groupid)
                             .first;
-                        print(
-                            'AFTER ${afterFilter.offer!.id} ${afterFilter.offer!.id != null}');
+                        
+                             var calls = await FlutterCallkitIncoming.activeCalls();
+                             print(
+                            'AFTER ACTIVE CALL $calls');
                         // if (afterFilter.offer!.id != null
                         //    ) {
                         // if (afterFilter.offer!.id != null) {

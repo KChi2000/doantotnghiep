@@ -35,7 +35,6 @@ class Signaling {
     DocumentReference roomRef = db.collection('groups').doc(grid);
     roomRef.get().then(
       (value) async {
-     
         var rs = value.data() as Map<String, dynamic>;
         print(
             ' Create PeerConnection with configuration: ${rs['offer'] == null} ${rs['offer'].toString().isEmpty}');
@@ -66,9 +65,10 @@ class Signaling {
           Map<String, dynamic> roomWithOffer = {
             'offer': {
               'sdp': offer.toMap()['sdp'],
-              'type':offer.toMap()['type'],
-              'id':Userinfo.userSingleton.uid,
-              'name':Userinfo.userSingleton.name
+              'type': offer.toMap()['type'],
+              'id': Userinfo.userSingleton.uid,
+              'name': Userinfo.userSingleton.name,
+              'pic': Userinfo.userSingleton.profilePic
             },
             'callStatus': 'calling',
             'recentMessageSender':
@@ -86,7 +86,6 @@ class Signaling {
             'time': '${DateTime.now().microsecondsSinceEpoch}',
             'type': typeOfcall == 'video' ? 'callvideo' : 'callaudio'
           });
-         
 
           peerConnection?.onTrack = (RTCTrackEvent event) {
             print('[MyRTC] Got remote track: ${event.streams[0]}');
@@ -199,11 +198,12 @@ class Signaling {
         await peerConnection!.setLocalDescription(answer);
 
         Map<String, dynamic> roomWithAnswer = {
-          'answer': {'type': answer.type, 'sdp': answer.sdp,
-            
-            
-              'id':Userinfo.userSingleton.uid,
-              'name':Userinfo.userSingleton.name
+          'answer': {
+            'type': answer.type,
+            'sdp': answer.sdp,
+            'id': Userinfo.userSingleton.uid,
+            'name': Userinfo.userSingleton.name,
+            'pic': Userinfo.userSingleton.profilePic
           },
           'callStatus': 'happening'
         };
@@ -250,8 +250,6 @@ class Signaling {
   }
 
   switchCamera(bool isFrontCameraSelected) {
-
-  
     localStream?.getVideoTracks().forEach((track) {
       // ignore: deprecated_member_use
       track.switchCamera();
@@ -259,20 +257,20 @@ class Signaling {
   }
 
   toggleMic(bool isAudioOn) {
-  
     localStream?.getAudioTracks().forEach((track) {
       track.enabled = !isAudioOn;
     });
   }
 
   toggleCamera(bool isVideoOn) {
-   
     // enable or disable video track
     localStream?.getVideoTracks().forEach((track) {
       track.enabled = !isVideoOn;
     });
+    
   }
- Future<void> hangUp(
+
+  Future<void> hangUp(
       RTCVideoRenderer localVideo, String grid, String typeOfcall) async {
     final batch = db.batch();
     List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
@@ -313,15 +311,14 @@ class Signaling {
     localStream!.dispose();
     remoteStream?.dispose();
   }
-  Future<void> calleeHangup(
-       String grid, String typeOfcall) async {
+
+  Future<void> calleeHangup(String grid, String typeOfcall) async {
     final batch = db.batch();
-   
+
 //  if (peerConnection != null) peerConnection!.removeStream(remoteStream!);
     if (remoteStream != null) {
       remoteStream!.getTracks().forEach((track) => track.stop());
     }
-   
 
     // var db = FirebaseFirestore.instance;
     var roomRef = db.collection('groups').doc(grid);
@@ -345,11 +342,9 @@ class Signaling {
     // await roomRef.delete();
 
     localStream!.dispose();
-   
   }
-void removeRemoteStream(){
 
-}
+  void removeRemoteStream() {}
   void registerPeerConnectionListeners() {
     peerConnection?.onIceGatheringState = (RTCIceGatheringState state) {
       print('[MyRTC] ICE gathering state changed: $state');
@@ -372,7 +367,7 @@ void removeRemoteStream(){
       onAddRemoteStream?.call(stream);
       remoteStream = stream;
     };
-    peerConnection?.onRemoveStream=(stream) {
+    peerConnection?.onRemoveStream = (stream) {
       print('[MyRTC] SOMEONE HAVE LEFT OUT');
       onAddRemoteStream?.call(stream);
       remoteStream = stream;

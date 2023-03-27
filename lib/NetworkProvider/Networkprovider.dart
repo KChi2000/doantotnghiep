@@ -102,6 +102,12 @@ class DatabaseService {
     });
   }
 
+  Future remoteStatusCamera(String grId, bool vl) async {
+    await groupCollection.doc(grId).update({
+      // 'offer': FieldValue.arrayUnion(elements),
+    });
+  }
+
   Future deleteDataInFB(String groupid, String groupname) async {
     final batch = FirebaseFirestore.instance.batch();
     var messagedata =
@@ -249,7 +255,6 @@ class DatabaseService {
       'type': data['type'],
       'isReadAr': listresult
     });
-    
   }
 
   updateisReadMessage(String grId) async {
@@ -268,8 +273,6 @@ class DatabaseService {
       listresult.add(element.toJson());
     });
     groupCollection.doc(grId).update({'isReadAr': listresult});
-
-   
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchMessage(String groupId) {
@@ -313,13 +316,11 @@ class DatabaseService {
     await userCollection
         .doc(Userinfo.userSingleton.uid)
         .update({'profilePic': '$urlDownload'});
-   
+
     return urlDownload;
   }
 
   Stream<DocumentSnapshot<Object?>> getProfileImage() {
     return userCollection.doc(Userinfo.userSingleton.uid).snapshots();
   }
-
-
 }

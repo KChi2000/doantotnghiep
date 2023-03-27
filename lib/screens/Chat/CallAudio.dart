@@ -175,8 +175,7 @@ class _CallAudioState extends State<CallAudio> {
                                             child: ClipRect(
                                               child: BackdropFilter(
                                                 filter: new ImageFilter.blur(
-                                                    sigmaX: 10.0,
-                                                    sigmaY: 10.0),
+                                                    sigmaX: 10.0, sigmaY: 10.0),
                                                 child: Container(
                                                   decoration: BoxDecoration(
                                                       color: Colors
@@ -192,19 +191,16 @@ class _CallAudioState extends State<CallAudio> {
                                                         MainAxisSize.min,
                                                     children: [
                                                       CircleAvatar(
-                                                        radius: 50,
-                                                        child: Text(
-                                                          'Bạn',
-                                                          style: TextStyle(
-                                                              color: Colors
-                                                                  .white),
-                                                        ),
-                                                      ),
+                                                          radius: 50,
+                                                          backgroundImage: Image
+                                                                  .network(Userinfo
+                                                                      .userSingleton
+                                                                      .profilePic!)
+                                                              .image),
                                                       Text(
                                                         'Bạn',
                                                         style: TextStyle(
-                                                            color:
-                                                                Colors.white,
+                                                            color: Colors.white,
                                                             fontSize: 20),
                                                       ),
                                                     ],
@@ -243,20 +239,35 @@ class _CallAudioState extends State<CallAudio> {
                                                           MainAxisSize.min,
                                                       children: [
                                                         CircleAvatar(
-                                                          radius: 50,
-                                                          child: Text(
-                                                            afterFilter.offer!
+                                                            radius: 50,
+                                                            backgroundImage: afterFilter
+                                                                        .offer!
                                                                         .id ==
                                                                     Userinfo
                                                                         .userSingleton
                                                                         .uid
-                                                                ? '${afterFilter.answer!.name}'
-                                                                : '${afterFilter.offer!.name}',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          ),
-                                                        ),
+                                                                ? Image.network(afterFilter
+                                                                        .answer!
+                                                                        .profile!)
+                                                                    .image
+                                                                : Image.network(
+                                                                        afterFilter
+                                                                            .offer!
+                                                                            .profile!)
+                                                                    .image
+                                                            // Text(
+                                                            //   afterFilter.offer!
+                                                            //               .id ==
+                                                            //           Userinfo
+                                                            //               .userSingleton
+                                                            //               .uid
+                                                            //       ? '${afterFilter.answer!.name}'
+                                                            //       : '${afterFilter.offer!.name}',
+                                                            //   style: TextStyle(
+                                                            //       color: Colors
+                                                            //           .white),
+                                                            // ),
+                                                            ),
                                                         Text(
                                                           afterFilter.offer!
                                                                       .id ==
@@ -322,13 +333,12 @@ class _CallAudioState extends State<CallAudio> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   CircleAvatar(
-                                                    radius: 50,
-                                                    child: Text(
-                                                      'Bạn',
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                  ),
+                                                      radius: 50,
+                                                      backgroundImage:
+                                                          Image.network(Userinfo
+                                                                  .userSingleton
+                                                                  .profilePic!)
+                                                              .image),
                                                   Text(
                                                     'Bạn',
                                                     style: TextStyle(

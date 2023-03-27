@@ -94,7 +94,6 @@ class _CallVideoState extends State<CallVideo> {
         isFrontCameraSelected);
     setState(() {});
     if (widget.answere!) {
-
       signaling.joinRoom(widget.groupid, _remoteRenderer, 'video');
       setState(() {});
     }
@@ -172,7 +171,6 @@ class _CallVideoState extends State<CallVideo> {
                                           return SizedBox();
                                         } else {
                                           return Container(
-                                         
                                             width: screenwidth,
                                             height: screenheight / 2 - 10,
                                             child: Stack(
@@ -184,19 +182,27 @@ class _CallVideoState extends State<CallVideo> {
                                                       .RTCVideoViewObjectFitCover,
                                                 ),
                                                 Positioned(
-                                              right: 0,
-                                              child: Container(
-                                                  color: Colors.pink,
-                                                  padding: EdgeInsets.only(
-                                                      right: 10,
-                                                      top: 3,
-                                                      bottom: 3,
-                                                      left: 10),
-                                                  child: Text(
-                                                  afterFilter.offer!.id == Userinfo.userSingleton.uid?  '${afterFilter.answer!.name}':'${afterFilter.offer!.name}',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  )))
+                                                    right: 0,
+                                                    child: Container(
+                                                        color: Colors.pink,
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 10,
+                                                                top: 3,
+                                                                bottom: 3,
+                                                                left: 10),
+                                                        child: Text(
+                                                          afterFilter.offer!
+                                                                      .id ==
+                                                                  Userinfo
+                                                                      .userSingleton
+                                                                      .uid
+                                                              ? '${afterFilter.answer!.name}'
+                                                              : '${afterFilter.offer!.name}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        )))
                                               ],
                                             ),
                                           );
@@ -208,59 +214,91 @@ class _CallVideoState extends State<CallVideo> {
                                 : SizedBox();
                           },
                         ),
-                        Flexible(
-                          child: Stack(
-                            children: [
-                              RTCVideoView(
-                                _localRenderer,
-                                mirror: true,
-                                objectFit: RTCVideoViewObjectFit
-                                    .RTCVideoViewObjectFitCover,
-                              ),
-                              BlocBuilder<OnHaveRemoteRenderCubit,
-                                  OnHaveRemoteRenderState>(
-                                builder: (context, state) {
-                                  if (state.addRemote) {
-                                    return BlocBuilder<GroupInfoCubitCubit,
-                                        GroupInfoCubitState>(
+                        BlocBuilder<ToggleCmCubit, ToggleCmState>(
+                          builder: (context, state) {
+                            return Flexible(
+                              child: Container(
+                                color: Colors.grey,
+                                child: Stack(
+                                  children: [
+                                    signaling.localStream != null
+                                        ? state.openCamera
+                                            ? RTCVideoView(
+                                                _localRenderer,
+                                                mirror: true,
+                                                objectFit: RTCVideoViewObjectFit
+                                                    .RTCVideoViewObjectFitCover,
+                                              )
+                                            : Center(
+                                                child: CircleAvatar(
+                                                    radius: 70,
+                                                    backgroundImage:
+                                                        Image.network(Userinfo
+                                                                .userSingleton
+                                                                .profilePic!)
+                                                            .image),
+                                              )
+                                        : Center(
+                                            child: CircleAvatar(
+                                                radius: 50,
+                                                backgroundImage: Image.network(
+                                                        Userinfo.userSingleton
+                                                            .profilePic!)
+                                                    .image),
+                                          ),
+                                    BlocBuilder<OnHaveRemoteRenderCubit,
+                                        OnHaveRemoteRenderState>(
                                       builder: (context, state) {
-                                        if (state is GroupInfoCubitLoaded) {
-                                          var afterFilter = state.groupinfo!
-                                              .where((element) =>
-                                                  element.groupId ==
-                                                  widget.groupid)
-                                              .first;
-                                          if (afterFilter.answer!.id == null ||
-                                              afterFilter.answer!.id
-                                                  .toString()
-                                                  .isEmpty) {
-                                            return SizedBox();
-                                          }
-                                          return Positioned(
-                                              right: 0,
-                                              child: Container(
-                                                  color: Colors.pink,
-                                                  padding: EdgeInsets.only(
-                                                      right: 10,
-                                                      top: 3,
-                                                      bottom: 3,
-                                                      left: 10),
-                                                  child: Text(
-                                                    'Bạn',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  )));
+                                        if (state.addRemote) {
+                                          return BlocBuilder<
+                                              GroupInfoCubitCubit,
+                                              GroupInfoCubitState>(
+                                            builder: (context, state) {
+                                              if (state
+                                                  is GroupInfoCubitLoaded) {
+                                                var afterFilter = state
+                                                    .groupinfo!
+                                                    .where((element) =>
+                                                        element.groupId ==
+                                                        widget.groupid)
+                                                    .first;
+                                                if (afterFilter.answer!.id ==
+                                                        null ||
+                                                    afterFilter.answer!.id
+                                                        .toString()
+                                                        .isEmpty) {
+                                                  return SizedBox();
+                                                }
+                                                return Positioned(
+                                                    right: 0,
+                                                    child: Container(
+                                                        color: Colors.pink,
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 10,
+                                                                top: 3,
+                                                                bottom: 3,
+                                                                left: 10),
+                                                        child: Text(
+                                                          'Bạn',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        )));
+                                              }
+                                              return SizedBox();
+                                            },
+                                          );
+                                        } else {
+                                          return SizedBox();
                                         }
-                                        return SizedBox();
                                       },
-                                    );
-                                  } else {
-                                    return SizedBox();
-                                  }
-                                },
-                              )
-                            ],
-                          ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -340,7 +378,7 @@ class _CallVideoState extends State<CallVideo> {
                                                         element.groupId ==
                                                         widget.groupid)
                                                     .first;
-                                              
+
                                                 if (afterFilter.offer!.id ==
                                                     Userinfo
                                                         .userSingleton.uid) {
@@ -382,16 +420,15 @@ class _CallVideoState extends State<CallVideo> {
                     ),
                   ),
                   BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
-                    listener: (context, state)async {
+                    listener: (context, state) async {
                       if (state is GroupInfoCubitLoaded) {
                         var afterFilter = state.groupinfo!
                             .where(
                                 (element) => element.groupId == widget.groupid)
                             .first;
-                        
-                             var calls = await FlutterCallkitIncoming.activeCalls();
-                             print(
-                            'AFTER ACTIVE CALL $calls');
+
+                        var calls = await FlutterCallkitIncoming.activeCalls();
+                        print('AFTER ACTIVE CALL $calls');
                         // if (afterFilter.offer!.id != null
                         //    ) {
                         // if (afterFilter.offer!.id != null) {
@@ -408,7 +445,6 @@ class _CallVideoState extends State<CallVideo> {
                         // }
                       }
                     },
-                   
                     child: SizedBox(),
                   ),
                 ],

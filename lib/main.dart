@@ -246,48 +246,49 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     return StreamBuilder<dynamic>(
                         stream: state.stream,
                         builder: (context, snapshot) {
-                          if(snapshot.hasData){
-                                context
-                                  .read<GroupInfoCubitCubit>()
-                                  .updateGroup(snapshot.data);
-                            }
+                          if (snapshot.hasData) {
+                            context
+                                .read<GroupInfoCubitCubit>()
+                                .updateGroup(snapshot.data);
+                          }
                           return BlocListener<GroupInfoCubitCubit,
-                                GroupInfoCubitState>(
+                              GroupInfoCubitState>(
                             listener: (context, state) {
-                                 if (state is GroupInfoCubitLoaded) {
-                                 state.groupinfo!.forEach((element) async {
-                                    if (element.recentMessageSender
-                                            .toString()
-                                            .isNotEmpty &&
-                                        element.recentMessageSender.toString() !=
-                                            null) {
-                                      if (element.callStatus == 'calling' &&
-                                          element.recentMessageSender
-                                                  .toString()
-                                                  .substring(
-                                                      element.recentMessageSender
-                                                              .toString()
-                                                              .length -
-                                                          29,
-                                                      element.recentMessageSender
-                                                          .toString()
-                                                          .length) !=
-                                              Userinfo.userSingleton.uid) {
-                                        // listenerEvent(ct);
-                                        await FlutterCallkitIncoming.startCall(
-                                            Callparam(
-                                                '${element.groupId}',
-                                                '${element.groupName}',
-                                                element.type == Type.callvideo
-                                                    ? 'video'
-                                                    : 'audio'));
-                                      } else if (element.callStatus == 'call end') {
-                                        await FlutterCallkitIncoming.endCall(
-                                            '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
-                                      }
+                              if (state is GroupInfoCubitLoaded) {
+                                state.groupinfo!.forEach((element) async {
+                                  if (element.recentMessageSender
+                                          .toString()
+                                          .isNotEmpty &&
+                                      element.recentMessageSender.toString() !=
+                                          null) {
+                                    if (element.callStatus == 'calling' &&
+                                        element.recentMessageSender
+                                                .toString()
+                                                .substring(
+                                                    element.recentMessageSender
+                                                            .toString()
+                                                            .length -
+                                                        29,
+                                                    element.recentMessageSender
+                                                        .toString()
+                                                        .length) !=
+                                            Userinfo.userSingleton.uid) {
+                                      // listenerEvent(ct);
+                                      await FlutterCallkitIncoming.startCall(
+                                          Callparam(
+                                              '${element.groupId}',
+                                              '${element.groupName}',
+                                              element.type == Type.callvideo
+                                                  ? 'video'
+                                                  : 'audio'));
+                                    } else if (element.callStatus ==
+                                        'call end') {
+                                      await FlutterCallkitIncoming.endCall(
+                                          '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
                                     }
-                                  });
-                                }
+                                  }
+                                });
+                              }
                             },
                             child: DisplayPage(),
                           );

@@ -194,13 +194,15 @@ class OfferAnswer {
   String? sdp;
   String? type;
   String? name;
-  OfferAnswer({this.sdp, this.type,this.id,this.name});
+  String? profile;
+  OfferAnswer({this.sdp, this.type,this.id,this.name,this.profile});
 
   OfferAnswer.fromJson(Map<String, dynamic> json) {
     sdp = json['sdp'];
     type = json['type'];
     id= json['id'];
     name= json['name'];
+    profile = json['pic'];
   }
 
   Map<String, dynamic> toJson() {
@@ -209,6 +211,7 @@ class OfferAnswer {
     data['type'] = this.type;
     data['id'] = this.id;
     data['name'] = this.name;
+    data['pic'] = this.profile;
     return data;
   }
 

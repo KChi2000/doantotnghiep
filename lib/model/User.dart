@@ -29,15 +29,16 @@ class Userinfo {
     this.sothich,
     this.registrationId
   });
-  void saveUserInfo(String uid, String name,String registrationId) {
+  void saveUserInfo(String uid, String name,String registrationId,String profilePic) {
     this.uid = uid;
     this.name = name;
     this.registrationId= registrationId;
+    this.profilePic;
   }
- void saveUserNameId(String uid, String name) {
+ void saveUserNameId(String uid, String name,String profilePic) {
     this.uid = uid;
     this.name = name;
-   
+   this.profilePic;
   }
   void saveUserUid(String uid) {
     this.uid = uid;
@@ -46,7 +47,9 @@ class Userinfo {
   void saveUserName(String name) {
     this.name = name;
   }
-
+void saveProfilePic(String link) {
+    this.profilePic = link;
+  }
  void saveRegistrationId(String registrationId) {
     this.registrationId = registrationId;
   }

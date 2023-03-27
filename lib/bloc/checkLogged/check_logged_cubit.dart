@@ -17,11 +17,12 @@ class CheckLoggedCubit extends Cubit<CheckLoggedState> {
    try{
      var id=await  HelperFunctions.getLoggedUserUid();
      var username = await HelperFunctions.getLoggedUserName();
+     var profilePic = await HelperFunctions.getUserPic();
      if(id ==null|| id.isEmpty || username ==null|| username.isEmpty){
       emit(CheckLoggedState(''));
      }
     else{
-      Userinfo.userSingleton.saveUserNameId(id, username);
+      Userinfo.userSingleton.saveUserNameId(id, username,profilePic.toString());
       emit(CheckLoggedState(id));
     }
    } catch(e){

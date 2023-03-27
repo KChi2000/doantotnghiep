@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:doantotnghiep/helper/helper_function.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../model/User.dart';
@@ -11,6 +12,7 @@ class FetchImageCubit extends Cubit<FetchImageState> {
     emit(FetchImageLoading());
     var rs = Userinfo.fromJson(snapshot);
   
+    Userinfo.userSingleton.saveProfilePic(rs.profilePic.toString());
     emit(FetchImageComplete(image: rs));
   }
 }

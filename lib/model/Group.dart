@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 import 'package:doantotnghiep/model/Message.dart';
@@ -138,6 +140,52 @@ class GroupInfo {
       callStatus.hashCode ^
       status.hashCode;
   }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'recentMessageSender': recentMessageSender,
+      'inviteId': inviteId,
+      'isReadAr': isReadAr!.map((x) => x.toMap()).toList(),
+      'members': members!.map((x) => x.toMap()).toList(),
+      'admin': admin?.toMap(),
+      'groupId': groupId,
+      'offer': offer?.toMap(),
+      'answer': answer?.toMap(),
+      'groupPic': groupPic,
+      'recentMessage': recentMessage,
+      'groupName': groupName,
+      'time': time,
+      'checked': checked,
+      'checkIsRead': checkIsRead,
+      'type': this.type!.name,
+      'callStatus': callStatus,
+      'status': status,
+    };
+  }
+
+  factory GroupInfo.fromMap(Map<String, dynamic> map) {
+    return GroupInfo(
+     recentMessageSender:  map['recentMessageSender'] != null ? map['recentMessageSender'] as String : null,
+    inviteId:   map['inviteId'] != null ? map['inviteId'] as String : null,
+    isReadAr:   map['isReadAr'] != null ? List<Read>.from((map['isReadAr'] as List<int>).map<Read?>((x) => Read.fromMap(x as Map<String,dynamic>),),) : null,
+    members:   map['members'] != null ? List<Members>.from((map['members'] as List<int>).map<Members?>((x) => Members.fromMap(x as Map<String,dynamic>),),) : null,
+    admin:   map['admin'] != null ? Admin.fromMap(map['admin'] as Map<String,dynamic>) : null,
+    groupId:   map['groupId'] != null ? map['groupId'] as String : null,
+    offer:   map['offer'] != null ? OfferAnswer.fromMap(map['offer'] as Map<String,dynamic>) : null,
+    answer:   map['answer'] != null ? OfferAnswer.fromMap(map['answer'] as Map<String,dynamic>) : null,
+    groupPic:   map['groupPic'] != null ? map['groupPic'] as String : null,
+    recentMessage:   map['recentMessage'] != null ? map['recentMessage'] as String : null,
+    groupName:   map['groupName'] != null ? map['groupName'] as String : null,
+    time:   map['time'] != null ? map['time'] as String : null,
+    checked:   map['checked'] != null ? map['checked'] as bool : null,
+    checkIsRead:   map['checkIsRead'] != null ? map['checkIsRead'] as bool : null,
+    type:   map['type'] != null ? Type.values.elementAt(findenum(map['type'])):null,
+    callStatus:   map['callStatus'] != null ? map['callStatus'] as String : null,
+     status:  map['status'] != null ? map['status'] as String : null,
+    );
+  }
+
+ 
 }
 
 class Members {
@@ -157,6 +205,22 @@ class Members {
     data['Name'] = this.Name;
     return data;
   }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'Id': Id,
+      'Name': Name,
+    };
+  }
+
+  factory Members.fromMap(Map<String, dynamic> map) {
+    return Members(
+      Id: map['Id'] != null ? map['Id'] as String : null,
+      Name: map['Name'] != null ? map['Name'] as String : null,
+    );
+  }
+
+
 }
 
 class Admin {
@@ -188,6 +252,22 @@ class Admin {
 
   @override
   int get hashCode => adminId.hashCode ^ adminName.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'adminId': adminId,
+      'adminName': adminName,
+    };
+  }
+
+  factory Admin.fromMap(Map<String, dynamic> map) {
+    return Admin(
+      adminId: map['adminId'] != null ? map['adminId'] as String : null,
+      adminName: map['adminName'] != null ? map['adminName'] as String : null,
+    );
+  }
+
+  
 }
 class OfferAnswer {
   String? id;
@@ -195,7 +275,8 @@ class OfferAnswer {
   String? type;
   String? name;
   String? profile;
-  OfferAnswer({this.sdp, this.type,this.id,this.name,this.profile});
+  bool? cameraStatus;
+  OfferAnswer({this.sdp, this.type,this.id,this.name,this.profile, bool? cameraStatus});
 
   OfferAnswer.fromJson(Map<String, dynamic> json) {
     sdp = json['sdp'];
@@ -203,6 +284,7 @@ class OfferAnswer {
     id= json['id'];
     name= json['name'];
     profile = json['pic'];
+    cameraStatus = json['cameraStatus'];
   }
 
   Map<String, dynamic> toJson() {
@@ -212,6 +294,7 @@ class OfferAnswer {
     data['id'] = this.id;
     data['name'] = this.name;
     data['pic'] = this.profile;
+     data['cameraStatus'] = this.cameraStatus;
     return data;
   }
 
@@ -226,6 +309,30 @@ class OfferAnswer {
 
   @override
   int get hashCode => sdp.hashCode ^ type.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'sdp': sdp,
+      'type': type,
+      'name': name,
+      'profile': profile,
+      'cameraStatus': cameraStatus,
+    };
+  }
+
+  factory OfferAnswer.fromMap(Map<String, dynamic> map) {
+    return OfferAnswer(
+      id: map['id'] != null ? map['id'] as String : null,
+      sdp: map['sdp'] != null ? map['sdp'] as String : null,
+      type: map['type'] != null ? map['type'] as String : null,
+      name: map['name'] != null ? map['name'] as String : null,
+      profile: map['profile'] != null ? map['profile'] as String : null,
+      cameraStatus: map['cameraStatus'] != null ? map['cameraStatus'] as bool : null,
+    );
+  }
+
+ 
 }
 class Read {
   String? Id;
@@ -244,4 +351,20 @@ class Read {
     data['isRead'] = this.isRead;
     return data;
   }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'Id': Id,
+      'isRead': isRead,
+    };
+  }
+
+  factory Read.fromMap(Map<String, dynamic> map) {
+    return Read(
+      Id: map['Id'] != null ? map['Id'] as String : null,
+      isRead: map['isRead'] != null ? map['isRead'] as bool : null,
+    );
+  }
+
+  
 }

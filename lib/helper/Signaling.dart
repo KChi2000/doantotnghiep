@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
+import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/User.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -68,7 +70,8 @@ class Signaling {
               'type': offer.toMap()['type'],
               'id': Userinfo.userSingleton.uid,
               'name': Userinfo.userSingleton.name,
-              'pic': Userinfo.userSingleton.profilePic
+              'pic': Userinfo.userSingleton.profilePic,
+              'cameraStatus':true
             },
             'callStatus': 'calling',
             'recentMessageSender':
@@ -203,7 +206,8 @@ class Signaling {
             'sdp': answer.sdp,
             'id': Userinfo.userSingleton.uid,
             'name': Userinfo.userSingleton.name,
-            'pic': Userinfo.userSingleton.profilePic
+            'pic': Userinfo.userSingleton.profilePic,
+            'cameraStatus':true
           },
           'callStatus': 'happening'
         };
@@ -262,12 +266,12 @@ class Signaling {
     });
   }
 
-  toggleCamera(bool isVideoOn) {
+  toggleCamera(bool isVideoOn, String grId, OfferAnswer data) async {
     // enable or disable video track
     localStream?.getVideoTracks().forEach((track) {
       track.enabled = !isVideoOn;
     });
-    
+    await DatabaseService().remoteStatusCamera(grId, !isVideoOn, data);
   }
 
   Future<void> hangUp(

@@ -327,7 +327,7 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                         maxLines: null,
                         decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'send a message...',
+                            hintText: 'Send a message...',
                             hintStyle: TextStyle(color: Colors.grey)),
                         onFieldSubmitted: (value) async {
                           context.read<SendMessageCubit>().sendmessage(

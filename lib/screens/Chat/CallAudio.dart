@@ -439,7 +439,7 @@ class _CallAudioState extends State<CallAudio> {
                                           ), () async {
                                         stopTime();
                                         await signaling.hangUp(_localRenderer,
-                                            widget.groupid, 'video');
+                                            widget.groupid, 'audio');
 
                                         Navigator.pop(context);
                                       }, Colors.red[900]!);

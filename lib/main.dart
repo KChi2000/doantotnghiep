@@ -190,7 +190,7 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
-
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
@@ -207,7 +207,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // navigatorKey: navigatorKey,
+      navigatorKey: navigatorKey,
       // navigatorObservers: [routeObserver],
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

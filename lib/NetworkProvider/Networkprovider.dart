@@ -102,9 +102,16 @@ class DatabaseService {
     });
   }
 
-  Future remoteStatusCamera(String grId, bool vl) async {
+  Future remoteStatusCamera(String grId, bool vl,OfferAnswer data) async {
     await groupCollection.doc(grId).update({
-      // 'offer': FieldValue.arrayUnion(elements),
+      '${data.type}': {
+        'id':'${data.id}',
+        'name':'${data.name}',
+        'pic':'${data.profile}',
+        'sdp':'${data.sdp}',
+        'type':'${data.type}',
+        'cameraStatus':vl
+      },
     });
   }
 

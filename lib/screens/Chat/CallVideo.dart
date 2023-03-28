@@ -173,14 +173,42 @@ class _CallVideoState extends State<CallVideo> {
                                           return Container(
                                             width: screenwidth,
                                             height: screenheight / 2 - 10,
+                                            color: Colors.grey,
                                             child: Stack(
                                               children: [
-                                                RTCVideoView(
-                                                  _remoteRenderer,
-                                                  mirror: true,
-                                                  objectFit: RTCVideoViewObjectFit
-                                                      .RTCVideoViewObjectFitCover,
-                                                ),
+                                                Userinfo.userSingleton.uid ==
+                                                        afterFilter.offer!.id
+                                                    ? afterFilter.answer!
+                                                            .cameraStatus!
+                                                        ? RTCVideoView(
+                                                            _remoteRenderer,
+                                                            mirror: true,
+                                                            objectFit:
+                                                                RTCVideoViewObjectFit
+                                                                    .RTCVideoViewObjectFitCover,
+                                                          )
+                                                        : Center(
+                                                            child: CircleAvatar(
+                                                                radius: 70,
+                                                                backgroundImage:
+                                                                    Image.network(afterFilter.answer!.profile!).image),
+                                                          )
+                                                    : afterFilter.offer!
+                                                            .cameraStatus!
+                                                        ? RTCVideoView(
+                                                            _remoteRenderer,
+                                                            mirror: true,
+                                                            objectFit:
+                                                                RTCVideoViewObjectFit
+                                                                    .RTCVideoViewObjectFitCover,
+                                                          )
+                                                        : Center(
+                                                            child: CircleAvatar(
+                                                                radius: 70,
+                                                                backgroundImage:
+                                                                    Image.network(afterFilter.offer!.profile!)
+                                                                        .image),
+                                                          ),
                                                 Positioned(
                                                     right: 0,
                                                     child: Container(
@@ -303,121 +331,122 @@ class _CallVideoState extends State<CallVideo> {
                       ],
                     ),
                   ),
-                  Positioned(
-                    bottom: 20.0,
-                    left: 0,
-                    right: 0,
-                    child: BlocConsumer<ToggleCmCubit, ToggleCmState>(
-                      listener: (context, state) {},
-                      builder: (context, state) {
-                        return Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            itemcall(
-                                Icon(
-                                  state.openCamera
-                                      ? Icons.videocam
-                                      : Icons.videocam_off,
-                                  color: Colors.black,
-                                ), () async {
-                              await context
-                                  .read<ToggleCmCubit>()
-                                  .toggleCamera();
-                              signaling.toggleCamera(state.openCamera);
-                            }, Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            itemcall(
-                                Icon(
-                                  state.enableMic ? Icons.mic : Icons.mic_off,
-                                  color: Colors.black,
-                                ), () async {
-                              await context.read<ToggleCmCubit>().toggleMic();
-                              signaling.toggleMic(state.enableMic);
-                            }, Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            itemcall(
-                                SvgPicture.asset(
-                                    'assets/icons/camera-flip.svg'), () async {
-                              await context
-                                  .read<ToggleCmCubit>()
-                                  .switchCamera();
-                              signaling.switchCamera(state.useFrontCamera);
-                            }, Colors.white),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                  BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+                    builder: (context, state) {
+                      return StreamBuilder<dynamic>(
+                          stream: state.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              context
+                                  .read<GroupInfoCubitCubit>()
+                                  .updateGroup(snapshot.data);
+                            }
+                            return BlocBuilder<GroupInfoCubitCubit,
+                                GroupInfoCubitState>(
                               builder: (context, state) {
-                                return StreamBuilder<dynamic>(
-                                    stream: state.stream,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        context
-                                            .read<GroupInfoCubitCubit>()
-                                            .updateGroup(snapshot.data);
-                                        return BlocBuilder<GroupInfoCubitCubit,
-                                            GroupInfoCubitState>(
-                                          builder: (context, state) {
-                                            return itemcall(
+                                if (state is GroupInfoCubitLoaded) {
+                                  var afterFilter = state.groupinfo!
+                                      .where((element) =>
+                                          element.groupId == widget.groupid)
+                                      .first;
+                                  return Positioned(
+                                    bottom: 20.0,
+                                    left: 0,
+                                    right: 0,
+                                    child: BlocConsumer<ToggleCmCubit,
+                                        ToggleCmState>(
+                                      listener: (context, state) {},
+                                      builder: (context, toggleCM) {
+                                        return Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            itemcall(
+                                                Icon(
+                                                  toggleCM.openCamera
+                                                      ? Icons.videocam
+                                                      : Icons.videocam_off,
+                                                  color: Colors.black,
+                                                ), () async {
+                                              await context
+                                                  .read<ToggleCmCubit>()
+                                                  .toggleCamera();
+                                              signaling.toggleCamera(
+                                                  toggleCM.openCamera,
+                                                  widget.groupid,
+                                                  (afterFilter.offer!.id ==
+                                                          Userinfo
+                                                              .userSingleton.uid
+                                                      ? afterFilter.offer
+                                                      : afterFilter.answer)!);
+                                            }, Colors.white),
+                                            SizedBox(
+                                              width: 30,
+                                            ),
+                                            itemcall(
+                                                Icon(
+                                                  toggleCM.enableMic
+                                                      ? Icons.mic
+                                                      : Icons.mic_off,
+                                                  color: Colors.black,
+                                                ), () async {
+                                              await context
+                                                  .read<ToggleCmCubit>()
+                                                  .toggleMic();
+                                              signaling.toggleMic(
+                                                  toggleCM.enableMic);
+                                            }, Colors.white),
+                                            SizedBox(
+                                              width: 30,
+                                            ),
+                                            itemcall(
+                                                SvgPicture.asset(
+                                                    'assets/icons/camera-flip.svg'),
+                                                () async {
+                                              await context
+                                                  .read<ToggleCmCubit>()
+                                                  .switchCamera();
+                                              signaling.switchCamera(
+                                                  toggleCM.useFrontCamera);
+                                            }, Colors.white),
+                                            SizedBox(
+                                              width: 30,
+                                            ),
+                                            itemcall(
                                                 SvgPicture.asset(
                                                   'assets/icons/phone-hangup.svg',
                                                   color: Colors.white,
                                                 ), () async {
                                               stopTime();
 
-                                              if (state
-                                                  is GroupInfoCubitLoaded) {
-                                                var afterFilter = state
-                                                    .groupinfo!
-                                                    .where((element) =>
-                                                        element.groupId ==
-                                                        widget.groupid)
-                                                    .first;
-
-                                                if (afterFilter.offer!.id ==
-                                                    Userinfo
-                                                        .userSingleton.uid) {
-                                                  await signaling.hangUp(
-                                                      _localRenderer,
-                                                      widget.groupid,
-                                                      'video');
-                                                } else {
-                                                  await signaling.calleeHangup(
-                                                      widget.groupid, 'video');
-                                                }
+                                              if (afterFilter.offer!.id ==
+                                                  Userinfo.userSingleton.uid) {
+                                                await signaling.hangUp(
+                                                    _localRenderer,
+                                                    widget.groupid,
+                                                    'video');
+                                              } else {
+                                                await signaling.calleeHangup(
+                                                    widget.groupid, 'video');
                                               }
 
                                               Navigator.pop(context);
-                                            }, Colors.red[900]!);
-                                          },
+                                            }, Colors.red[900]!),
+                                            SizedBox(
+                                              width: 15,
+                                            ),
+                                          ],
                                         );
-                                      }
-                                      return itemcall(
-                                          SvgPicture.asset(
-                                            'assets/icons/phone-hangup.svg',
-                                            color: Colors.white,
-                                          ), () async {
-                                        stopTime();
-                                        await signaling.hangUp(_localRenderer,
-                                            widget.groupid, 'video');
-
-                                        Navigator.pop(context);
-                                      }, Colors.red[900]!);
-                                    });
+                                      },
+                                    ),
+                                  );
+                                }
+                                return SizedBox();
                               },
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                            );
+                          });
+                    },
                   ),
                   BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
                     listener: (context, state) async {

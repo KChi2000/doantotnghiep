@@ -59,7 +59,7 @@ class SendMessageCubit extends Cubit<SendMessageState> {
                   },
                   'priority': 'high',
                   "data": {
-                    "group": "${group.toJson()}",
+                    "group": "${group.toMap()}",
                     // "body": "Notification Body",
                     // "title": "title data",
                     // "key_1": "key_1 data",

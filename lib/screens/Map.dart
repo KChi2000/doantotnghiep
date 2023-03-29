@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:doantotnghiep/bloc/FetchLocation/fetch_location_cubit.dart';
+import 'package:doantotnghiep/bloc/countToBuild/count_to_build_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import 'package:doantotnghiep/model/User.dart';
 import 'package:doantotnghiep/screens/Chat/connectToFriend.dart';
@@ -33,6 +34,7 @@ class _TrackingState extends State<Tracking> {
     context.read<FetchLocationCubit>().requestLocation();
     context.read<GetProfileCubit>().getStreamProfile();
     context.read<GetUserGroupCubit>().getUerGroup();
+    context.read<CountToBuildCubit>().init();
     // context.read<FetchLocationCubit>().UpdateLocation();
 
     super.initState();
@@ -74,19 +76,21 @@ class _TrackingState extends State<Tracking> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-                  
                     builder: (context, state) {
                       return StreamBuilder(
                           stream: state.stream,
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                             context
+                              context
                                   .read<GroupInfoCubitCubit>()
                                   .updateGroup(snapshot.data);
-                              return BlocBuilder<GroupInfoCubitCubit,
+                              return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
+                                listener: (context, state) {
+                                  print('RUN LISTENERRRRRRRRRRR');
+                                },
+                               
                                 builder: (context, state) {
-                                 
                                   if (state is GroupInfoCubitLoaded) {
                                     if (state.groupinfo!.length == 0) {
                                       context
@@ -105,7 +109,8 @@ class _TrackingState extends State<Tracking> {
                                             .backToInitial();
                                         return SizedBox();
                                       }
-                                       print('RUN AGAIN GROUP INFO CUBIT ${state.runTime}');
+                                      print(
+                                          'RUN AGAIN GROUP INFO CUBIT ${context.read<CountToBuildCubit>().state}');
                                       context
                                           .read<FetchLocationToShowCubit>()
                                           .fetchFromDb(filterlist.last);
@@ -134,16 +139,19 @@ class _TrackingState extends State<Tracking> {
                                                     borderSide:
                                                         BorderSide.none)),
                                             onChanged: (value) {
-                                              if (value!.groupId.toString() !=
-                                                  (context
-                                                              .read<
-                                                                  FetchLocationToShowCubit>()
-                                                              .state
-                                                          as FetchLocationToShowLoaded)
-                                                      .selectedGroup
-                                                      .groupId) {
-                                                context.read<FetchLocationToShowCubit>().fetchFromDb(value);
-                                              }
+                                              // if (value!.groupId.toString() !=
+                                              //     (context
+                                              //                 .read<
+                                              //                     FetchLocationToShowCubit>()
+                                              //                 .state
+                                              //             as FetchLocationToShowLoaded)
+                                              //         .selectedGroup
+                                              //         .groupId) {
+                                              context
+                                                  .read<
+                                                      FetchLocationToShowCubit>()
+                                                  .fetchFromDb(value!);
+                                              // }
                                             }),
                                       );
                                     }
@@ -262,9 +270,7 @@ class _TrackingState extends State<Tracking> {
                                           target:
                                               LatLng(21.5752612, 105.8281156),
                                           zoom: 5),
-                                      markers: {
-                                     
-                                      },
+                                      markers: {},
                                     );
                                   },
                                 );

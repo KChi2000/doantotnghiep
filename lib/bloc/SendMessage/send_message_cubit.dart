@@ -28,8 +28,8 @@ class SendMessageCubit extends Cubit<SendMessageState> {
         listOfRegistration_ids.remove(token);
       }
       
-     // print(
-     //     'AFTER REMOVE DEVICE ID: ${listOfRegistration_ids.length}\n ${listOfRegistration_ids.first}');
+     print(
+         'AFTER REMOVE DEVICE ID: ${listOfRegistration_ids.length}\n ${listOfRegistration_ids.first}');
       emit(SendMessageState(isSend: true));
       if (ms.contentMessage.isNotEmpty &&
           ms.contentMessage.toString() != null) {

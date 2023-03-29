@@ -12,8 +12,8 @@ class GroupInfoCubitLoaded extends GroupInfoCubitState {
   List<GroupInfo>? groupinfo;
   List<GroupInfo>? savedGroupinfo;
   GroupInfo? selectedGroup;
-  int runTime;
-  GroupInfoCubitLoaded({this.groupinfo, this.selectedGroup,this.savedGroupinfo,required this.runTime});
+
+  GroupInfoCubitLoaded({this.groupinfo, this.selectedGroup,this.savedGroupinfo});
 
   @override
   List<Object> get props => [groupinfo!, selectedGroup!];
@@ -25,7 +25,7 @@ class GroupInfoCubitLoaded extends GroupInfoCubitState {
   }) {
     return GroupInfoCubitLoaded(
       groupinfo: groupinfo ?? this.groupinfo,
-runTime: runTime
+
     );
   }
 }

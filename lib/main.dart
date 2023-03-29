@@ -10,6 +10,7 @@ import 'package:doantotnghiep/bloc/TimKiemGroup/tim_kiem_group_cubit.dart';
 import 'package:doantotnghiep/bloc/canCreateGroup/can_create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
+import 'package:doantotnghiep/bloc/countToBuild/count_to_build_cubit.dart';
 import 'package:doantotnghiep/bloc/createGroup/create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
@@ -112,8 +113,12 @@ void main() async {
         BlocProvider(
           create: (context) => GetUserGroupCubit(),
         ),
+         
         BlocProvider(
           create: (context) => GroupInfoCubitCubit(),
+        ),
+         BlocProvider(
+          create: (context) => CountToBuildCubit(context.read<GroupInfoCubitCubit>()),
         ),
         BlocProvider(
           create: (context) => MessageCubitCubit(),
@@ -178,6 +183,7 @@ void main() async {
         BlocProvider(
           create: (context) => CheckCanDisplayNotificationCubit(),
         ),
+      
       ],
       child: MyApp(),
     ),

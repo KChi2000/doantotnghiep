@@ -82,9 +82,12 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
 
   changeSelectedGroup(GroupInfo group) {
     emit(GroupInfoCubitLoading());
-    emit(GroupInfoCubitLoaded(
+   if(state is GroupInfoCubitLoaded){
+     emit(GroupInfoCubitLoaded(
         groupinfo: (state as GroupInfoCubitLoaded).groupinfo,
+        savedGroupinfo: (state as GroupInfoCubitLoaded).savedGroupinfo,
         selectedGroup: group));
+   }
   }
 
   initial() {

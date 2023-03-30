@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:doantotnghiep/bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
+import 'package:doantotnghiep/bloc/countToBuild/count_to_build_cubit.dart';
 import 'package:doantotnghiep/bloc/getUserGroup/get_user_group_cubit.dart';
 import 'package:doantotnghiep/bloc/onHaveRemoteRender/on_have_remote_render_cubit.dart';
 import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
 import 'package:doantotnghiep/helper/Signaling.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
+import 'package:doantotnghiep/main.dart';
 import 'package:doantotnghiep/model/User.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -44,22 +46,26 @@ class _CallVideoState extends State<CallVideo> {
   @override
   void initState() {
     context.read<OnHaveRemoteRenderCubit>().haveRemote(widget.answere!);
+    
     setTime();
     createRoom();
     initValue();
     onAddRemote();
+    context.read<CountToBuildCubit>().init();
     super.initState();
   }
 
   setTime() {
     timer = Timer.periodic(Duration(seconds: 1), (timer) async {
       time += 1;
-      if (time == 30 &&
+     if(mounted){
+       if (time == 30 &&
           context.read<OnHaveRemoteRenderCubit>().state.addRemote == false) {
         timer.cancel();
         await signaling.hangUp(_localRenderer, widget.groupid, 'video');
-        Navigator.pop(context);
+        // Navigator.pop(context);
       }
+     }
     });
   }
 
@@ -125,9 +131,6 @@ class _CallVideoState extends State<CallVideo> {
                             style: TextStyle(color: Colors.white, fontSize: 28),
                           ),
                         ),
-                        // SizedBox(
-                        //   height: 10,
-                        // ),
                         Text(
                           widget.grname,
                           style: TextStyle(
@@ -191,7 +194,10 @@ class _CallVideoState extends State<CallVideo> {
                                                             child: CircleAvatar(
                                                                 radius: 70,
                                                                 backgroundImage:
-                                                                    Image.network(afterFilter.answer!.profile!).image),
+                                                                    Image.network(afterFilter
+                                                                            .answer!
+                                                                            .profile!)
+                                                                        .image),
                                                           )
                                                     : afterFilter.offer!
                                                             .cameraStatus!
@@ -206,7 +212,9 @@ class _CallVideoState extends State<CallVideo> {
                                                             child: CircleAvatar(
                                                                 radius: 70,
                                                                 backgroundImage:
-                                                                    Image.network(afterFilter.offer!.profile!)
+                                                                    Image.network(afterFilter
+                                                                            .offer!
+                                                                            .profile!)
                                                                         .image),
                                                           ),
                                                 Positioned(
@@ -341,8 +349,31 @@ class _CallVideoState extends State<CallVideo> {
                                   .read<GroupInfoCubitCubit>()
                                   .updateGroup(snapshot.data);
                             }
-                            return BlocBuilder<GroupInfoCubitCubit,
+                            return 
+                            BlocConsumer<GroupInfoCubitCubit,
                                 GroupInfoCubitState>(
+                                  listenWhen: (previous, current) {
+                                    // print('AFTER previous state $previous and current state $current');
+                                    return true;
+                                  },
+                              listener: (context, state) async {
+                                print('run in listener');
+                                if (state is GroupInfoCubitLoaded) {
+                                  print('AFTER run in listener');
+                                  var afterFilter = state.groupinfo!
+                                      .where((element) =>
+                                          element.groupId == widget.groupid)
+                                      .first;
+
+                                  if (afterFilter.callStatus == 'call end') {
+                                    print('AFTER listen to CALL at  ${context.read<CountToBuildCubit>().state}');
+                                   if( context.read<CountToBuildCubit>().state ==0){
+                                    Navigator.of(navigatorKey.currentState!.context).pop();
+                                   }
+                                    context.read<CountToBuildCubit>().add();
+                                  }
+                                }
+                              },
                               builder: (context, state) {
                                 if (state is GroupInfoCubitLoaded) {
                                   var afterFilter = state.groupinfo!
@@ -419,7 +450,9 @@ class _CallVideoState extends State<CallVideo> {
                                                   color: Colors.white,
                                                 ), () async {
                                               stopTime();
-
+                                              await FlutterCallkitIncoming
+                                                  .endCall(
+                                                      'video${widget.groupid}');
                                               if (afterFilter.offer!.id ==
                                                   Userinfo.userSingleton.uid) {
                                                 await signaling.hangUp(
@@ -429,9 +462,10 @@ class _CallVideoState extends State<CallVideo> {
                                               } else {
                                                 await signaling.calleeHangup(
                                                     widget.groupid, 'video');
+                                                       Navigator.pop(context);
                                               }
 
-                                              Navigator.pop(context);
+                                            
                                             }, Colors.red[900]!),
                                             SizedBox(
                                               width: 15,
@@ -447,34 +481,6 @@ class _CallVideoState extends State<CallVideo> {
                             );
                           });
                     },
-                  ),
-                  BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
-                    listener: (context, state) async {
-                      if (state is GroupInfoCubitLoaded) {
-                        var afterFilter = state.groupinfo!
-                            .where(
-                                (element) => element.groupId == widget.groupid)
-                            .first;
-
-                        var calls = await FlutterCallkitIncoming.activeCalls();
-                        print('AFTER ACTIVE CALL $calls');
-                        // if (afterFilter.offer!.id != null
-                        //    ) {
-                        // if (afterFilter.offer!.id != null) {
-                        //   Navigator.pop(context);
-                        //   Fluttertoast.showToast(
-                        //       msg: "Kết thúc cuộc gọi",
-                        //       toastLength: Toast.LENGTH_SHORT,
-                        //       gravity: ToastGravity.BOTTOM,
-                        //       timeInSecForIosWeb: 1,
-                        //       textColor: Colors.white,
-                        //       backgroundColor: Colors.pink,
-                        //       fontSize: 16.0);
-                        // }
-                        // }
-                      }
-                    },
-                    child: SizedBox(),
                   ),
                 ],
               ))),

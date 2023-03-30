@@ -167,19 +167,19 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
               child: IconButton(
                   onPressed: () async {
                     // FlutterRingtonePlayer.playRingtone();
-                    // context
-                    //     .read<NoticeCallingCubit>()
-                    //     .notificationCalling(true);
-
-                    Future.delayed(Duration.zero, () {
-                      navigatePush(
-                          context,
-                          CallVideo(
-                            groupid: widget.group.groupId.toString(),
-                            grname: widget.group.groupName.toString(),
-                            answere: false,
-                          ));
-                    });
+                    await DatabaseService()
+                        .refreshCallStatus(widget.group.groupId.toString())
+                        .then((value) => {
+                              Future.delayed(Duration.zero, () {
+                                navigatePush(
+                                    context,
+                                    CallVideo(
+                                      groupid: widget.group.groupId.toString(),
+                                      grname: widget.group.groupName.toString(),
+                                      answere: false,
+                                    ));
+                              })
+                            });
                   },
                   icon: Icon(Icons.videocam)),
             ),
@@ -206,8 +206,7 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                                     return ItemThanhVien(
                                         widget.group.members![index],
                                         index,
-                                        widget.group.admin!.adminId
-                                            .toString(),
+                                        widget.group.admin!.adminId.toString(),
                                         widget.group.members!.length);
                                   },
                                 ),
@@ -281,9 +280,8 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                                         listener: (context, state) {
                                           if (state
                                               is GetPicGroupMemberLoaded) {
-                                            listController.jumpTo(
-                                                listController.position
-                                                    .maxScrollExtent);
+                                            listController.jumpTo(listController
+                                                .position.maxScrollExtent);
                                           }
                                         },
                                         builder: (context, stateUser) {

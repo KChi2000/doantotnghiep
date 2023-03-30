@@ -87,9 +87,11 @@ class _TrackingState extends State<Tracking> {
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
-                                  print('RUN LISTENERRRRRRRRRRR');
+                                  // if(state is GroupInfoCubitLoaded){
+                                  //     print('RUN LISTENERRRRRRRRRRR ${state.selectedGroup!.groupName} ${state.selectedGroup!.members!.length}');
+                                  // }
+                                  
                                 },
-                               
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
                                     if (state.groupinfo!.length == 0) {
@@ -109,11 +111,15 @@ class _TrackingState extends State<Tracking> {
                                             .backToInitial();
                                         return SizedBox();
                                       }
-                                      print(
-                                          'RUN AGAIN GROUP INFO CUBIT ${context.read<CountToBuildCubit>().state}');
-                                      context
-                                          .read<FetchLocationToShowCubit>()
-                                          .fetchFromDb(filterlist.last);
+                                      if (context
+                                              .read<CountToBuildCubit>()
+                                              .state ==
+                                          0) {
+                                        context
+                                            .read<FetchLocationToShowCubit>()
+                                            .fetchFromDb(filterlist.last);
+                                      }
+                                      context.read<CountToBuildCubit>().add();
                                       return Container(
                                         constraints:
                                             BoxConstraints(maxWidth: 200),
@@ -151,6 +157,7 @@ class _TrackingState extends State<Tracking> {
                                                   .read<
                                                       FetchLocationToShowCubit>()
                                                   .fetchFromDb(value!);
+                                                  context.read<GroupInfoCubitCubit>().changeSelectedGroup(value);
                                               // }
                                             }),
                                       );

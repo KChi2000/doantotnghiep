@@ -237,7 +237,11 @@ class DatabaseService {
       // showSnackbar(context, message, color)
     }
   }
-
+ Future refreshCallStatus(String grid)async{
+   await groupCollection.doc(grid).update({
+    'callStatus':''
+   });
+  }
   sendMessage(String groupId, Map<String, dynamic> data) async {
     checkCanUpdate = false;
     await groupCollection.doc(groupId).collection('Messages').add(data);

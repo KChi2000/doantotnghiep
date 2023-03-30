@@ -67,15 +67,13 @@ class _DisplayPageState extends State<DisplayPage> {
     FirebaseMessaging.instance.getInitialMessage().then((value) {
       print(
           'FB message when app terminated:\n${value?.notification?.title} ${value?.notification?.body}');
-          if(value != null){
-             navigatorKey.currentState!.context
-            .read<ChangetabCubit>()
-            .change(1);
-              GroupInfo groupdata = GroupInfo.fromMap(value.data['group']);
+      if (value != null) {
+        navigatorKey.currentState!.context.read<ChangetabCubit>().change(1);
+        GroupInfo groupdata = GroupInfo.fromMap(value.data['group']);
         print('data got: ${groupdata.groupName}');
-         navigatePush(navigatorKey.currentState!.context,
-           chatDetail(group: groupdata));
-          }
+        navigatePush(
+            navigatorKey.currentState!.context, chatDetail(group: groupdata));
+      }
     });
     FirebaseMessaging.onMessage.listen((value) {
       if (mounted) {
@@ -88,15 +86,12 @@ class _DisplayPageState extends State<DisplayPage> {
       if (value != null) {
         print(
             'FB message in background: ${value.notification!.title} ${value.data['group']}');
-         navigatorKey.currentState!.context
-            .read<ChangetabCubit>()
-            .change(1);
-      
+        navigatorKey.currentState!.context.read<ChangetabCubit>().change(1);
+
         GroupInfo groupdata = GroupInfo.fromMap(value.data['group']);
         print('data got: ${groupdata.groupName}');
-         navigatePush(navigatorKey.currentState!.context,
-           chatDetail(group: groupdata));
-      
+        navigatePush(
+            navigatorKey.currentState!.context, chatDetail(group: groupdata));
       }
     });
   }
@@ -124,59 +119,7 @@ class _DisplayPageState extends State<DisplayPage> {
             BlocBuilder<ChangetabCubit, ChangetabState>(
               builder: (context, changeTab) {
                 return Scaffold(
-                    body: BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
-                      builder: (context, state) {
-                        return StreamBuilder<dynamic>(
-                            stream: state.stream,
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                context
-                                    .read<GroupInfoCubitCubit>()
-                                    .updateGroup(snapshot.data);
-                              }
-                              return BlocListener<GroupInfoCubitCubit,
-                                  GroupInfoCubitState>(
-                                listener: (context, state) {
-                                  // if (state is GroupInfoCubitLoaded) {
-                                  //   state.groupinfo!.forEach((element) async {
-                                  //     if (element.recentMessageSender
-                                  //             .toString()
-                                  //             .isNotEmpty &&
-                                  //         element.recentMessageSender.toString() !=
-                                  //             null) {
-                                  //       if (element.callStatus == 'calling' &&
-                                  //           element.recentMessageSender
-                                  //                   .toString()
-                                  //                   .substring(
-                                  //                       element.recentMessageSender
-                                  //                               .toString()
-                                  //                               .length -
-                                  //                           29,
-                                  //                       element.recentMessageSender
-                                  //                           .toString()
-                                  //                           .length) !=
-                                  //               Userinfo.userSingleton.uid) {
-                                  //         // listenerEvent(ct);
-                                  //         await FlutterCallkitIncoming.startCall(
-                                  //             Callparam(
-                                  //                 '${element.groupId}',
-                                  //                 '${element.groupName}',
-                                  //                 element.type == Type.callvideo
-                                  //                     ? 'video'
-                                  //                     : 'audio'));
-                                  //       } else if (element.callStatus == 'call end') {
-                                  //         await FlutterCallkitIncoming.endCall(
-                                  //             '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
-                                  //       }
-                                  //     }
-                                  //   });
-                                  // }
-                                },
-                                child: listPage.elementAt(changeTab.index),
-                              );
-                            });
-                      },
-                    ),
+                    body: listPage.elementAt(changeTab.index),
                     bottomNavigationBar: Container(
                       decoration: BoxDecoration(
                         boxShadow: <BoxShadow>[
@@ -320,7 +263,7 @@ class _DisplayPageState extends State<DisplayPage> {
             print('ACTION_CALL_DECLINE');
             break;
           case Event.ACTION_CALL_ENDED:
-            // TODO: ended an incoming/outgoing call
+            print('ACTION_CALL_ENDED');
             break;
           case Event.ACTION_CALL_TIMEOUT:
             // TODO: missed an incoming call

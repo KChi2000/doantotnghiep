@@ -396,55 +396,117 @@ Widget groupitems(
                                 fontSize: 16,
                                 fontFamily: 'roboto'),
                           ),
-                          PopupMenuItem(
-                            onTap: () async {
-                                 if (Userinfo.userSingleton.uid !=
+                               PopupMenuItem(
+                                  onTap: () async {
+                                    if (Userinfo.userSingleton.uid !=
                                         group.admin!.adminId.toString()) {
-                                      ct.loaderOverlay.show();
-                                      await context
-                                          .read<JoindStatusCubit>()
-                                          .leaveGroup(group.groupId.toString(),
-                                              group.groupName.toString());
-                                      ct.loaderOverlay.hide();
-
-                                      Fluttertoast.showToast(
-                                          msg: "Đã rời nhóm thành công",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          textColor: Colors.white,
-                                          backgroundColor: Colors.pink,
-                                          fontSize: 16.0);
+                                      Future.delayed(
+                                        const Duration(seconds: 0),
+                                        () => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            surfaceTintColor: Colors.white,
+                                            title: Text(
+                                                'Bạn có chắc muốn rời nhóm?'),
+                                            actions: [
+                                              ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Hủy')),
+                                              ElevatedButton(
+                                                  onPressed: () async {
+                                                    ct.loaderOverlay.show();
+                                                    await context
+                                                        .read<
+                                                            JoindStatusCubit>()
+                                                        .leaveGroup(
+                                                            group.groupId
+                                                                .toString(),
+                                                            group.groupName
+                                                                .toString());
+                                                    ct.loaderOverlay.hide();
+                                                    Navigator.pop(context);
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Đã rời nhóm thành công",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.BOTTOM,
+                                                        timeInSecForIosWeb: 1,
+                                                        textColor: Colors.white,
+                                                        backgroundColor:
+                                                            Colors.pink,
+                                                        fontSize: 16.0);
+                                                  },
+                                                  child: Text('Xác nhận'))
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     } else {
-                                      ct.loaderOverlay.show();
-                                      await context
-                                          .read<JoindStatusCubit>()
-                                          .deleteGroup(group.groupId.toString(),
-                                              group.groupName.toString());
-                                      ct.loaderOverlay.hide();
-
-                                      Fluttertoast.showToast(
-                                          msg: "Đã xóa nhóm thành công",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          textColor: Colors.white,
-                                          backgroundColor: Colors.pink,
-                                          fontSize: 16.0);
+                                      Future.delayed(
+                                        const Duration(seconds: 0),
+                                        () => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            surfaceTintColor: Colors.white,
+                                            title: Text(
+                                                'Bạn có chắc muốn xóa nhóm?'),
+                                            actions: [
+                                              ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Hủy')),
+                                              ElevatedButton(
+                                                  onPressed: () async {
+                                                    ct.loaderOverlay.show();
+                                                    await context
+                                                        .read<
+                                                            JoindStatusCubit>()
+                                                        .deleteGroup(
+                                                            group.groupId
+                                                                .toString(),
+                                                            group.groupName
+                                                                .toString());
+                                                    ct.loaderOverlay.hide();
+                                                    Navigator.pop(context);
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Đã xóa thành công",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.BOTTOM,
+                                                        timeInSecForIosWeb: 1,
+                                                        textColor: Colors.white,
+                                                        backgroundColor:
+                                                            Colors.pink,
+                                                        fontSize: 16.0);
+                                                  },
+                                                  child: Text('Xác nhận'))
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     }
-                            },
-                            child: Text(
-                                Userinfo.userSingleton.uid ==
-                                        group.admin!.adminId.toString()
-                                    ? 'Xoá nhóm'
-                                    : 'Rời nhóm',
-                                style: TextStyle(color: Colors.pink)),
-                            padding:
-                                EdgeInsets.only(top: 5, bottom: 5, left: 10),
-                            // height: 20,
-                            textStyle:
-                                TextStyle(color: Colors.black, fontSize: 16),
-                          )
+                                  },
+                                  child: Text(
+                                      Userinfo.userSingleton.uid ==
+                                              group.admin!.adminId.toString()
+                                          ? 'Xoá nhóm'
+                                          : 'Rời nhóm',
+                                      style: TextStyle(color: Colors.pink)),
+                                  padding: EdgeInsets.only(
+                                      top: 5, bottom: 5, left: 10),
+                                  // height: 20,
+                                  textStyle: TextStyle(
+                                      color: Colors.black, fontSize: 16),
+                                )
                         ];
                       },
                       icon: Icon(

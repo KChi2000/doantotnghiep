@@ -352,21 +352,18 @@ class _CallVideoState extends State<CallVideo> {
                             return 
                             BlocConsumer<GroupInfoCubitCubit,
                                 GroupInfoCubitState>(
-                                  listenWhen: (previous, current) {
-                                    // print('AFTER previous state $previous and current state $current');
-                                    return true;
-                                  },
+                                  
                               listener: (context, state) async {
-                                print('run in listener');
+                              
                                 if (state is GroupInfoCubitLoaded) {
-                                  print('AFTER run in listener');
+                                 
                                   var afterFilter = state.groupinfo!
                                       .where((element) =>
                                           element.groupId == widget.groupid)
                                       .first;
 
                                   if (afterFilter.callStatus == 'call end') {
-                                    print('AFTER listen to CALL at  ${context.read<CountToBuildCubit>().state}');
+                                  
                                    if( context.read<CountToBuildCubit>().state ==0){
                                     Navigator.of(navigatorKey.currentState!.context).pop();
                                    }

@@ -6,6 +6,7 @@ import 'package:doantotnghiep/main.dart';
 
 import 'package:doantotnghiep/NetworkProvider/NetWorkProvider_Auth.dart';
 import 'package:doantotnghiep/NetworkProvider/Networkprovider.dart';
+import 'package:doantotnghiep/screens/DisplayPage.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../model/User.dart';
@@ -29,7 +30,7 @@ class LoginCubit extends Cubit<LoginState> {
           snapshot.docs[0]['fullName'],
           snapshot.docs[0]['registration_id'],
           snapshot.docs[0]['profilePic']);
-      navigateReplacement(context, MyApp());
+     
       emit(LoginLoaded());
     } else {
       emit(LoginError());

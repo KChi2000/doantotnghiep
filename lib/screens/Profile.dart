@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/getProfile/get_profile_cubit.dart';
 import 'package:doantotnghiep/constant.dart';
+import 'package:doantotnghiep/screens/DisplayPage.dart';
+import 'package:doantotnghiep/screens/auth/Login.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -208,11 +210,13 @@ class _ProfileState extends State<Profile> {
                                             .then((value) {
                                           //  context.read<CheckLoggedCubit>().checkUserIsLogged();
 
-                                          Navigator.pushReplacement(
-                                              context,
+                                         Future.delayed(Duration.zero,() {
+                                            Navigator.pushReplacement(
+                                              navigatorKey.currentState!.context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      MyApp()));
+                                                      Login()));
+                                         },);
                                         });
                                       },
                                       child: Text('Đồng ý')),

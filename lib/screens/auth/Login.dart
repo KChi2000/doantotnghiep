@@ -16,6 +16,8 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 import '../../NetworkProvider/Networkprovider.dart';
+import '../../bloc/Changetab/changetab_cubit.dart';
+import '../DisplayPage.dart';
 
 final RegExp _emailRegExp = RegExp(
   r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$',
@@ -45,22 +47,22 @@ class _LoginState extends State<Login> {
         resizeToAvoidBottomInset: true,
         // appBar: AppBar(title: Text('Login'),),
         body: LoaderOverlay(
-             useDefaultLoading: false,
-        overlayOpacity: 0.6,
-        overlayWidget: Center(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Đang đăng nhập...',
-              style: TextStyle(color: Colors.white),
-            )
-          ],
-        )),
+          useDefaultLoading: false,
+          overlayOpacity: 0.6,
+          overlayWidget: Center(
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Đang đăng nhập...',
+                style: TextStyle(color: Colors.white),
+              )
+            ],
+          )),
           child: SingleChildScrollView(
             child: Container(
               // color: Colors.amber,
@@ -166,6 +168,14 @@ class _LoginState extends State<Login> {
                           builder: (context, state) {
                             if (state is LoginLoading) {
                               context.loaderOverlay.show();
+                            } else if (state is LoginLoaded) {
+                              context.read<ChangetabCubit>().change(0);
+                              Future.delayed(
+                                Duration.zero,
+                                () {
+                                  navigateReplacement(context, DisplayPage());
+                                },
+                              );
                             }
                             context.loaderOverlay.hide();
                             return Text('Đăng nhập');

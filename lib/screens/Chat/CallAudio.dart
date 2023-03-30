@@ -19,8 +19,10 @@ import 'package:loader_overlay/loader_overlay.dart';
 
 import '../../bloc/Changetab/changetab_cubit.dart';
 import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../../bloc/countToBuild/count_to_build_cubit.dart';
 import '../../bloc/getUserGroup/get_user_group_cubit.dart';
 import '../../components/navigate.dart';
+import '../../main.dart';
 import '../../model/User.dart';
 import '../DisplayPage.dart';
 
@@ -50,6 +52,7 @@ class _CallAudioState extends State<CallAudio> {
     createRoom();
     initValue();
     onAddRemote();
+    context.read<CountToBuildCubit>().init();
     super.initState();
   }
 
@@ -254,20 +257,7 @@ class _CallAudioState extends State<CallAudio> {
                                                                         afterFilter
                                                                             .offer!
                                                                             .profile!)
-                                                                    .image
-                                                            // Text(
-                                                            //   afterFilter.offer!
-                                                            //               .id ==
-                                                            //           Userinfo
-                                                            //               .userSingleton
-                                                            //               .uid
-                                                            //       ? '${afterFilter.answer!.name}'
-                                                            //       : '${afterFilter.offer!.name}',
-                                                            //   style: TextStyle(
-                                                            //       color: Colors
-                                                            //           .white),
-                                                            // ),
-                                                            ),
+                                                                    .image),
                                                         Text(
                                                           afterFilter.offer!
                                                                       .id ==
@@ -395,54 +385,73 @@ class _CallAudioState extends State<CallAudio> {
                                         context
                                             .read<GroupInfoCubitCubit>()
                                             .updateGroup(snapshot.data);
-                                        return BlocBuilder<GroupInfoCubitCubit,
-                                            GroupInfoCubitState>(
-                                          builder: (context, state) {
-                                            return itemcall(
-                                                SvgPicture.asset(
-                                                  'assets/icons/phone-hangup.svg',
-                                                  color: Colors.white,
-                                                ), () async {
-                                              stopTime();
-
-                                              if (state
-                                                  is GroupInfoCubitLoaded) {
-                                                var afterFilter = state
-                                                    .groupinfo!
-                                                    .where((element) =>
-                                                        element.groupId ==
-                                                        widget.groupid)
-                                                    .first;
-
-                                                if (afterFilter.offer!.id ==
-                                                    Userinfo
-                                                        .userSingleton.uid) {
-                                                  await signaling.hangUp(
-                                                      _localRenderer,
-                                                      widget.groupid,
-                                                      'audio');
-                                                } else {
-                                                  await signaling.calleeHangup(
-                                                      widget.groupid, 'audio');
-                                                }
-                                              }
-
-                                              Navigator.pop(context);
-                                            }, Colors.red[900]!);
-                                          },
-                                        );
                                       }
-                                      return itemcall(
-                                          SvgPicture.asset(
-                                            'assets/icons/phone-hangup.svg',
-                                            color: Colors.white,
-                                          ), () async {
-                                        stopTime();
-                                        await signaling.hangUp(_localRenderer,
-                                            widget.groupid, 'audio');
+                                      return BlocConsumer<GroupInfoCubitCubit,
+                                          GroupInfoCubitState>(
+                                        listener: (context, state) async {
+                                          print('run in listener');
+                                          if (state is GroupInfoCubitLoaded) {
+                                            print('AFTER run in listener');
+                                            var afterFilter = state.groupinfo!
+                                                .where((element) =>
+                                                    element.groupId ==
+                                                    widget.groupid)
+                                                .first;
 
-                                        Navigator.pop(context);
-                                      }, Colors.red[900]!);
+                                            if (afterFilter.callStatus ==
+                                                'call end') {
+                                              print(
+                                                  'AFTER listen to CALL at  ${context.read<CountToBuildCubit>().state}');
+                                              if (context
+                                                      .read<CountToBuildCubit>()
+                                                      .state ==
+                                                  0) {
+                                                Navigator.of(navigatorKey
+                                                        .currentState!.context)
+                                                    .pop();
+                                              }
+                                              context
+                                                  .read<CountToBuildCubit>()
+                                                  .add();
+                                            }
+                                          }
+                                        },
+                                        builder: (context, state) {
+                                          return itemcall(
+                                              SvgPicture.asset(
+                                                'assets/icons/phone-hangup.svg',
+                                                color: Colors.white,
+                                              ), () async {
+                                            stopTime();
+
+                                            if (state is GroupInfoCubitLoaded) {
+                                              var afterFilter = state.groupinfo!
+                                                  .where((element) =>
+                                                      element.groupId ==
+                                                      widget.groupid)
+                                                  .first;
+
+                                              stopTime();
+                                              await FlutterCallkitIncoming
+                                                  .endCall(
+                                                      'video${widget.groupid}');
+                                              if (afterFilter.offer!.id ==
+                                                  Userinfo.userSingleton.uid) {
+                                                await signaling.hangUp(
+                                                    _localRenderer,
+                                                    widget.groupid,
+                                                    'video');
+                                              } else {
+                                                await signaling.calleeHangup(
+                                                    widget.groupid, 'video');
+                                                Navigator.pop(context);
+                                              }
+                                            }
+
+                                            Navigator.pop(context);
+                                          }, Colors.red[900]!);
+                                        },
+                                      );
                                     });
                               },
                             ),
@@ -454,30 +463,6 @@ class _CallAudioState extends State<CallAudio> {
                       },
                     ),
                   ),
-                  BlocListener<GroupInfoCubitCubit, GroupInfoCubitState>(
-                    listener: (context, state) {
-                      if (state is GroupInfoCubitLoaded) {
-                        state.groupinfo!.forEach((element) async {
-                          if (element.groupId.toString() == widget.groupid) {
-                            if (element.callStatus == 'call end') {
-                              // Navigator.pop(ct);
-                              // ct.read<ChangetabCubit>().change(1);
-                              // navigateReplacement(ct, DisplayPage());
-                              // Fluttertoast.showToast(
-                              //     msg: "Kết thúc cuộc gọi",
-                              //     toastLength: Toast.LENGTH_SHORT,
-                              //     gravity: ToastGravity.BOTTOM,
-                              //     timeInSecForIosWeb: 1,
-                              //     textColor: Colors.white,
-                              //     backgroundColor: Colors.pink,
-                              //     fontSize: 16.0);
-                            }
-                          }
-                        });
-                      }
-                    },
-                    child: SizedBox(),
-                  )
                 ],
               ))),
     );

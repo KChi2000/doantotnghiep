@@ -159,6 +159,10 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
                                                               BorderSide(
                                                                   color: Colors
                                                                       .black))),
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(
+                                                    50),
+                                              ],
                                               validator: (value) {
                                                 if (groupNameCon.text.isEmpty ||
                                                     groupNameCon.text.length ==
@@ -324,7 +328,6 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
 
                               return BlocBuilder<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
-                             
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
                                     return Column(
@@ -729,7 +732,7 @@ class groupitem extends StatelessWidget {
                                             actions: [
                                               ElevatedButton(
                                                   onPressed: () {
-                                                    Navigator.pop(context);
+                                                    Navigator.pop(context,'huy');
                                                   },
                                                   child: Text('Hủy')),
                                               ElevatedButton(

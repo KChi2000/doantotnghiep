@@ -10,15 +10,15 @@ Widget ItemThanhVien(Members e, int index,String adminid,int tongmember) {
        adminid == e.Id
             ? Userinfo.userSingleton.uid == e.Id
                 ? Text(
-                    '${e.Name.toString()}(Bạn-Admin)',
+                    '${e.Name.toString()} (Bạn-Admin)',
                     style: TextStyle(fontSize: 18),
                   )
                 : Text(
-                    '${e.Name.toString()}(Admin)',
+                    '${e.Name.toString()} (Admin)',
                     style: TextStyle(fontSize: 18),
                   )
             : Text(
-                '${e.Name.toString()}',
+              Userinfo.userSingleton.uid == e.Id? '${e.Name.toString()} (Bạn)': '${e.Name.toString()}',
                 style: TextStyle(fontSize: 18),
               ),
         index != tongmember - 1

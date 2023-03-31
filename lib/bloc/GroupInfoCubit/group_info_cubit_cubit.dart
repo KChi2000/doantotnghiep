@@ -13,10 +13,19 @@ import '../../model/User.dart';
 part 'group_info_cubit_state.dart';
 
 class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
-  
   GroupInfoCubitCubit() : super(GroupInfoCubitinitial());
   void updateGroup(QuerySnapshot snapshot) {
-   
+    List<GroupInfo>? saved = [];
+    if (state is GroupInfoCubitLoaded) {
+      saved = (state as GroupInfoCubitLoaded).groupinfo!;
+      saved..sort((a, b) => a.time!.compareTo(b.time!));
+      var filter = saved.where((element) =>
+          element.groupId ==
+          (state as GroupInfoCubitLoaded).selectedGroup!.groupId);
+      if (filter.length != 0) {
+        print('SAVE IN BLOC ${filter.first.members!.length}');
+      }
+    }
     emit(GroupInfoCubitLoading());
     var rs = snapshot.docs.map((e) {
       return GroupInfo.fromJson(e.data() as Map<String, dynamic>);
@@ -54,7 +63,7 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
       emit(GroupInfoCubitLoaded(
         groupinfo: rs,
         selectedGroup: rs.first,
-        savedGroupinfo: rs,
+        savedGroupinfo: saved,
       ));
     } else {
       emit(GroupInfoCubitLoaded(
@@ -74,24 +83,23 @@ class GroupInfoCubitCubit extends Cubit<GroupInfoCubitState> {
             return a.time!.compareTo(b.time!);
           }),
         selectedGroup: rs.last,
-        savedGroupinfo: rs..sort((a, b) => a.time!.compareTo(b.time!)),
+        savedGroupinfo: saved,
       ));
-      
     }
   }
 
   changeSelectedGroup(GroupInfo group) {
-    emit(GroupInfoCubitLoading());
-   if(state is GroupInfoCubitLoaded){
-     emit(GroupInfoCubitLoaded(
-        groupinfo: (state as GroupInfoCubitLoaded).groupinfo,
-        savedGroupinfo: (state as GroupInfoCubitLoaded).savedGroupinfo,
-        selectedGroup: group));
-   }
+    // emit(GroupInfoCubitLoading());
+    print('BEFORE UPDATE SELECTED GROUP STATE IS $state');
+    if (state is GroupInfoCubitLoaded) {
+      emit(GroupInfoCubitLoaded(
+          groupinfo: (state as GroupInfoCubitLoaded).groupinfo,
+          savedGroupinfo: (state as GroupInfoCubitLoaded).savedGroupinfo,
+          selectedGroup: group));
+    }
   }
 
   initial() {
     emit(GroupInfoCubitinitial());
-    
   }
 }

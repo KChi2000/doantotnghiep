@@ -9,9 +9,10 @@ import '../../model/User.dart';
 
 part 'join_status_state.dart';
 
-class JoindStatusCubit extends Cubit<JoindStatusState> {
+class JoindStatusCubit extends Cubit<JoinState> {
   JoindStatusCubit() : super(JoindStatusState(joined: false));
   void setJoinStatus(String groupId) async {
+    emit(Processing());
     var joined =
         await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
             .checkIfJoined(groupId);
@@ -20,11 +21,13 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
   }
 
   joinGroup(String groupId, String groupName) async {
-   
-    String content = '';
+   if(state is JoindStatusState){
+    var stat = (state as JoindStatusState).joined;
+       String content = '';
+       emit(Processing());
     await DatabaseService(uid: Userinfo.userSingleton.uid)
-        .JoinToGroup(state.joined, groupId, groupName.toString());
-    if (state.joined) {
+        .JoinToGroup(stat, groupId, groupName.toString());
+    if (stat) {
       content = 'đã rời nhóm';
     } else {
       content = 'đã tham gia nhóm';
@@ -42,6 +45,8 @@ class JoindStatusCubit extends Cubit<JoindStatusState> {
             .checkIfJoined(groupId);
 
     emit(JoindStatusState(joined: joined));
+   }
+   
   }
 
   leaveGroup(String groupId, String groupName) async {

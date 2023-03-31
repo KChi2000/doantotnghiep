@@ -11,6 +11,7 @@ import 'package:doantotnghiep/bloc/canCreateGroup/can_create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/checkCode.dart/check_code_cubit.dart';
 import 'package:doantotnghiep/bloc/checkLogged/check_logged_cubit.dart';
 import 'package:doantotnghiep/bloc/countToBuild/count_to_build_cubit.dart';
+import 'package:doantotnghiep/bloc/countToRebuild/count_to_rebuild_cubit.dart';
 import 'package:doantotnghiep/bloc/createGroup/create_group_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchImage/fetch_image_cubit.dart';
 import 'package:doantotnghiep/bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
@@ -32,6 +33,7 @@ import 'package:doantotnghiep/bloc/showBoxInviteId/show_box_invite_id_cubit.dart
 import 'package:doantotnghiep/bloc/toggleCM/toggle_cm_cubit.dart';
 
 import 'package:doantotnghiep/helper/helper_function.dart';
+import 'package:doantotnghiep/model/Group.dart';
 import 'package:doantotnghiep/model/Message.dart';
 import 'package:doantotnghiep/screens/Chat/CallVideo.dart';
 import 'package:doantotnghiep/screens/Chat/chatDetail.dart';
@@ -60,8 +62,27 @@ import 'model/User.dart';
 import 'screens/Chat/CallAudio.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
+  GroupInfo group = GroupInfo.fromJson(message!.notification!.title as Map<String,dynamic>);
   print(
-      'FB message from background ${message!.notification!.title} ${message!.notification!.body}');
+      'FB message from background ${group.toJson()}');
+  
+  // await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
+  //     id: 'message.data',
+  //     nameCaller: 'sdesa',
+  //     avatar: 'xdsdfs',
+  //     handle: 'sfdasf',
+  //     duration: 30000,
+  //     textAccept: 'dfsfaf',
+  //     textDecline: 'sfdsf',
+  //     textMissedCall: 'fsdg',
+  //     textCallback: 'dsfsdfsd',
+  //     android: AndroidParams(
+  //         isCustomNotification: true,
+  //         isCustomSmallExNotification: false,
+  //         isShowMissedCallNotification: true,
+  //         ringtonePath: 'system_ringtone_default',
+  //         backgroundColor: '#0955fa',
+  //         actionColor: '#4CAF50')));
 }
 
 void main() async {
@@ -113,12 +134,15 @@ void main() async {
         BlocProvider(
           create: (context) => GetUserGroupCubit(),
         ),
-         
         BlocProvider(
           create: (context) => GroupInfoCubitCubit(),
         ),
-         BlocProvider(
-          create: (context) => CountToBuildCubit(context.read<GroupInfoCubitCubit>()),
+        BlocProvider(
+          create: (context) =>
+              CountToBuildCubit(context.read<GroupInfoCubitCubit>()),
+        ),
+        BlocProvider(
+          create: (context) => CountToRebuildCubit(),
         ),
         BlocProvider(
           create: (context) => MessageCubitCubit(),
@@ -183,7 +207,6 @@ void main() async {
         BlocProvider(
           create: (context) => CheckCanDisplayNotificationCubit(),
         ),
-      
       ],
       child: MyApp(),
     ),
@@ -196,7 +219,9 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
+
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {

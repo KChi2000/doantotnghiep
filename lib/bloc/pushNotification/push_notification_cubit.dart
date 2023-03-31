@@ -35,12 +35,36 @@ class PushNotificationCubit extends Cubit<PushNotificationState> {
                     "title": "${group.groupName.toString()}"
                   },
                   'priority': 'high',
-                  "data": {
-                    "body": "Notification Body",
-                    "title": "Notification Title",
-                    "key_1": "Value for key_1",
-                    "key_2": "Value for key_2"
-                  }
+                  "data": {}
+                }));
+    }catch(e){
+
+    }
+  }
+   pushCallNoti(GroupInfo group,String content,Map<String,dynamic> data)async{
+     List<Userinfo> listlocation =
+        await DatabaseService().fetchGrouplocation(group);
+    List<String?> listOfRegistration_ids =
+        listlocation.map((e) => e.registrationId).toList();
+    try{
+     var token = await FirebaseMessaging.instance.getToken();
+      listOfRegistration_ids.remove(token);
+       http.Response response =
+            await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+                headers: {
+                  'Authorization':
+                      'key=AAAAUU2PhnA:APA91bGHF5XySlMdvuH_D8vzi0WbRxtA7bFUk-xp2Wu2MKiDEtQ7tu7gUCZS9CIAcEjJdhhTezgUPg4q6QzoABH-yDDqQfizZ5dWJVvOVQhUkV98I9afP6FPMOxa1m3fNUa7XRzS6CpZ',
+                  'Content-Type': 'application/json'
+                },
+                body: jsonEncode(<String, dynamic>{
+                  "registration_ids": listOfRegistration_ids,
+                  "notification": {
+                    "body":
+                        "${content}",
+                    "title": "${group.toJson()}"
+                  },
+                  'priority': 'high',
+                  "data": data
                 }));
     }catch(e){
 

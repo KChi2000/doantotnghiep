@@ -75,7 +75,7 @@ class _CallVideoState extends State<CallVideo> {
 
   onAddRemote() {
     signaling.onAddRemoteStream = ((stream) {
-      print('Vao on add remote stream');
+      
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
       timer!.cancel();
@@ -250,6 +250,7 @@ class _CallVideoState extends State<CallVideo> {
                                 : SizedBox();
                           },
                         ),
+                      Container(width: screenwidth,height: 1,color: Colors.black,),
                         BlocBuilder<ToggleCmCubit, ToggleCmState>(
                           builder: (context, state) {
                             return Flexible(
@@ -457,9 +458,10 @@ class _CallVideoState extends State<CallVideo> {
                                                     widget.groupid,
                                                     'video');
                                               } else {
+                                                   Navigator.pop(context);
                                                 await signaling.calleeHangup(
                                                     widget.groupid, 'video');
-                                                       Navigator.pop(context);
+                                                    
                                               }
 
                                             

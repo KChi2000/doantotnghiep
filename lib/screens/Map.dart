@@ -12,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import '../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
+import '../bloc/countToRebuild/count_to_rebuild_cubit.dart';
 import '../bloc/fetchImage/fetch_image_cubit.dart';
 import '../bloc/getProfile/get_profile_cubit.dart';
 import '../bloc/getUserGroup/get_user_group_cubit.dart';
@@ -34,7 +35,7 @@ class _TrackingState extends State<Tracking> {
     context.read<FetchLocationCubit>().requestLocation();
     context.read<GetProfileCubit>().getStreamProfile();
     context.read<GetUserGroupCubit>().getUerGroup();
-    context.read<CountToBuildCubit>().init();
+    context.read<CountToRebuildCubit>().init();
     // context.read<FetchLocationCubit>().UpdateLocation();
 
     super.initState();
@@ -87,10 +88,22 @@ class _TrackingState extends State<Tracking> {
                               return BlocConsumer<GroupInfoCubitCubit,
                                   GroupInfoCubitState>(
                                 listener: (context, state) {
-                                  // if(state is GroupInfoCubitLoaded){
-                                  //     print('RUN LISTENERRRRRRRRRRR ${state.selectedGroup!.groupName} ${state.selectedGroup!.members!.length}');
-                                  // }
-                                  
+                                  if (state is GroupInfoCubitLoaded) {
+                                    var rs1 = state.savedGroupinfo!.where(
+                                        (element) =>
+                                            element.groupId ==
+                                            state.selectedGroup!.groupId);
+                                    var rs2 = state.groupinfo!.where(
+                                        (element) =>
+                                            element.groupId ==
+                                            state.selectedGroup!.groupId);
+                                    print('SAVE INFO ${rs1.first.members!.length} AND CURRENT INFO ${rs2.first.members!.length}');
+                                    if(rs1.first.members!.length != rs2.first.members!.length){
+                                        context
+                                            .read<FetchLocationToShowCubit>()
+                                            .fetchFromDb(state.selectedGroup!);
+                                    }
+                                  }
                                 },
                                 builder: (context, state) {
                                   if (state is GroupInfoCubitLoaded) {
@@ -112,14 +125,17 @@ class _TrackingState extends State<Tracking> {
                                         return SizedBox();
                                       }
                                       if (context
-                                              .read<CountToBuildCubit>()
+                                              .read<CountToRebuildCubit>()
                                               .state ==
                                           0) {
+                                             context
+                                                  .read<GroupInfoCubitCubit>()
+                                                  .changeSelectedGroup(filterlist.last);
                                         context
                                             .read<FetchLocationToShowCubit>()
                                             .fetchFromDb(filterlist.last);
                                       }
-                                      context.read<CountToBuildCubit>().add();
+                                      context.read<CountToRebuildCubit>().add();
                                       return Container(
                                         constraints:
                                             BoxConstraints(maxWidth: 200),
@@ -157,7 +173,9 @@ class _TrackingState extends State<Tracking> {
                                                   .read<
                                                       FetchLocationToShowCubit>()
                                                   .fetchFromDb(value!);
-                                                  context.read<GroupInfoCubitCubit>().changeSelectedGroup(value);
+                                              context
+                                                  .read<GroupInfoCubitCubit>()
+                                                  .changeSelectedGroup(value);
                                               // }
                                             }),
                                       );

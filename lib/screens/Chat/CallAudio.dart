@@ -59,18 +59,20 @@ class _CallAudioState extends State<CallAudio> {
   setTime() {
     timer = Timer.periodic(Duration(seconds: 1), (timer) async {
       time += 1;
-      if (time == 30 &&
+     if(mounted){
+       if (time == 30 &&
           context.read<OnHaveRemoteRenderCubit>().state.addRemote == false) {
         timer.cancel();
-        await signaling.hangUp(_localRenderer, widget.groupid, 'video');
-        Navigator.pop(context);
+        await signaling.hangUp(_localRenderer, widget.groupid, 'audio');
+     
       }
+     }
     });
   }
 
   onAddRemote() {
     signaling.onAddRemoteStream = ((stream) {
-      print('Vao on add remote stream');
+   
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
       timer!.cancel();
@@ -389,9 +391,9 @@ class _CallAudioState extends State<CallAudio> {
                                       return BlocConsumer<GroupInfoCubitCubit,
                                           GroupInfoCubitState>(
                                         listener: (context, state) async {
-                                          print('run in listener');
+                                        
                                           if (state is GroupInfoCubitLoaded) {
-                                            print('AFTER run in listener');
+                                        
                                             var afterFilter = state.groupinfo!
                                                 .where((element) =>
                                                     element.groupId ==
@@ -400,8 +402,7 @@ class _CallAudioState extends State<CallAudio> {
 
                                             if (afterFilter.callStatus ==
                                                 'call end') {
-                                              print(
-                                                  'AFTER listen to CALL at  ${context.read<CountToBuildCubit>().state}');
+                                          
                                               if (context
                                                       .read<CountToBuildCubit>()
                                                       .state ==
@@ -434,21 +435,22 @@ class _CallAudioState extends State<CallAudio> {
                                               stopTime();
                                               await FlutterCallkitIncoming
                                                   .endCall(
-                                                      'video${widget.groupid}');
+                                                      'audio${widget.groupid}');
                                               if (afterFilter.offer!.id ==
                                                   Userinfo.userSingleton.uid) {
                                                 await signaling.hangUp(
                                                     _localRenderer,
                                                     widget.groupid,
-                                                    'video');
+                                                    'audio');
                                               } else {
+                                                 Navigator.pop(context);
                                                 await signaling.calleeHangup(
-                                                    widget.groupid, 'video');
-                                                Navigator.pop(context);
+                                                    widget.groupid, 'audio');
+                                               
                                               }
                                             }
 
-                                            Navigator.pop(context);
+                                      
                                           }, Colors.red[900]!);
                                         },
                                       );

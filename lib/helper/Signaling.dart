@@ -308,7 +308,7 @@ class Signaling {
       'answer': {},
       'offer': {},
       'callStatus': 'call end',
-      'recentMessage': 'Kết thúc cuộc gọi video'
+      'recentMessage': 'Kết thúc cuộc gọi $typeOfcall'
     });
     // await roomRef.delete();
 

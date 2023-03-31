@@ -37,6 +37,7 @@ import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 import '../../bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
 import '../../bloc/getPicGroupMember/check_can_display_notification_cubit.dart';
 import '../../bloc/getUserGroup/get_user_group_cubit.dart';
+import '../../bloc/pushNotification/push_notification_cubit.dart';
 import '../../components/ItemMessage.dart';
 import '../../components/ItemThanhVien.dart';
 import '../../components/callItem.dart';
@@ -99,7 +100,6 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
 
   @override
   void didPush() {
-    print(' Route was pushed onto navigator and is now topmost route.');
     context
         .read<CheckCanDisplayNotificationCubit>()
         .canDisplayNotification(false);
@@ -108,20 +108,17 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
 
   @override
   void didPop() {
-    print(' Covering route was popped off the navigator.');
     super.didPop();
   }
 
   @override
-  void didPopNext() {
-    print(' Covering route was popped off the navigator.');
-  }
+  void didPopNext() {}
 
   @override
   void didPushNext() {
     // TODO: implement didPushNext
     super.didPushNext();
-    print('Push to ohter screen');
+
     context
         .read<CheckCanDisplayNotificationCubit>()
         .canDisplayNotification(true);
@@ -129,8 +126,6 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-//  GroupInfo args = ModalRoute.of(context)!.settings.arguments as GroupInfo;
-// print('ARGUMENT FROM ROUTE: ${args.groupName}');
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -146,43 +141,59 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
             icon: Icon(Icons.arrow_back),
           ),
           actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(
-                  onPressed: () async {
-                    Future.delayed(Duration.zero, () {
-                      navigatePush(
-                          context,
-                          CallAudio(
-                            groupid: widget.group.groupId.toString(),
-                            grname: widget.group.groupName.toString(),
-                            answere: false,
-                          ));
-                    });
-                  },
-                  icon: Icon(Icons.call)),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: IconButton(
-                  onPressed: () async {
-                    // FlutterRingtonePlayer.playRingtone();
-                    await DatabaseService()
-                        .refreshCallStatus(widget.group.groupId.toString())
-                        .then((value) => {
-                              Future.delayed(Duration.zero, () {
-                                navigatePush(
-                                    context,
-                                    CallVideo(
-                                      groupid: widget.group.groupId.toString(),
-                                      grname: widget.group.groupName.toString(),
-                                      answere: false,
-                                    ));
-                              })
-                            });
-                  },
-                  icon: Icon(Icons.videocam)),
-            ),
+            widget.group.members!.length == 1
+                ? SizedBox()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: IconButton(
+                        onPressed: () async {
+                          await context.read<PushNotificationCubit>().pushCallNoti(
+                              widget.group,
+                              'audio',
+                              widget.group.toMap()
+                              );
+                          //  await DatabaseService()
+                          //     .refreshCallStatus(widget.group.groupId.toString())
+                          //     .then((value) => {
+                          //           Future.delayed(Duration.zero, () {
+                          //   navigatePush(
+                          //       context,
+                          //       CallAudio(
+                          //         groupid: widget.group.groupId.toString(),
+                          //         grname: widget.group.groupName.toString(),
+                          //         answere: false,
+                          //       ));
+                          // })
+                          //         });
+                        },
+                        icon: Icon(Icons.call)),
+                  ),
+            widget.group.members!.length == 1
+                ? SizedBox()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: IconButton(
+                        onPressed: () async {
+                          // FlutterRingtonePlayer.playRingtone();
+                          await DatabaseService()
+                              .refreshCallStatus(
+                                  widget.group.groupId.toString())
+                              .then((value) => {
+                                    Future.delayed(Duration.zero, () {
+                                      navigatePush(
+                                          context,
+                                          CallVideo(
+                                            groupid:
+                                                widget.group.groupId.toString(),
+                                            grname: widget.group.groupName
+                                                .toString(),
+                                            answere: false,
+                                          ));
+                                    })
+                                  });
+                        },
+                        icon: Icon(Icons.videocam)),
+                  ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: IconButton(
@@ -193,10 +204,10 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                               backgroundColor: Colors.white,
                               surfaceTintColor: Colors.white,
                               title: Text(
-                                  'Thành viên(${widget.group.members!.length})'),
+                                  'Thành viên (${widget.group.members!.length})'),
                               content: Container(
                                 constraints: BoxConstraints(
-                                    minHeight: 80, maxHeight: 200),
+                                    minHeight: 30, maxHeight: 200),
                                 width: 100,
                                 color: Colors.white,
                                 child: ListView.builder(
@@ -265,7 +276,6 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                               MessageCubitState>(
                             listener: (context, state) {},
                             builder: (context, state) {
-                              print('REBUILD MESSAGE AAAAAAAAAs ');
                               return Expanded(
                                 child: SingleChildScrollView(
                                   reverse: true,

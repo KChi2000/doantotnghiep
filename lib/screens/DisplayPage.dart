@@ -73,6 +73,7 @@ class _DisplayPageState extends State<DisplayPage> {
         print('data got: ${groupdata.groupName}');
         navigatePush(
             navigatorKey.currentState!.context, chatDetail(group: groupdata));
+      
       }
     });
     FirebaseMessaging.onMessage.listen((value) {
@@ -91,7 +92,7 @@ class _DisplayPageState extends State<DisplayPage> {
         GroupInfo groupdata = GroupInfo.fromMap(value.data['group']);
         print('data got: ${groupdata.groupName}');
         navigatePush(
-            navigatorKey.currentState!.context, chatDetail(group: groupdata));
+            navigatorKey.currentState!.context,chatDetail(group: groupdata));
       }
     });
   }
@@ -202,11 +203,11 @@ class _DisplayPageState extends State<DisplayPage> {
         if (!mounted) return;
         switch (event!.event) {
           case Event.ACTION_CALL_INCOMING:
-            print('ACTION_CALL_INCOMING');
+          
             break;
           case Event.ACTION_CALL_START:
             Map<String, dynamic> data = event.body;
-            print('ACTION_CALL_START ${data}');
+         
             await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
                 id: data['id'],
                 nameCaller: data['nameCaller'],
@@ -224,18 +225,21 @@ class _DisplayPageState extends State<DisplayPage> {
                     ringtonePath: 'system_ringtone_default',
                     backgroundColor: '#0955fa',
                     actionColor: '#4CAF50')));
-            print('ACTION_CALL_END ${data}');
+         
             break;
           case Event.ACTION_CALL_ACCEPT:
-            print(
-                'ACTION_CALL_ACCEPT ${(event.body as Map<String, dynamic>)['id'].toString().substring(5)}');
-            (event.body as Map<String, dynamic>)['id']
+         
+              await DatabaseService()
+                        .refreshCallStatus((event.body as Map<String, dynamic>)['id']
+                              .toString()
+                              .substring(5)).then((value) {
+                                    Future.delayed(Duration.zero, () {
+                  (event.body as Map<String, dynamic>)['id']
                         .toString()
                         .substring(0, 5) ==
                     'video'
-                ? Future.delayed(Duration.zero, () {
-                    navigatePush(
-                        context,
+                ?  navigatePush(
+                        navigatorKey.currentState!.context,
                         CallVideo(
                           groupid: (event.body as Map<String, dynamic>)['id']
                               .toString()
@@ -243,11 +247,9 @@ class _DisplayPageState extends State<DisplayPage> {
                           grname: (event.body
                               as Map<String, dynamic>)['nameCaller'],
                           answere: true,
-                        ));
-                  })
-                : Future.delayed(Duration.zero, () {
+                        ))   : Future.delayed(Duration.zero, () {
                     navigatePush(
-                        context,
+                        navigatorKey.currentState!.context,
                         CallAudio(
                           groupid: (event.body as Map<String, dynamic>)['id']
                               .toString()
@@ -256,14 +258,18 @@ class _DisplayPageState extends State<DisplayPage> {
                               as Map<String, dynamic>)['nameCaller'],
                           answere: true,
                         ));
+                  });;
                   });
+                              });
+                
+             
 
             break;
           case Event.ACTION_CALL_DECLINE:
-            print('ACTION_CALL_DECLINE');
+      
             break;
           case Event.ACTION_CALL_ENDED:
-            print('ACTION_CALL_ENDED');
+        
             break;
           case Event.ACTION_CALL_TIMEOUT:
             // TODO: missed an incoming call

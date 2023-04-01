@@ -77,15 +77,7 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
     context.read<SendMessageCubit>().initialStatusSendMessage();
   }
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   // TODO: implement didChangeAppLifecycleState
-  //   if (state == AppLifecycleState.resumed) {
-  //     print('in the chat detail');
-  //   } else {
-  //     print('not in th chat detail');
-  //   }
-  // }
+  
 
   @override
   void didChangeDependencies() {

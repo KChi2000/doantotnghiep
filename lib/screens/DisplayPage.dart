@@ -76,45 +76,28 @@ class _DisplayPageState extends State<DisplayPage> {
       }
     });
     FirebaseMessaging.onMessage.listen((value) async {
-      if (value.notification!.body.toString() == 'audio') {
-        Map<String, dynamic> map = value.data;
-        await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
-            id: '${map['groupId']}',
-            nameCaller: 'Nhóm ${map['GroupName']}',
-            avatar: 'audio',
-            handle: 'đang gọi ${value.notification!.body}',
-            duration: 30000,
-            textAccept: 'TRẢ LỜI',
-            textDecline: 'TỪ CHỐI',
-            textMissedCall: 'Cuộc gọi nhỡ',
-            textCallback: 'GỌI LẠI',
-            android: AndroidParams(
-                isCustomNotification: true,
-                isCustomSmallExNotification: false,
-                isShowMissedCallNotification: true,
-                ringtonePath: 'system_ringtone_default',
-                backgroundColor: '#0955fa',
-                actionColor: '#4CAF50')));
-      } else if (value.notification!.body.toString() == 'video') {
-        Map<String, dynamic> map = value.data;
-        await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
-            id: '${map['groupId']}',
-            nameCaller: 'Nhóm ${map['GroupName']}',
-            avatar: '',
-            handle: 'đang gọi ${value.notification!.body}',
-            duration: 30000,
-            textAccept: 'TRẢ LỜI',
-            textDecline: 'TỪ CHỐI',
-            textMissedCall: 'Cuộc gọi nhỡ',
-            textCallback: 'GỌI LẠI',
-            android: AndroidParams(
-                isCustomNotification: true,
-                isCustomSmallExNotification: false,
-                isShowMissedCallNotification: true,
-                ringtonePath: 'system_ringtone_default',
-                backgroundColor: '#0955fa',
-                actionColor: '#4CAF50')));
-      } else {
+      Map<String, dynamic> map = value.data;
+      var params = CallKitParams(
+          id: '${map['groupId']}',
+          nameCaller: 'Nhóm ${map['GroupName']}',
+          avatar: '${value.notification!.body.toString()}',
+          handle: 'đang gọi ${value.notification!.body}',
+          duration: 30000,
+          textAccept: 'TRẢ LỜI',
+          textDecline: 'TỪ CHỐI',
+          textMissedCall: 'Cuộc gọi nhỡ',
+          textCallback: 'GỌI LẠI',
+          android: AndroidParams(
+              isCustomNotification: true,
+              isCustomSmallExNotification: false,
+              isShowMissedCallNotification: true,
+              ringtonePath: 'system_ringtone_default',
+              backgroundColor: '#0955fa',
+              actionColor: '#4CAF50'));
+      if (value.notification!.body.toString() == 'audio' || value.notification!.body.toString() == 'video') {
+        await FlutterCallkitIncoming.startCall(params);
+        await FlutterCallkitIncoming.showCallkitIncoming(params);
+      }  else {
         if (mounted) {
           LocalNotificationService.showNotificationOnForeground(value);
           print(

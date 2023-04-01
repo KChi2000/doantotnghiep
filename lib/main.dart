@@ -239,7 +239,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void checkUserLoggedIn() async {
     context.read<CheckLoggedCubit>().checkUserIsLogged();
   }
-
+@override
+  void didChangeAppLifecycleState(AppLifecycleState state)async {
+    // TODO: implement didChangeAppLifecycleState
+    if (state == AppLifecycleState.resumed) {
+      // List<Object?> data = await FlutterCallkitIncoming.activeCalls();
+      // Object? currentCall= data.first;
+      // var map = json.decode(currentCall.toString());
+      // print('OPEN APP TO CALL ${map}');
+     // navigatorKey.currentState!.push(MaterialPageRoute(builder: (context)=>CallAudio(groupid: currentCall['id'], grname: currentCall['nameCaller'])));
+    } 
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -298,8 +308,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                                       element.recentMessageSender.toString() !=
                                           null) {
                                     if (element.callStatus == 'call end') {
-                                      await FlutterCallkitIncoming.endCall(
-                                          '${element.groupId}');
+                                      await FlutterCallkitIncoming.endAllCalls();
+                                      // endCall(
+                                      //     '${element.groupId}');
                                     }
                                   }
                                 });
@@ -319,3 +330,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
   }
 }
+
+
+
+
+
+
+//{"actionColor": "#4CAF50", "appName": "", "args": "{}", "avatar": "xdsdfs", "backgroundColor": "#0955fa", "backgroundUrl": "", "duration": 30000.0, "extra": {}, "from": "", "handle": "đang gọi audio", "headers": {}, "id": "ITe3hw3S2XtO00M2B9H4", "isAccepted": true, "isCustomNotification": true, "isCustomSmallExNotification": false, "isShowCallback": true, "isShowLogo": false, "isShowMissedCallNotification": true, "nameCaller": "Nhóm Du lịch Hàn Quốc", "ringtonePath": "system_ringtone_default", "textAccept": "TRẢ LỜI", "textCallback": "GỌI LẠI", "textDecline": "TỪ CHỐI", "textMissedCall": "Cuộc gọi nhỡ", "type": 0.0, "uuid": ""}

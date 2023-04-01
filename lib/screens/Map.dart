@@ -36,7 +36,7 @@ class _TrackingState extends State<Tracking> {
     context.read<GetProfileCubit>().getStreamProfile();
     context.read<GetUserGroupCubit>().getUerGroup();
     context.read<CountToRebuildCubit>().init();
-    // context.read<FetchLocationCubit>().UpdateLocation();
+    context.read<FetchLocationCubit>().UpdateLocation();
 
     super.initState();
   }

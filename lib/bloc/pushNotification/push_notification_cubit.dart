@@ -48,6 +48,7 @@ class PushNotificationCubit extends Cubit<PushNotificationState> {
         listlocation.map((e) => e.registrationId).toList();
     try{
      var token = await FirebaseMessaging.instance.getToken();
+    print('GROUP TO STRING: ${group.toStringS()}');
       listOfRegistration_ids.remove(token);
        http.Response response =
             await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
@@ -61,13 +62,13 @@ class PushNotificationCubit extends Cubit<PushNotificationState> {
                   "notification": {
                     "body":
                         "${content}",
-                    "title": "${group.toJson()}"
+                    "title": group.toStringS()
                   },
                   'priority': 'high',
                   "data": data
                 }));
     }catch(e){
-
+        print(e.toString());
     }
   }
 }

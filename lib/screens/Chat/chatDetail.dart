@@ -32,6 +32,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 import '../../bloc/Changetab/changetab_cubit.dart';
+import '../../bloc/GroupInfoCubit/group_info_cubit_cubit.dart';
 import '../../bloc/MakeAVideoCall/make_a_video_call_cubit.dart';
 
 import '../../bloc/fetchLocationToShow/fetch_location_to_show_cubit.dart';
@@ -147,24 +148,26 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: IconButton(
                         onPressed: () async {
-                          await context.read<PushNotificationCubit>().pushCallNoti(
-                              widget.group,
-                              'audio',
-                              widget.group.toMap()
-                              );
-                          //  await DatabaseService()
-                          //     .refreshCallStatus(widget.group.groupId.toString())
-                          //     .then((value) => {
-                          //           Future.delayed(Duration.zero, () {
-                          //   navigatePush(
-                          //       context,
-                          //       CallAudio(
-                          //         groupid: widget.group.groupId.toString(),
-                          //         grname: widget.group.groupName.toString(),
-                          //         answere: false,
-                          //       ));
-                          // })
-                          //         });
+                          await DatabaseService()
+                              .refreshCallStatus(
+                                  widget.group.groupId.toString())
+                              .then((value) => {
+                                    Future.delayed(Duration.zero, () {
+                                      navigatePush(
+                                          context,
+                                          CallAudio(
+                                            groupid:
+                                                widget.group.groupId.toString(),
+                                            grname: widget.group.groupName
+                                                .toString(),
+                                            answere: false,
+                                          ));
+                                    })
+                                  });
+                          await context
+                              .read<PushNotificationCubit>()
+                              .pushCallNoti(
+                                  widget.group, 'audio', widget.group.toJson());
                         },
                         icon: Icon(Icons.call)),
                   ),
@@ -190,7 +193,12 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                                             answere: false,
                                           ));
                                     })
+                                    
                                   });
+                                  await context
+                              .read<PushNotificationCubit>()
+                              .pushCallNoti(
+                                  widget.group, 'video', widget.group.toJson());
                         },
                         icon: Icon(Icons.videocam)),
                   ),
@@ -264,14 +272,16 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                                     child: Text(
                                         'Hãy nhắn gì đó cho các bạn của bạn nào ((:')));
                           }
-                          if (snapshot.data!.docChanges.length != 0) {
-                            DatabaseService().updateisReadMessage(
-                                widget.group.groupId!.toString());
-                          }
+                          // if (snapshot.data!.docChanges.length != 0) {
+                          //   DatabaseService().updateisReadMessage(
+                          //       widget.group.groupId!.toString());
+                          // }
+
                           context
                               .read<MessageCubitCubit>()
                               .DisplayMessage(snapshot);
-
+                          DatabaseService().updateisReadMessage(
+                              widget.group.groupId.toString());
                           return BlocConsumer<MessageCubitCubit,
                               MessageCubitState>(
                             listener: (context, state) {},
@@ -377,45 +387,48 @@ class _chatDetailState extends State<chatDetail> with RouteAware {
                           ))
                     ],
                   ),
-                )
+                ),
+              // BlocBuilder<GetUserGroupCubit, GetUserGroupState>(
+              //     builder: (context, state) {
+              //       return StreamBuilder<dynamic>(
+              //           stream: state.stream,
+              //           builder: (context, snapshot) {
+              //             if (snapshot.hasData) {
+              //               context
+              //                   .read<GroupInfoCubitCubit>()
+              //                   .updateGroup(snapshot.data);
+              //             }
+              //             return 
+                          // BlocListener<GroupInfoCubitCubit,
+                          //     GroupInfoCubitState>(
+                          //   listener: (context, state) {
+                          //     if (state is GroupInfoCubitLoaded) {
+                          //       state.groupinfo!.forEach((element) async {
+                          //         if (element.recentMessageSender
+                          //                 .toString()
+                          //                 .isNotEmpty &&
+                          //             element.recentMessageSender.toString() !=
+                          //                 null) {
+                          //          if (element.callStatus ==
+                          //               'call end') {
+                          //             await FlutterCallkitIncoming.endAllCalls();
+                          //             // endCall(
+                          //             //     '${element.groupId}');
+                          //           }
+                          //         }
+                          //       });
+                          //     }
+                          //   },
+                          //   child: SizedBox(),
+                          // ),
+                //         });
+                //   },
+                // ),
               ],
             ),
           ),
         ));
   }
 
-  Widget messagestatus(String status, int index, int length) {
-    if (index == length - 1) {
-      return Text(status,
-          style: TextStyle(fontSize: 11, color: Colors.black54));
-    }
-    return SizedBox();
-  }
-
-  Future<void> pushNotification(String sender, String message) async {
-    try {
-      http.Response response =
-          await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-              headers: {
-                'Authorization':
-                    'key=AAAAUU2PhnA:APA91bGHF5XySlMdvuH_D8vzi0WbRxtA7bFUk-xp2Wu2MKiDEtQ7tu7gUCZS9CIAcEjJdhhTezgUPg4q6QzoABH-yDDqQfizZ5dWJVvOVQhUkV98I9afP6FPMOxa1m3fNUa7XRzS6CpZ',
-                'Content-Type': 'application/json'
-              },
-              body: jsonEncode(<String, dynamic>{
-                "to":
-                    "c703z063S36jDx-OsYfh6H:APA91bFU0j1v9phGcmHe6zn05Q-9bsG8qK2HVO72JPnsNNJttZuRvQJeVVfmGBYBPA7ACi8C2NvLetpQqexe1WXkHOoKgXsOIkFDv2myr6PoDGqU1fEyraKN1gkmGCoZ0Qr7BgBqxXCf",
-                "notification": {
-                  "body": "$sender: $message",
-                  "title": "Tin nhắn từ nhóm..."
-                },
-                'priority': 'high',
-                "data": {
-                  "body": "Notification Body",
-                  "title": "Notification Title",
-                  "key_1": "Value for key_1",
-                  "key_2": "Value for key_2"
-                }
-              }));
-    } catch (e) {}
-  }
+ 
 }

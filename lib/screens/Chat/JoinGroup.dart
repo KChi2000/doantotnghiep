@@ -138,123 +138,117 @@ class _JoinGroupState extends State<JoinGroup> {
   }
 
   Widget grouprow(GroupInfo group) {
-    return GestureDetector(
-      // onTap: () {
-      //   navigatePush(
-      //       context,
-      //       chatDetail(
-      //        group: group,
-      //       ));
-      // },
-
-      child: Container(
-        // margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-        color: Colors.transparent,
-        width: screenwidth,
-        child: Row(
-          children: [
-            CircleAvatar(
-              minRadius: 30,
-              child: Container(
-                child: Center(
-                  child: Text(
-                    group.groupName.toString().substring(0, 1),
-                    style: TextStyle(color: Colors.white),
-                  ),
+    return Container(
+      // margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+      color: Colors.transparent,
+      width: screenwidth,
+      child: Row(
+        children: [
+          CircleAvatar(
+            minRadius: 30,
+            child: Container(
+              child: Center(
+                child: Text(
+                  group.groupName.toString().substring(0, 1),
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
-            SizedBox(
-              width: 10,
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  group.groupName.toString(),
-                  style: TextStyle(color: Colors.black87, fontSize: 17),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                group.groupName.toString(),
+                style: TextStyle(color: Colors.black87, fontSize: 17),
+              ),
+              RichText(
+                  text: TextSpan(children: [
+                TextSpan(
+                  text: group.admin!.adminId.toString() ==
+                          Userinfo.userSingleton.uid
+                      ? 'Người tạo nhóm: bạn'
+                      : 'Người tạo nhóm: ${group.admin?.adminName}',
+                  style: TextStyle(color: Colors.black87, fontSize: 14),
                 ),
-                RichText(
-                    text: TextSpan(children: [
-                  TextSpan(
-                    text: group.admin!.adminId.toString() ==
-                            Userinfo.userSingleton.uid
-                        ? 'Người tạo nhóm: bạn'
-                        : 'Người tạo nhóm: ${group.admin?.adminName}',
-                    style: TextStyle(color: Colors.black87, fontSize: 14),
-                  ),
-                ])),
-                Text(
-                  'Thành viên: ${group.members?.length.toString()}',
-                )
-              ],
-            ),
-            Spacer(),
-            BlocConsumer<JoindStatusCubit, JoinState>(
-              listener: (context, state) {},
-              builder: (context, state) {
-               if(state is JoindStatusState){
-                 return Userinfo.userSingleton.uid ==
-                        group.admin!.adminId.toString()
-                    ? SizedBox()
-                    : TextButton(
-                        onPressed: state.joined
-                            ? null
-                            : () async {
-                                print('STATE JOIN: ${state.joined}');
-                                await context
-                                    .read<JoindStatusCubit>()
-                                    .joinGroup(group.groupId.toString(),
-                                        group.groupName.toString());
-
-                                await context
-                                    .read<JoinToGroupCubit>()
-                                    .updateData(codeCon.text);
-                                // if (state.joined) {
-                                //   Fluttertoast.showToast(
-                                //       msg: "Đã rời nhóm thành công",
-                                //       toastLength: Toast.LENGTH_SHORT,
-                                //       gravity: ToastGravity.BOTTOM,
-                                //       timeInSecForIosWeb: 1,
-                                //       textColor: Colors.white,
-                                //       backgroundColor: Colors.pink,
-                                //       fontSize: 16.0);
-                                // } else {
-                                  await context
-                                      .read<PushNotificationCubit>()
-                                      .pushNoti(group,
-                                          '${Userinfo.userSingleton.name} đã tham gia nhóm');
-                                  Fluttertoast.showToast(
-                                      msg: "Đã tham gia thành công",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.BOTTOM,
-                                      timeInSecForIosWeb: 1,
-                                      textColor: Colors.white,
-                                      backgroundColor: Colors.pink,
-                                      fontSize: 16.0);
-                                // }
-                              },
-                        child: state.joined
-                            ? Text(
-                                'Đã tham gia',
-                                style: TextStyle(color: Colors.grey[400]),
-                              )
-                            : Text('Tham gia'));
-               }
+              ])),
+              Text(
+                'Thành viên: ${group.members?.length.toString()}',
+              )
+            ],
+          ),
+          Spacer(),
+          BlocConsumer<JoindStatusCubit, JoinState>(
+            listener: (context, state) {},
+            builder: (context, state) {
+             if(state is JoindStatusState){
                return Userinfo.userSingleton.uid ==
-                        group.admin!.adminId.toString()
-                    ? SizedBox()
-                    : TextButton(onPressed: null, child: Padding(
+                      group.admin!.adminId.toString()
+                  ? SizedBox()
+                  : TextButton(
+                      onPressed: state.joined
+                          ? null
+                          : () async {
+                              print('STATE JOIN: ${state.joined}');
+                              await context
+                                  .read<JoindStatusCubit>()
+                                  .joinGroup(group.groupId.toString(),
+                                      group.groupName.toString());
+
+                              await context
+                                  .read<JoinToGroupCubit>()
+                                  .updateData(codeCon.text);
+                              // if (state.joined) {
+                              //   Fluttertoast.showToast(
+                              //       msg: "Đã rời nhóm thành công",
+                              //       toastLength: Toast.LENGTH_SHORT,
+                              //       gravity: ToastGravity.BOTTOM,
+                              //       timeInSecForIosWeb: 1,
+                              //       textColor: Colors.white,
+                              //       backgroundColor: Colors.pink,
+                              //       fontSize: 16.0);
+                              // } else {
+                                await context
+                                    .read<PushNotificationCubit>()
+                                    .pushNoti(group,
+                                        '${Userinfo.userSingleton.name} đã tham gia nhóm');
+                                Fluttertoast.showToast(
+                                    msg: "Đã tham gia thành công",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    textColor: Colors.white,
+                                    backgroundColor: Colors.pink,
+                                    fontSize: 16.0);
+                              // }
+                            },
+                      child: state.joined
+                          ? Text(
+                              'Đã tham gia',
+                              style: TextStyle(color: Colors.grey[400]),
+                            )
+                          : Text('Tham gia'));
+             }
+             return Userinfo.userSingleton.uid ==
+                      group.admin!.adminId.toString()
+                  ? SizedBox()
+                  : SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: TextButton(onPressed: null, child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Center(child: CircularProgressIndicator(),
                       ),
-                    ));
-              },
-            )
-          ],
-        ),
+                    )),
+                  );
+            },
+          )
+        ],
       ),
     );
   }

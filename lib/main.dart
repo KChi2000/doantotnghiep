@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:doantotnghiep/bloc/ChangeMessageStatus/change_message_status_cubit.dart';
 import 'package:doantotnghiep/bloc/Changetab/changetab_cubit.dart';
 import 'package:doantotnghiep/bloc/FetchLocation/fetch_location_cubit.dart';
@@ -62,27 +64,30 @@ import 'model/User.dart';
 import 'screens/Chat/CallAudio.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
-  GroupInfo group = GroupInfo.fromJson(message!.notification!.title as Map<String,dynamic>);
-  print(
-      'FB message from background ${group.toJson()}');
-  
-  // await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
-  //     id: 'message.data',
-  //     nameCaller: 'sdesa',
-  //     avatar: 'xdsdfs',
-  //     handle: 'sfdasf',
-  //     duration: 30000,
-  //     textAccept: 'dfsfaf',
-  //     textDecline: 'sfdsf',
-  //     textMissedCall: 'fsdg',
-  //     textCallback: 'dsfsdfsd',
-  //     android: AndroidParams(
-  //         isCustomNotification: true,
-  //         isCustomSmallExNotification: false,
-  //         isShowMissedCallNotification: true,
-  //         ringtonePath: 'system_ringtone_default',
-  //         backgroundColor: '#0955fa',
-  //         actionColor: '#4CAF50')));
+  // GroupInfo group = GroupInfo.fromJson(message.data['data'] as Map<String,dynamic>);
+
+  // print(
+  //     'FB message from background: ${map}');
+  Map<String, dynamic> map = message.data;
+  var params = CallKitParams(
+      id: '${map['groupId']}',
+      nameCaller: 'Nhóm ${map['GroupName']}',
+      avatar: 'xdsdfs',
+      handle: 'đang gọi ${message.notification!.body}',
+      duration: 30000,
+      textAccept: 'TRẢ LỜI',
+      textDecline: 'TỪ CHỐI',
+      textMissedCall: 'Cuộc gọi nhỡ',
+      textCallback: 'GỌI LẠI',
+      android: AndroidParams(
+          isCustomNotification: true,
+          isCustomSmallExNotification: false,
+          isShowMissedCallNotification: true,
+          ringtonePath: 'system_ringtone_default',
+          backgroundColor: '#0955fa',
+          actionColor: '#4CAF50'));
+  await FlutterCallkitIncoming.startCall(params);
+  await FlutterCallkitIncoming.showCallkitIncoming(params);
 }
 
 void main() async {
@@ -292,30 +297,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                                           .isNotEmpty &&
                                       element.recentMessageSender.toString() !=
                                           null) {
-                                    if (element.callStatus == 'calling' &&
-                                        element.recentMessageSender
-                                                .toString()
-                                                .substring(
-                                                    element.recentMessageSender
-                                                            .toString()
-                                                            .length -
-                                                        29,
-                                                    element.recentMessageSender
-                                                        .toString()
-                                                        .length) !=
-                                            Userinfo.userSingleton.uid) {
-                                      // listenerEvent(ct);
-                                      await FlutterCallkitIncoming.startCall(
-                                          Callparam(
-                                              '${element.groupId}',
-                                              '${element.groupName}',
-                                              element.type == Type.callvideo
-                                                  ? 'video'
-                                                  : 'audio'));
-                                    } else if (element.callStatus ==
-                                        'call end') {
+                                    if (element.callStatus == 'call end') {
                                       await FlutterCallkitIncoming.endCall(
-                                          '${element.type == Type.callvideo ? 'video' : 'audio'}${element.groupId}');
+                                          '${element.groupId}');
                                     }
                                   }
                                 });

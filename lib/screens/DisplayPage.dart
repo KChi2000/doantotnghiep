@@ -73,14 +73,53 @@ class _DisplayPageState extends State<DisplayPage> {
         print('data got: ${groupdata.groupName}');
         navigatePush(
             navigatorKey.currentState!.context, chatDetail(group: groupdata));
-      
       }
     });
-    FirebaseMessaging.onMessage.listen((value) {
-      if (mounted) {
-        print(
-            'FB message in foreground: can display notification: ${context.read<CheckCanDisplayNotificationCubit>().state}\n${value.notification!.title} ${value.notification!.body}');
-        LocalNotificationService.showNotificationOnForeground(value);
+    FirebaseMessaging.onMessage.listen((value) async {
+      if (value.notification!.body.toString() == 'audio') {
+        Map<String, dynamic> map = value.data;
+        await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
+            id: '${map['groupId']}',
+            nameCaller: 'Nhóm ${map['GroupName']}',
+            avatar: 'audio',
+            handle: 'đang gọi ${value.notification!.body}',
+            duration: 30000,
+            textAccept: 'TRẢ LỜI',
+            textDecline: 'TỪ CHỐI',
+            textMissedCall: 'Cuộc gọi nhỡ',
+            textCallback: 'GỌI LẠI',
+            android: AndroidParams(
+                isCustomNotification: true,
+                isCustomSmallExNotification: false,
+                isShowMissedCallNotification: true,
+                ringtonePath: 'system_ringtone_default',
+                backgroundColor: '#0955fa',
+                actionColor: '#4CAF50')));
+      } else if (value.notification!.body.toString() == 'video') {
+        Map<String, dynamic> map = value.data;
+        await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
+            id: '${map['groupId']}',
+            nameCaller: 'Nhóm ${map['GroupName']}',
+            avatar: '',
+            handle: 'đang gọi ${value.notification!.body}',
+            duration: 30000,
+            textAccept: 'TRẢ LỜI',
+            textDecline: 'TỪ CHỐI',
+            textMissedCall: 'Cuộc gọi nhỡ',
+            textCallback: 'GỌI LẠI',
+            android: AndroidParams(
+                isCustomNotification: true,
+                isCustomSmallExNotification: false,
+                isShowMissedCallNotification: true,
+                ringtonePath: 'system_ringtone_default',
+                backgroundColor: '#0955fa',
+                actionColor: '#4CAF50')));
+      } else {
+        if (mounted) {
+          LocalNotificationService.showNotificationOnForeground(value);
+          print(
+              'FB message in foreground: can display notification: ${context.read<CheckCanDisplayNotificationCubit>().state}\n${value.notification!.title} ${value.notification!.body}');
+        }
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((value) async {
@@ -92,7 +131,7 @@ class _DisplayPageState extends State<DisplayPage> {
         GroupInfo groupdata = GroupInfo.fromMap(value.data['group']);
         print('data got: ${groupdata.groupName}');
         navigatePush(
-            navigatorKey.currentState!.context,chatDetail(group: groupdata));
+            navigatorKey.currentState!.context, chatDetail(group: groupdata));
       }
     });
   }
@@ -203,11 +242,10 @@ class _DisplayPageState extends State<DisplayPage> {
         if (!mounted) return;
         switch (event!.event) {
           case Event.ACTION_CALL_INCOMING:
-          
             break;
           case Event.ACTION_CALL_START:
             Map<String, dynamic> data = event.body;
-         
+
             await FlutterCallkitIncoming.showCallkitIncoming(CallKitParams(
                 id: data['id'],
                 nameCaller: data['nameCaller'],
@@ -225,72 +263,48 @@ class _DisplayPageState extends State<DisplayPage> {
                     ringtonePath: 'system_ringtone_default',
                     backgroundColor: '#0955fa',
                     actionColor: '#4CAF50')));
-         
+
             break;
           case Event.ACTION_CALL_ACCEPT:
-         
-              await DatabaseService()
-                        .refreshCallStatus((event.body as Map<String, dynamic>)['id']
-                              .toString()
-                              .substring(5)).then((value) {
-                                    Future.delayed(Duration.zero, () {
-                  (event.body as Map<String, dynamic>)['id']
-                        .toString()
-                        .substring(0, 5) ==
-                    'video'
-                ?  navigatePush(
-                        navigatorKey.currentState!.context,
-                        CallVideo(
-                          groupid: (event.body as Map<String, dynamic>)['id']
-                              .toString()
-                              .substring(5),
-                          grname: (event.body
-                              as Map<String, dynamic>)['nameCaller'],
-                          answere: true,
-                        ))   : Future.delayed(Duration.zero, () {
-                    navigatePush(
-                        navigatorKey.currentState!.context,
-                        CallAudio(
-                          groupid: (event.body as Map<String, dynamic>)['id']
-                              .toString()
-                              .substring(5),
-                          grname: (event.body
-                              as Map<String, dynamic>)['nameCaller'],
-                          answere: true,
-                        ));
-                  });;
-                  });
-                              });
-                
-             
+            // await DatabaseService()
+            //     .refreshCallStatus(
+            //         (event.body as Map<String, dynamic>)['id'].toString())
+            // .then((value) {
+            if ((event.body as Map<String, dynamic>)['avatar'] == 'audio') {
+              Future.delayed(Duration.zero, () {
+                navigatePush(
+                    navigatorKey.currentState!.context,
+                    CallAudio(
+                      groupid:
+                          (event.body as Map<String, dynamic>)['id'].toString(),
+                      grname:
+                          (event.body as Map<String, dynamic>)['nameCaller'],
+                      answere: true,
+                    ));
+              });
+            } else if ((event.body as Map<String, dynamic>)['avatar'] ==
+                'video') {
+              Future.delayed(Duration.zero, () {
+                navigatePush(
+                    navigatorKey.currentState!.context,
+                    CallVideo(
+                      groupid:
+                          (event.body as Map<String, dynamic>)['id'].toString(),
+                      grname:
+                          (event.body as Map<String, dynamic>)['nameCaller'],
+                      answere: true,
+                    ));
+              });
+            }
+
+            print('ACTION: ${(event.body as Map<String, dynamic>)['avatar']}');
+
+            // });
 
             break;
           case Event.ACTION_CALL_DECLINE:
-      
             break;
           case Event.ACTION_CALL_ENDED:
-        
-            break;
-          case Event.ACTION_CALL_TIMEOUT:
-            // TODO: missed an incoming call
-            break;
-          case Event.ACTION_CALL_CALLBACK:
-            // TODO: only Android - click action `Call back` from missed call notification
-            break;
-          case Event.ACTION_CALL_TOGGLE_HOLD:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_MUTE:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_DMTF:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_GROUP:
-            // TODO: only iOS
-            break;
-          case Event.ACTION_CALL_TOGGLE_AUDIO_SESSION:
-            // TODO: only iOS
             break;
         }
       });

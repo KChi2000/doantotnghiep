@@ -163,10 +163,9 @@ class _SearchGroupState extends State<SearchGroup> {
         navigatePush(
             context,
             chatDetail(
-             group: group,
+              group: group,
             ));
       },
-    
       child: Container(
         // margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
         color: Colors.transparent,
@@ -216,14 +215,14 @@ Widget groupitems(
     GroupInfo group, BuildContext ct, bool margin, FocusNode focusNode) {
   return GestureDetector(
     onTap: group.status == 'deleted'
-          ? null
-          : () {
-      navigateReplacement(
-          ct,
-          chatDetail(
-          group: group,
-          ));
-    },
+        ? null
+        : () {
+            navigateReplacement(
+                ct,
+                chatDetail(
+                  group: group,
+                ));
+          },
     onLongPress: () {},
     child: Stack(
       children: [
@@ -260,259 +259,254 @@ Widget groupitems(
                     Text(
                       group.groupName.toString(),
                       style: TextStyle(
-                          color:group.status == 'deleted'
-                          ? Colors.grey: Colors.black87,
+                          color: group.status == 'deleted'
+                              ? Colors.grey
+                              : Colors.black87,
                           fontSize: 17,
                           fontWeight: group.status == 'deleted'
-                          ?  FontWeight.normal: group.checkIsRead!
-                              ? FontWeight.w400
-                              : FontWeight.w600),
+                              ? FontWeight.normal
+                              : group.checkIsRead!
+                                  ? FontWeight.w400
+                                  : FontWeight.w600),
                     ),
                     group.status == 'deleted'
-                          ? Text(
-                              Userinfo.userSingleton.uid ==
-                                      group.admin!.adminId.toString()
-                                  ? 'Nhóm đã bị xóa bởi bạn'
-                                  : 'Nhóm đã bị xóa bởi Admin',
-                              style: TextStyle(color: Colors.grey),
-                            )
-                          :  Row(mainAxisSize: MainAxisSize.max, children: [
-                      group.type == Type.announce
-                          ? SizedBox()
-                          : Text(
-                              group.type != Type.announce
-                                  ? Userinfo.userSingleton.uid ==
-                                          group.recentMessageSender
-                                              .toString()
-                                              .substring(group
-                                                      .recentMessageSender
+                        ? Text(
+                            Userinfo.userSingleton.uid ==
+                                    group.admin!.adminId.toString()
+                                ? 'Nhóm đã bị xóa bởi bạn'
+                                : 'Nhóm đã bị xóa bởi Admin',
+                            style: TextStyle(color: Colors.grey),
+                          )
+                        : Row(mainAxisSize: MainAxisSize.max, children: [
+                            group.type == Type.announce
+                                ? SizedBox()
+                                : Text(
+                                    group.type != Type.announce
+                                        ? Userinfo.userSingleton.uid ==
+                                                group.recentMessageSender
+                                                    .toString()
+                                                    .substring(group
+                                                            .recentMessageSender
+                                                            .toString()
+                                                            .length -
+                                                        28)
+                                            ? 'Bạn: '
+                                            : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
+                                        : 'Chưa có tin nhắn nào',
+                                    style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                        fontWeight: group.checkIsRead!
+                                            ? FontWeight.w400
+                                            : FontWeight.w600),
+                                  ),
+                            Flexible(
+                              // width: 200,
+                              child: group.type == Type.announce
+                                  ? Text(
+                                      group.recentMessageSender ==
+                                              Userinfo.userSingleton.name
+                                          ? 'bạn ${group.recentMessage.toString()}'
+                                          : group.recentMessageSender
                                                       .toString()
-                                                      .length -
-                                                  28)
-                                      ? 'Bạn: '
-                                      : '${group.recentMessageSender.toString().substring(0, group.recentMessageSender.toString().length - 29)}:'
-                                  : 'Chưa có tin nhắn nào',
-                              style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: group.checkIsRead!
-                                      ? FontWeight.w400
-                                      : FontWeight.w600),
+                                                      .isEmpty ||
+                                                  group.recentMessageSender ==
+                                                      null
+                                              ? '${group.recentMessage.toString()}'
+                                              : '${group.recentMessageSender} ${group.recentMessage.toString()}',
+                                      maxLines: 1,
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                          overflow: TextOverflow.ellipsis,
+                                          fontWeight: group.checkIsRead!
+                                              ? FontWeight.w400
+                                              : FontWeight.w600),
+                                    )
+                                  : Text(
+                                      group.recentMessage != null
+                                          ? '${group.recentMessage.toString()}'
+                                          : '',
+                                      maxLines: 1,
+                                      softWrap: true,
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                          overflow: TextOverflow.ellipsis,
+                                          fontWeight: group.checkIsRead!
+                                              ? FontWeight.w400
+                                              : FontWeight.w600),
+                                    ),
                             ),
-                      Flexible(
-                        // width: 200,
-                        child: group.type == Type.announce
-                            ? Text(
-                                group.recentMessageSender ==
-                                        Userinfo.userSingleton.name
-                                    ? 'bạn ${group.recentMessage.toString()}'
-                                    : group.recentMessageSender
-                                                .toString()
-                                                .isEmpty ||
-                                            group.recentMessageSender == null
-                                        ? '${group.recentMessage.toString()}'
-                                        : '${group.recentMessageSender} ${group.recentMessage.toString()}',
-                                maxLines: 1,
-                                softWrap: true,
-                                style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                    overflow: TextOverflow.ellipsis,
-                                    fontWeight: group.checkIsRead!
-                                        ? FontWeight.w400
-                                        : FontWeight.w600),
-                              )
-                            : Text(
-                                group.recentMessage != null
-                                    ? '${group.recentMessage.toString()}'
-                                    : '',
-                                maxLines: 1,
-                                softWrap: true,
-                                style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                    overflow: TextOverflow.ellipsis,
-                                    fontWeight: group.checkIsRead!
-                                        ? FontWeight.w400
-                                        : FontWeight.w600),
-                              ),
-                      ),
-                      Text('  '),
-                      group.recentMessageSender.toString().isEmpty ||
-                              group.recentMessageSender == null
-                          ? SizedBox()
-                          : Text(
-                              group.time == null ||
-                                      group.time.toString().isEmpty
-                                  ? ''
-                                  : '${DateTime.fromMicrosecondsSinceEpoch(int.parse(group.time!)).toString().split(' ').last.substring(0, 5)}',
-                              style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: group.checkIsRead!
-                                      ? FontWeight.w400
-                                      : FontWeight.w600),
-                            )
-                    ])
+                            Text('  '),
+                            group.recentMessageSender.toString().isEmpty ||
+                                    group.recentMessageSender == null
+                                ? SizedBox()
+                                : Text(
+                                    group.time == null ||
+                                            group.time.toString().isEmpty
+                                        ? ''
+                                        : '${DateTime.fromMicrosecondsSinceEpoch(int.parse(group.time!)).toString().split(' ').last.substring(0, 5)}',
+                                    style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                        fontWeight: group.checkIsRead!
+                                            ? FontWeight.w400
+                                            : FontWeight.w600),
+                                  )
+                          ])
                   ],
                 ),
               ),
               // Spacer(),
-            group.status == 'deleted'
-                    ? SizedBox()
-                    :  Align(
-                  alignment: Alignment.topRight,
-                  child: PopupMenuButton(
-                      offset: Offset(-30, 30),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
-                      elevation: 10,
-                      padding: EdgeInsets.all(0),
-                      surfaceTintColor: Colors.white,
-                      itemBuilder: (context) {
-                        return [
-                          PopupMenuItem(
-                            onTap: () {
-                              FocusScope.of(ct).requestFocus(FocusNode());
-                              Clipboard.setData(
-                                      ClipboardData(text: group.inviteId))
-                                  .then((_) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Invite id copied to clipboard: ${group.inviteId}"),
-                                  duration: Duration(seconds: 2),
-                                ));
-                              });
-                            },
-                            child: Text(
-                              'Copy inviteid',
-                              style: TextStyle(color: Colors.pink),
-                            ),
-                            padding:
-                                EdgeInsets.only(top: 5, bottom: 5, left: 10),
-                            textStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontFamily: 'roboto'),
-                          ),
-                               PopupMenuItem(
-                                  onTap: () async {
-                                    if (Userinfo.userSingleton.uid !=
-                                        group.admin!.adminId.toString()) {
-                                      Future.delayed(
-                                        const Duration(seconds: 0),
-                                        () => showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            surfaceTintColor: Colors.white,
-                                            title: Text(
-                                                'Bạn có chắc muốn rời nhóm?'),
-                                            actions: [
-                                              ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Text('Hủy')),
-                                              ElevatedButton(
-                                                  onPressed: () async {
-                                                    ct.loaderOverlay.show();
-                                                    await context
-                                                        .read<
-                                                            JoindStatusCubit>()
-                                                        .leaveGroup(
-                                                            group.groupId
-                                                                .toString(),
-                                                            group.groupName
-                                                                .toString());
-                                                    ct.loaderOverlay.hide();
-                                                    Navigator.pop(context);
-                                                    Fluttertoast.showToast(
-                                                        msg:
-                                                            "Đã rời nhóm thành công",
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                        timeInSecForIosWeb: 1,
-                                                        textColor: Colors.white,
-                                                        backgroundColor:
-                                                            Colors.pink,
-                                                        fontSize: 16.0);
-                                                  },
-                                                  child: Text('Xác nhận'))
-                                            ],
-                                          ),
+              group.status == 'deleted'
+                  ? SizedBox()
+                  : Align(
+                      alignment: Alignment.topRight,
+                      child: PopupMenuButton(
+                          offset: Offset(-30, 30),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)),
+                          elevation: 10,
+                          padding: EdgeInsets.all(0),
+                          surfaceTintColor: Colors.white,
+                          itemBuilder: (context) {
+                            return [
+                              PopupMenuItem(
+                                onTap: () {
+                                  FocusScope.of(ct).requestFocus(FocusNode());
+                                  Clipboard.setData(
+                                          ClipboardData(text: group.inviteId))
+                                      .then((_) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(
+                                          "Đã copy invite id vào bộ nhớ tạm: ${group.inviteId}",style: TextStyle(color: Colors.white,fontFamily: 'roboto'),),
+                                      duration: Duration(seconds: 2),
+                                    ));
+                                  });
+                                },
+                                child: Text(
+                                  'Copy inviteid',
+                                  style: TextStyle(color: Colors.pink),
+                                ),
+                                padding: EdgeInsets.only(
+                                    top: 5, bottom: 5, left: 10),
+                                textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontFamily: 'roboto'),
+                              ),
+                              PopupMenuItem(
+                                onTap: () async {
+                                  if (Userinfo.userSingleton.uid !=
+                                      group.admin!.adminId.toString()) {
+                                    Future.delayed(
+                                      const Duration(seconds: 0),
+                                      () => showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          surfaceTintColor: Colors.white,
+                                          title: Text(
+                                              'Bạn có chắc muốn rời nhóm?'),
+                                          actions: [
+                                            ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context, 'huy');
+                                                },
+                                                child: Text('Hủy')),
+                                            ElevatedButton(
+                                                onPressed: () async {
+                                                  Navigator.pop(context, 'ok');
+                                                },
+                                                child: Text('Xác nhận'))
+                                          ],
                                         ),
-                                      );
-                                    } else {
-                                      Future.delayed(
-                                        const Duration(seconds: 0),
-                                        () => showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            surfaceTintColor: Colors.white,
-                                            title: Text(
-                                                'Bạn có chắc muốn xóa nhóm?'),
-                                            actions: [
-                                              ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Text('Hủy')),
-                                              ElevatedButton(
-                                                  onPressed: () async {
-                                                    ct.loaderOverlay.show();
-                                                    await context
-                                                        .read<
-                                                            JoindStatusCubit>()
-                                                        .deleteGroup(
-                                                            group.groupId
-                                                                .toString(),
-                                                            group.groupName
-                                                                .toString());
-                                                    ct.loaderOverlay.hide();
-                                                    Navigator.pop(context);
-                                                    Fluttertoast.showToast(
-                                                        msg:
-                                                            "Đã xóa thành công",
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                        timeInSecForIosWeb: 1,
-                                                        textColor: Colors.white,
-                                                        backgroundColor:
-                                                            Colors.pink,
-                                                        fontSize: 16.0);
-                                                  },
-                                                  child: Text('Xác nhận'))
-                                            ],
-                                          ),
+                                      ).then((value) async {
+                                        if (value == 'ok') {
+                                          ct.loaderOverlay.show();
+                                          await context
+                                              .read<JoindStatusCubit>()
+                                              .leaveGroup(
+                                                  group.groupId.toString(),
+                                                  group.groupName.toString());
+                                          ct.loaderOverlay.hide();
+                                          Fluttertoast.showToast(
+                                              msg: "Đã rời nhóm thành công",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 1,
+                                              textColor: Colors.white,
+                                              backgroundColor: Colors.pink,
+                                              fontSize: 16.0);
+                                        }
+                                      }),
+                                    );
+                                  } else {
+                                    Future.delayed(
+                                      const Duration(seconds: 0),
+                                      () => showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          surfaceTintColor: Colors.white,
+                                          title: Text(
+                                              'Bạn có chắc muốn xóa nhóm?'),
+                                          actions: [
+                                            ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context, 'huy');
+                                                },
+                                                child: Text('Hủy')),
+                                            ElevatedButton(
+                                                onPressed: () async {
+                                                  Navigator.pop(context, 'ok');
+                                                },
+                                                child: Text('Xác nhận'))
+                                          ],
                                         ),
-                                      );
-                                    }
-                                  },
-                                  child: Text(
-                                      Userinfo.userSingleton.uid ==
-                                              group.admin!.adminId.toString()
-                                          ? 'Xoá nhóm'
-                                          : 'Rời nhóm',
-                                      style: TextStyle(color: Colors.pink)),
-                                  padding: EdgeInsets.only(
-                                      top: 5, bottom: 5, left: 10),
-                                  // height: 20,
-                                  textStyle: TextStyle(
-                                      color: Colors.black, fontSize: 16),
-                                )
-                        ];
-                      },
-                      icon: Icon(
-                        Icons.more_vert,
-                        color: Colors.black54,
-                      )))
+                                      ).then((value) async {
+                                        if (value == 'ok') {
+                                          ct.loaderOverlay.show();
+                                          await context
+                                              .read<JoindStatusCubit>()
+                                              .deleteGroup(
+                                                  group.groupId.toString(),
+                                                  group.groupName.toString());
+                                          ct.loaderOverlay.hide();
+                                          Fluttertoast.showToast(
+                                              msg: "Đã xóa thành công",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 1,
+                                              textColor: Colors.white,
+                                              backgroundColor: Colors.pink,
+                                              fontSize: 16.0);
+                                        }
+                                      }),
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                    Userinfo.userSingleton.uid ==
+                                            group.admin!.adminId.toString()
+                                        ? 'Xoá nhóm'
+                                        : 'Rời nhóm',
+                                    style: TextStyle(color: Colors.pink)),
+                                padding: EdgeInsets.only(
+                                    top: 5, bottom: 5, left: 10),
+                                // height: 20,
+                                textStyle: TextStyle(
+                                    color: Colors.black, fontSize: 16),
+                              )
+                            ];
+                          },
+                          icon: Icon(
+                            Icons.more_vert,
+                            color: Colors.black54,
+                          )))
             ],
           ),
         ),

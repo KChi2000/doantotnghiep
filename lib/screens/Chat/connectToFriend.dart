@@ -216,7 +216,7 @@ class _ConnectToFriendState extends State<ConnectToFriend> with RouteAware {
                                                             .showSnackBar(
                                                                 SnackBar(
                                                           content: Text(
-                                                              "Invite id copied to clipboard: ${state.inviteid}"),
+                                                              "Đã copy invite id vào bộ nhớ tạm: ${state.inviteid}"),
                                                           duration: Duration(
                                                               seconds: 2),
                                                         ));
@@ -652,8 +652,13 @@ class groupitem extends StatelessWidget {
                                         .then((_) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(SnackBar(
+                                        backgroundColor: Colors.black,
                                         content: Text(
-                                            "Invite id copied to clipboard: ${group.inviteId}"),
+                                          "Đã copy invite id vào bộ nhớ tạm: ${group.inviteId}",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: 'roboto'),
+                                        ),
                                         duration: Duration(seconds: 2),
                                       ));
                                     });
@@ -685,39 +690,37 @@ class groupitem extends StatelessWidget {
                                             actions: [
                                               ElevatedButton(
                                                   onPressed: () {
-                                                    Navigator.pop(context);
+                                                    Navigator.pop(
+                                                        context, 'huy');
                                                   },
                                                   child: Text('Hủy')),
                                               ElevatedButton(
                                                   onPressed: () async {
-                                                    ct.loaderOverlay.show();
-                                                    await context
-                                                        .read<
-                                                            JoindStatusCubit>()
-                                                        .leaveGroup(
-                                                            group.groupId
-                                                                .toString(),
-                                                            group.groupName
-                                                                .toString());
-                                                    ct.loaderOverlay.hide();
-                                                    Navigator.pop(context);
-                                                    Fluttertoast.showToast(
-                                                        msg:
-                                                            "Đã rời nhóm thành công",
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                        timeInSecForIosWeb: 1,
-                                                        textColor: Colors.white,
-                                                        backgroundColor:
-                                                            Colors.pink,
-                                                        fontSize: 16.0);
+                                                    Navigator.pop(
+                                                        context, 'ok');
                                                   },
                                                   child: Text('Xác nhận'))
                                             ],
                                           ),
-                                        ),
+                                        ).then((value) async {
+                                          if (value == 'ok') {
+                                            ct.loaderOverlay.show();
+                                            await context
+                                                .read<JoindStatusCubit>()
+                                                .leaveGroup(
+                                                    group.groupId.toString(),
+                                                    group.groupName.toString());
+                                            ct.loaderOverlay.hide();
+                                            Fluttertoast.showToast(
+                                                msg: "Đã rời nhóm thành công",
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.BOTTOM,
+                                                timeInSecForIosWeb: 1,
+                                                textColor: Colors.white,
+                                                backgroundColor: Colors.pink,
+                                                fontSize: 16.0);
+                                          }
+                                        }),
                                       );
                                     } else {
                                       Future.delayed(
@@ -732,39 +735,37 @@ class groupitem extends StatelessWidget {
                                             actions: [
                                               ElevatedButton(
                                                   onPressed: () {
-                                                    Navigator.pop(context,'huy');
+                                                    Navigator.pop(
+                                                        context, 'huy');
                                                   },
                                                   child: Text('Hủy')),
                                               ElevatedButton(
                                                   onPressed: () async {
-                                                    ct.loaderOverlay.show();
-                                                    await context
-                                                        .read<
-                                                            JoindStatusCubit>()
-                                                        .deleteGroup(
-                                                            group.groupId
-                                                                .toString(),
-                                                            group.groupName
-                                                                .toString());
-                                                    ct.loaderOverlay.hide();
-                                                    Navigator.pop(context);
-                                                    Fluttertoast.showToast(
-                                                        msg:
-                                                            "Đã xóa thành công",
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                        timeInSecForIosWeb: 1,
-                                                        textColor: Colors.white,
-                                                        backgroundColor:
-                                                            Colors.pink,
-                                                        fontSize: 16.0);
+                                                    Navigator.pop(
+                                                        context, 'ok');
                                                   },
                                                   child: Text('Xác nhận'))
                                             ],
                                           ),
-                                        ),
+                                        ).then((value) async {
+                                          if (value == 'ok') {
+                                            ct.loaderOverlay.show();
+                                            await context
+                                                .read<JoindStatusCubit>()
+                                                .deleteGroup(
+                                                    group.groupId.toString(),
+                                                    group.groupName.toString());
+                                            ct.loaderOverlay.hide();
+                                            Fluttertoast.showToast(
+                                                msg: "Đã xóa thành công",
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.BOTTOM,
+                                                timeInSecForIosWeb: 1,
+                                                textColor: Colors.white,
+                                                backgroundColor: Colors.pink,
+                                                fontSize: 16.0);
+                                          }
+                                        }),
                                       );
                                     }
                                   },

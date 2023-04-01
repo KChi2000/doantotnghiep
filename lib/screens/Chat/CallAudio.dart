@@ -72,7 +72,6 @@ class _CallAudioState extends State<CallAudio> {
 
   onAddRemote() {
     signaling.onAddRemoteStream = ((stream) {
-   
       context.read<OnHaveRemoteRenderCubit>().haveRemote(true);
       _remoteRenderer.srcObject = stream;
       timer!.cancel();
